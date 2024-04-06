@@ -171,7 +171,11 @@ public class UserService {
         // Mettre à jour le mot de passe de l'utilisateur
         user.setUserPassword(passwordEncoder.encode(newPassword));
         userDao.save(user);
+
+        // Envoyer l'email informant l'utilisateur que son mot de passe a été créé avec succès
+        sendPasswordCreationEmail(userEmail, user.getUserFirstName(), user.getUserLastName(), user.getUserName());
     }
+
 
     // Méthode pour envoyer un email informant l'utilisateur que son mot de passe a été créé avec succès
     public void sendPasswordCreationEmail(String userEmail, String userFirstName, String userLastName, String userName) {
@@ -184,6 +188,7 @@ public class UserService {
         // Créer le message d'e-mail
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(userEmail);
+
         message.setSubject("Création de mot de passe réussie");
         message.setText(emailContent);
 
