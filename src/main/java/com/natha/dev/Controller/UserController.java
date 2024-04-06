@@ -1,6 +1,7 @@
 package com.natha.dev.Controller;
 
 import com.natha.dev.Configuration.EmailConfig;
+import com.natha.dev.Dao.UserDao;
 import com.natha.dev.Model.Users;
 import com.natha.dev.ServiceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private EmailConfig emailConfig;
-
+ @Autowired
+ private UserDao userDao;
 
 
 
@@ -38,7 +40,6 @@ public class UserController {
         }
 
         // Autres validations des données d'entrée
-        // ...
 
         // Enregistrer l'utilisateur avec son rôle en appelant le service utilisateur
         Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, roleName);
@@ -49,6 +50,24 @@ public class UserController {
         // Retourner une réponse indiquant que l'utilisateur a été enregistré avec succès
         return ResponseEntity.ok("Utilisateur enregistré avec succès. Un e-mail contenant un code OTP a été envoyé à " + userEmail + ".");
     }
+//
+@PostMapping("/createPassword")
+public ResponseEntity<String> createPassword(@RequestBody Map<String, String> request) {
+    String userEmail = request.get("userEmail");
+    String userFirstName=request.get("userFirstName");
+    String userLastName=request.get("userLastName");
+    String userName=request.get("userName");
+    String newPassword = request.get("newPassword");
+
+    // Appel du service pour créer le mot de passe
+    userService.createPassword(userEmail, newPassword);
+
+    // Appel du service pour envoyer l'e-mail de confirmation
+    userService.sendPasswordCreationEmail(userEmail,  userFirstName , userLastName , userName );
+
+    // Réponse indiquant que le mot de passe a été créé avec succès
+    return ResponseEntity.ok("Mot de passe créé avec succès pour l'utilisateur avec l'email : " + userEmail);
+}
 
 
 
