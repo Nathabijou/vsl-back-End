@@ -219,27 +219,17 @@ public class UserService {
         // Générer un code OTP aléatoire
         String otpCode = generateOTP();
 
-        // Stocker le code OTP dans la map associé à l'e-mail de l'utilisateur
-        otpMap.put(userEmail, otpCode);
+        // Stocker le code OTP dans l'objet Users
+        user.setOtpCode(otpCode);
+
+        // Mettre à jour l'objet Users dans la base de données
+        userDao.save(user);
 
         // Envoyer le code OTP par e-mail
         sendOTPByEmail(userEmail, otpCode);
     }
 
-    // Méthode pour générer un code OTP aléatoire
-    private String generateOTP() {
-        // Générer un code OTP aléatoire à 6 chiffres
-        int otpLength = 6;
-        String digits = "0123456789";
-        SecureRandom random = new SecureRandom();
-        StringBuilder otp = new StringBuilder(otpLength);
-        for (int i = 0; i < otpLength; i++) {
-            otp.append(digits.charAt(random.nextInt(digits.length())));
-        }
-        return otp.toString();
-    }
 
-    // Méthode pour envoyer le code OTP par e-mail
     private void sendOTPByEmail(String userEmail, String otpCode) {
         // Préparer le contenu de l'e-mail
         String emailContent = "Votre code OTP pour réinitialiser votre mot de passe est : " + otpCode + "\n\n"
@@ -257,13 +247,50 @@ public class UserService {
         emailSender.send(message);
     }
 
+
+    // Méthode pour générer un code OTP aléatoire
+    private String generateOTP() {
+        // Générer un code OTP aléatoire à 6 chiffres
+        int otpLength = 6;
+        String digits = "0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder otp = new StringBuilder(otpLength);
+        for (int i = 0; i < otpLength; i++) {
+            otp.append(digits.charAt(random.nextInt(digits.length())));
+        }
+        return otp.toString();
+    }
+
+    // Méthode pour envoyer le code OTP par e-mail
+
+
+
+
+
+
     // Méthode pour vérifier si le code OTP est valide
     public boolean verifyOTP(String userEmail, String otpCode) {
-        // Récupérer le code OTP associé à l'e-mail depuis la map temporaire
-        String storedOTP = otpMap.get(userEmail);
-        // Vérifier si le code OTP entré correspond au code stocké
-        return storedOTP != null && storedOTP.equals(otpCode);
+        try {
+            // Récupérer l'utilisateur par son e-mail
+            Users user = userDao.findByUserEmail(userEmail);
+
+            if (user == null) {
+                throw new RuntimeException("Utilisateur non trouvé pour l'e-mail : " + userEmail);
+            }
+
+            // Récupérer l'OTP stocké dans l'objet Users
+            String storedOTP = user.getOtpCode();
+
+            // Vérifier si l'OTP entré correspond à celui stocké
+            return storedOTP != null && storedOTP.equals(otpCode);
+        } catch (Exception e) {
+            // Gérer toute exception survenue lors de la vérification de l'OTP
+            throw new RuntimeException("Une erreur s'est produite lors de la vérification de l'OTP.", e);
+        }
     }
+
+
+
 
     // Méthode pour mettre à jour le mot de passe
     public void updatePassword(String userEmail, String newPassword, String otpCode) {
@@ -282,6 +309,8 @@ public class UserService {
     }
 
 
-
+    public Users findByEmail(String userEmail) {
+        return userDao.findByUserEmail(userEmail);
+    }
 
 }

@@ -44,6 +44,13 @@ public class Users {
         this.role = role;
     }
 
+    public String getOtpCode() {
+        return this.otpCode;
+    }
+
+    public void setOtpCode(String otpCode) {
+        this.otpCode = otpCode;
+    }
 
 
 }

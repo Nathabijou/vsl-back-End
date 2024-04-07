@@ -5,6 +5,7 @@ import com.natha.dev.Dao.UserDao;
 import com.natha.dev.Model.Users;
 import com.natha.dev.ServiceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -50,25 +51,7 @@ public class UserController {
         // Retourner une réponse indiquant que l'utilisateur a été enregistré avec succès
         return ResponseEntity.ok("Utilisateur enregistré avec succès. Un e-mail contenant un code OTP a été envoyé à " + userEmail + ".");
     }
-/*
-@PostMapping("/createPassword")
-public ResponseEntity<String> createPassword(@RequestBody Map<String, String> request) {
-    String userEmail = request.get("userEmail");
-    String userFirstName=request.get("userFirstName");
-    String userLastName=request.get("userLastName");
-    String userName=request.get("userName");
-    String newPassword = request.get("newPassword");
 
-    // Appel du service pour créer le mot de passe
-    userService.createPassword(userEmail, newPassword);
-
-    // Appel du service pour envoyer l'e-mail de confirmation
-    userService.sendPasswordCreationEmail(userEmail,  userFirstName , userLastName , userName );
-
-    // Réponse indiquant que le mot de passe a été créé avec succès
-    return ResponseEntity.ok("Mot de passe créé avec succès pour l'utilisateur avec l'email : " + userEmail);
-}
- */
 
     @PostMapping("/createPassword")
     public ResponseEntity<String> createPassword(@RequestBody Map<String, String> request) {
@@ -94,6 +77,52 @@ public ResponseEntity<String> createPassword(@RequestBody Map<String, String> re
     }
 
 
+    @PostMapping("/reset")
+    public void resetPassword(@RequestBody Map<String, String> requestBody) {
+        // Récupérer l'e-mail de l'utilisateur à partir du corps de la requête
+        String userEmail = requestBody.get("userEmail");
+
+        // Vérifier si l'e-mail existe dans la base de données
+        Users user = userService.findByEmail(userEmail);
+        if (user == null) {
+            throw new RuntimeException("Utilisateur non trouvé pour l'e-mail : " + userEmail);
+        }
+
+        // Réinitialiser le mot de passe
+        userService.resetPassword(userEmail);
+    }
+
+
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<String> verifyOTP(@RequestParam("userEmail") String userEmail,
+                                            @RequestParam("otpCode") String otpCode) {
+        try {
+            // Vérifier l'OTP
+            boolean isOTPValid = userService.verifyOTP(userEmail, otpCode);
+
+            if (isOTPValid) {
+                // OTP valide
+                return ResponseEntity.ok("OTP vérifié avec succès. Vous pouvez réinitialiser votre mot de passe.");
+            } else {
+                // OTP invalide
+                return ResponseEntity.badRequest().body("Code OTP invalide. Veuillez réessayer.");
+            }
+        } catch (RuntimeException e) {
+            // Erreur lors de la vérification
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Une erreur s'est produite lors de la vérification de l'OTP.");
+        }
+    }
+
+
+
+    @PostMapping("/update")
+    public void updatePassword(@RequestParam("email") String userEmail,
+                               @RequestParam("newPassword") String newPassword,
+                               @RequestParam("otpCode") String otpCode) {
+        userService.updatePassword(userEmail, newPassword, otpCode);
+    }
 
     @GetMapping({"/forAdmin"})
     @PreAuthorize("hasRole('Admin')")
