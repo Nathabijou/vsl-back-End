@@ -118,14 +118,41 @@ public class UserController {
         }
     }
 
+    @PostMapping("/set-new-password")
+    public ResponseEntity<String> setNewPassword(@RequestBody Map<String, String> request) {
+        try {
+            String userEmail = request.get("userEmail");
+            String newPassword = request.get("newPassword");
+            String confirmPassword = request.get("confirmPassword");
+
+            // Vérifier si les mots de passe correspondent
+            if (!newPassword.equals(confirmPassword)) {
+                return ResponseEntity.badRequest().body("Les mots de passe ne correspondent pas.");
+            }
+
+            // Appeler le service pour définir le nouveau mot de passe
+            userService.setNewPassword(userEmail, newPassword);
+
+            // Envoyer une réponse indiquant que le mot de passe a été mis à jour avec succès
+            return ResponseEntity.ok("Mot de passe mis à jour avec succès pour l'utilisateur avec l'e-mail : " + userEmail);
+        } catch (Exception e) {
+            // Gérer les erreurs
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Une erreur s'est produite lors de la mise à jour du mot de passe : " + e.getMessage());
+        }
+    }
 
 
+
+/*
     @PostMapping("/update")
     public void updatePassword(@RequestParam("email") String userEmail,
                                @RequestParam("newPassword") String newPassword,
                                @RequestParam("otpCode") String otpCode) {
         userService.updatePassword(userEmail, newPassword, otpCode);
     }
+
+ */
 
     @GetMapping({"/forAdmin"})
     @PreAuthorize("hasRole('Admin')")

@@ -317,10 +317,35 @@ public class UserService {
         // Effacer le code OTP de la map après utilisation
         otpMap.remove(userEmail);
     }
+    public void setNewPassword(String userEmail, String newPassword) {
+        // Récupérer l'utilisateur par son e-mail
+        Users user = userDao.findByUserEmail(userEmail);
+        if (user == null) {
+            throw new RuntimeException("Utilisateur non trouvé pour l'e-mail : " + userEmail);
+        }
+
+        // Mettre à jour le mot de passe de l'utilisateur
+        user.setUserPassword(newPassword);
+        userDao.save(user);
+
+        // Envoyer un message de confirmation à l'utilisateur
+        sendPasswordChangeConfirmation(userEmail);
+    }
+
+    public void sendPasswordChangeConfirmation(String userEmail) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(userEmail);
+        message.setSubject("Confirmation de changement de mot de passe");
+        message.setText("Votre mot de passe a été modifié avec succès.");
+
+        emailSender.send(message);
+    }
 
 
     public Users findByEmail(String userEmail) {
         return userDao.findByUserEmail(userEmail);
     }
+
+
 
 }
