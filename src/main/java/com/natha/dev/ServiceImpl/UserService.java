@@ -281,13 +281,23 @@ public class UserService {
             // Récupérer l'OTP stocké dans l'objet Users
             String storedOTP = user.getOtpCode();
 
-            // Vérifier si l'OTP entré correspond à celui stocké
-            return storedOTP != null && storedOTP.equals(otpCode);
+            // Vérifier si l'OTP stocké est non null et correspond au code OTP fourni
+            if (storedOTP != null && storedOTP.equals(otpCode)) {
+                // Si l'OTP correspond, vous pouvez effacer l'OTP stocké dans l'objet User,
+                // car il ne devrait être utilisé qu'une seule fois
+                user.setOtpCode(null);
+                userDao.save(user); // Enregistrer les modifications dans la base de données
+                return true;
+            } else {
+                // Si l'OTP ne correspond pas, retourner false
+                return false;
+            }
         } catch (Exception e) {
             // Gérer toute exception survenue lors de la vérification de l'OTP
             throw new RuntimeException("Une erreur s'est produite lors de la vérification de l'OTP.", e);
         }
     }
+
 
 
 

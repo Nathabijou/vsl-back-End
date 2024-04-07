@@ -95,9 +95,12 @@ public class UserController {
 
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<String> verifyOTP(@RequestParam("userEmail") String userEmail,
-                                            @RequestParam("otpCode") String otpCode) {
+    public ResponseEntity<String> verifyOTP(@RequestBody Map<String, String> requestBody) {
         try {
+            // Récupérer l'e-mail de l'utilisateur et le code OTP à partir du corps de la requête
+            String userEmail = requestBody.get("userEmail");
+            String otpCode = requestBody.get("otpCode");
+
             // Vérifier l'OTP
             boolean isOTPValid = userService.verifyOTP(userEmail, otpCode);
 
