@@ -73,11 +73,12 @@ public ResponseEntity<String> createPassword(@RequestBody Map<String, String> re
     @PostMapping("/createPassword")
     public ResponseEntity<String> createPassword(@RequestBody Map<String, String> request) {
         String userEmail = request.get("userEmail");
-        String userFirstName=request.get("userFirstName");
-        String userLastName=request.get("userLastName");
-        String userName=request.get("userName");
-        String newPassword = request.get("newPassword");
 
+
+        String userFirstName = request.get("userFirstName");
+        String userLastName = request.get("userLastName");
+        String userName = request.get("userName");
+        String newPassword = request.get("newPassword");
         // Appel du service pour créer ou mettre à jour le mot de passe
         if (newPassword != null && !newPassword.isEmpty()) {
             userService.createPassword(userEmail, newPassword);

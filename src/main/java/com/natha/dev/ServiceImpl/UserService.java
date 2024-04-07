@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.security.SecureRandom;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -180,21 +181,106 @@ public class UserService {
     // Méthode pour envoyer un email informant l'utilisateur que son mot de passe a été créé avec succès
     public void sendPasswordCreationEmail(String userEmail, String userFirstName, String userLastName, String userName) {
         // Préparer le contenu de l'e-mail
-        String emailContent = "Bonjour " + userFirstName + " " + userLastName + ",\n\n"
+        //String emailContent = "Bonjour " + userFirstName + " " + userLastName + ",\n\n"
+        String emailContent =    ""
                 + "Votre mot de passe a été créé avec succès pour le compte associé à l'adresse e-mail : " + userEmail + ".\n\n"
-                + "Vous êtes maintenant membre de Top Hospital. Vous pouvez maintenant vous connecter à votre compte en utilisant votre nom d'utilisateur : " + userName + ".\n\n"
+                + "Vous êtes maintenant membre de Top Hospital. Vous pouvez maintenant vous connecter à votre compte en utilisant votre nom d'utilisateur dans le message précédent.\n\n"
                 + "Cordialement,\n\nTop Hospital";
 
         // Créer le message d'e-mail
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(userEmail);
-
         message.setSubject("Création de mot de passe réussie");
         message.setText(emailContent);
 
         // Envoyer l'e-mail
         emailSender.send(message);
     }
+
+
+
+
+
+
+
+
+    //pour reset password
+    // Méthode pour réinitialiser le mot de passe
+    private Map<String, String> otpMap = new HashMap<>();
+
+    // Méthode pour réinitialiser le mot de passe
+    public void resetPassword(String userEmail) {
+        // Vérifier si l'utilisateur existe avec cet e-mail
+        Users user = userDao.findByUserEmail(userEmail);
+        if (user == null) {
+            throw new RuntimeException("Utilisateur non trouvé pour l'e-mail : " + userEmail);
+        }
+
+        // Générer un code OTP aléatoire
+        String otpCode = generateOTP();
+
+        // Stocker le code OTP dans la map associé à l'e-mail de l'utilisateur
+        otpMap.put(userEmail, otpCode);
+
+        // Envoyer le code OTP par e-mail
+        sendOTPByEmail(userEmail, otpCode);
+    }
+
+    // Méthode pour générer un code OTP aléatoire
+    private String generateOTP() {
+        // Générer un code OTP aléatoire à 6 chiffres
+        int otpLength = 6;
+        String digits = "0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder otp = new StringBuilder(otpLength);
+        for (int i = 0; i < otpLength; i++) {
+            otp.append(digits.charAt(random.nextInt(digits.length())));
+        }
+        return otp.toString();
+    }
+
+    // Méthode pour envoyer le code OTP par e-mail
+    private void sendOTPByEmail(String userEmail, String otpCode) {
+        // Préparer le contenu de l'e-mail
+        String emailContent = "Votre code OTP pour réinitialiser votre mot de passe est : " + otpCode + "\n\n"
+                + "Veuillez utiliser ce code pour confirmer votre demande de réinitialisation de mot de passe.\n\n"
+                + "Ce code expirera dans 10 minutes.\n\n"
+                + "Cordialement,\n\nTop Hospital";
+
+        // Créer le message d'e-mail
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(userEmail);
+        message.setSubject("Code OTP pour réinitialisation de mot de passe");
+        message.setText(emailContent);
+
+        // Envoyer l'e-mail
+        emailSender.send(message);
+    }
+
+    // Méthode pour vérifier si le code OTP est valide
+    public boolean verifyOTP(String userEmail, String otpCode) {
+        // Récupérer le code OTP associé à l'e-mail depuis la map temporaire
+        String storedOTP = otpMap.get(userEmail);
+        // Vérifier si le code OTP entré correspond au code stocké
+        return storedOTP != null && storedOTP.equals(otpCode);
+    }
+
+    // Méthode pour mettre à jour le mot de passe
+    public void updatePassword(String userEmail, String newPassword, String otpCode) {
+        // Vérifier si le code OTP est correct
+        if (!verifyOTP(userEmail, otpCode)) {
+            throw new RuntimeException("Code OTP invalide pour l'e-mail : " + userEmail);
+        }
+
+        // Mettre à jour le mot de passe de l'utilisateur
+        Users user = userDao.findByUserEmail(userEmail);
+        user.setUserPassword(passwordEncoder.encode(newPassword));
+        userDao.save(user);
+
+        // Effacer le code OTP de la map après utilisation
+        otpMap.remove(userEmail);
+    }
+
 
 
 
