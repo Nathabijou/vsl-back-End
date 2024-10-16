@@ -1,8 +1,10 @@
 package com.natha.dev.Model;
 
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -20,8 +22,20 @@ public class Users {
     private String userFirstName;
     private String userLastName;
     private String otpCode;
-    private boolean status;
+    private String userSexe;
 
+    private boolean status;
+    private LocalDateTime lastLoginTime;
+    private LocalDateTime lastLogoutTime;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "createDate")
+    private Date createDate;
+
+    @PrePersist
+    protected void onCreate() {
+        createDate = new Date();
+    }
 
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -34,8 +48,6 @@ public class Users {
             }
     )
     private Set<Role> role;
-
-
     public Set<Role> getRole() {
         return role;
     }
@@ -51,6 +63,4 @@ public class Users {
     public void setOtpCode(String otpCode) {
         this.otpCode = otpCode;
     }
-
-
 }

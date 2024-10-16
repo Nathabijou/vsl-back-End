@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -64,7 +65,7 @@ public class UserService {
     }
 
 
-    public Users registerNewUserWithRole(String userName, String userEmail, String userPassword, String userFirstName, String userLastName, String roleName) {
+    public Users registerNewUserWithRole(String userName, String userEmail, String userPassword, String userFirstName, String userLastName, String userSexe, String roleName) {
         // Vérifier si l'utilisateur avec le même nom d'utilisateur existe déjà
         Users existingUser = userDao.findByUserName(userName);
         if (existingUser != null) {
@@ -94,7 +95,11 @@ public class UserService {
         user.setUserPassword(getEncodedPassword(userPassword));
         user.setUserFirstName(userFirstName);
         user.setUserLastName(userLastName);
+        user.setUserSexe(userSexe);
         user.setRole(userRoles);
+
+        // Définir la date de création
+        user.setCreateDate(new Date());
 
         user.setUserPassword(userPassword != null ? getEncodedPassword(userPassword) : "");
 
@@ -162,20 +167,17 @@ public class UserService {
 
 
 
-    public void createPassword(String userEmail, String newPassword) {
-        // Récupérer l'utilisateur par son email
+    public void createNewPassword(String userEmail, String newPassword) {
         Users user = userDao.findByUserEmail(userEmail);
         if (user == null) {
-            throw new RuntimeException("Utilisateur non trouvé pour l'email : " + userEmail);
+            throw new RuntimeException("Utilisateur non trouvé pour l'e-mail : " + userEmail);
         }
 
-        // Mettre à jour le mot de passe de l'utilisateur
+        // Mettre à jour le mot de passe de l'utilisateur avec le nouveau mot de passe
         user.setUserPassword(passwordEncoder.encode(newPassword));
         userDao.save(user);
-
-        // Envoyer l'email informant l'utilisateur que son mot de passe a été créé avec succès
-        sendPasswordCreationEmail(userEmail, user.getUserFirstName(), user.getUserLastName(), user.getUserName());
     }
+
 
 
     // Méthode pour envoyer un email informant l'utilisateur que son mot de passe a été créé avec succès
@@ -183,7 +185,7 @@ public class UserService {
         // Préparer le contenu de l'e-mail
         //String emailContent = "Bonjour " + userFirstName + " " + userLastName + ",\n\n"
         String emailContent =    ""
-                + "Votre mot de passe a été créé avec succès pour le compte associé à l'adresse e-mail : " + userEmail + ".\n\n"
+                + "Votre mot de passe a été créé avec succès pour le compte associé à l'adresse e-mail : \n\n" + userEmail + ".\n\n"
                 + "Vous êtes maintenant membre de Top Hospital. Vous pouvez maintenant vous connecter à votre compte en utilisant votre nom d'utilisateur dans le message précédent.\n\n"
                 + "Cordialement,\n\nTop Hospital";
 
@@ -196,12 +198,6 @@ public class UserService {
         // Envoyer l'e-mail
         emailSender.send(message);
     }
-
-
-
-
-
-
 
 
     //pour reset password
@@ -232,7 +228,7 @@ public class UserService {
 
     private void sendOTPByEmail(String userEmail, String otpCode) {
         // Préparer le contenu de l'e-mail
-        String emailContent = "Votre code OTP pour réinitialiser votre mot de passe est : " + otpCode + "\n\n"
+        String emailContent = "Votre code OTP pour réinitialiser votre mot de passe est :\n\n " + otpCode + "\n\n"
                 + "Veuillez utiliser ce code pour confirmer votre demande de réinitialisation de mot de passe.\n\n"
                 + "Ce code expirera dans 10 minutes.\n\n"
                 + "Cordialement,\n\nTop Hospital";
@@ -240,7 +236,7 @@ public class UserService {
         // Créer le message d'e-mail
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(userEmail);
-        message.setSubject("Code OTP pour réinitialisation de mot de passe");
+        message.setSubject("Reset Password");
         message.setText(emailContent);
 
         // Envoyer l'e-mail
@@ -303,42 +299,56 @@ public class UserService {
 
 
     // Méthode pour mettre à jour le mot de passe
-    public void updatePassword(String userEmail, String newPassword, String otpCode) {
-        // Vérifier si le code OTP est correct
-        if (!verifyOTP(userEmail, otpCode)) {
-            throw new RuntimeException("Code OTP invalide pour l'e-mail : " + userEmail);
-        }
-
-        // Mettre à jour le mot de passe de l'utilisateur
-        Users user = userDao.findByUserEmail(userEmail);
-        user.setUserPassword(passwordEncoder.encode(newPassword));
-        userDao.save(user);
-
-        // Effacer le code OTP de la map après utilisation
-        otpMap.remove(userEmail);
-    }
-    public void setNewPassword(String userEmail, String newPassword) {
-        // Récupérer l'utilisateur par son e-mail
+    public void modifyPassword(String userEmail, String oldPassword, String newPassword) {
+        // Récupérer l'utilisateur par son email
         Users user = userDao.findByUserEmail(userEmail);
         if (user == null) {
             throw new RuntimeException("Utilisateur non trouvé pour l'e-mail : " + userEmail);
         }
 
-        // Mettre à jour le mot de passe de l'utilisateur
-        user.setUserPassword(newPassword);
-        userDao.save(user);
+        // Vérifier si l'ancien mot de passe est correct
+        if (!passwordEncoder.matches(oldPassword, user.getUserPassword())) {
+            throw new RuntimeException("L'ancien mot de passe est incorrect.");
+        }
 
-        // Envoyer un message de confirmation à l'utilisateur
-        sendPasswordChangeConfirmation(userEmail);
+        // Mettre à jour le mot de passe de l'utilisateur
+        user.setUserPassword(passwordEncoder.encode(newPassword));
+        userDao.save(user);
     }
 
     public void sendPasswordChangeConfirmation(String userEmail) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(userEmail);
-        message.setSubject("Confirmation de changement de mot de passe");
-        message.setText("Votre mot de passe a été modifié avec succès.");
+        message.setSubject("Password reset Confirmation");
+        message.setText("Felicitaion \n Votre mot de passe a été modifié avec succès.");
 
         emailSender.send(message);
+    }
+    public void sendPasswordChange(String userEmail) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(userEmail);
+        message.setSubject("Confirmation de changement de mot de passe");
+        message.setText("Felicitaion \n Votre mot de passe a été modifié avec succès.");
+
+        emailSender.send(message);
+    }
+
+
+    // Dans votre service ou contrôleur, enregistrez l'heure de connexion lorsqu'un utilisateur se connecte
+    public void updateLastLoginTime(String userEmail) {
+        Users user = userDao.findByUserEmail(userEmail);
+        if (user != null) {
+            user.setLastLoginTime(LocalDateTime.now());
+            userDao.save(user);
+        }
+    }
+
+    public LocalDateTime getLastLoginTime(String userEmail) {
+        Users user = userDao.findByUserEmail(userEmail);
+        if (user != null) {
+            return user.getLastLoginTime();
+        }
+        return null;
     }
 
 

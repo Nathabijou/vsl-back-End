@@ -2,15 +2,22 @@ package com.natha.dev.Controller;
 
 import com.natha.dev.Configuration.EmailConfig;
 import com.natha.dev.Dao.UserDao;
+import com.natha.dev.Model.JwtRequest;
+import com.natha.dev.Model.JwtResponse;
 import com.natha.dev.Model.Users;
+import com.natha.dev.ServiceImpl.JwtService;
 import com.natha.dev.ServiceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @CrossOrigin
@@ -21,19 +28,22 @@ public class UserController {
     private UserService userService;
     @Autowired
     private EmailConfig emailConfig;
- @Autowired
- private UserDao userDao;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
 
-
+//pour creer un compte
     @PostMapping("/registerNewUser")
     public ResponseEntity<String> registerNewUserWithRole(@RequestBody Map<String, String> userRequest) {
-        String userName = userRequest.get("userName");
-        String userEmail = userRequest.get("userEmail");
-        String userPassword = userRequest.get("userPassword");
+        String userName      = userRequest.get("userName");
+        String userEmail     = userRequest.get("userEmail");
+        String userPassword  = userRequest.get("userPassword");
         String userFirstName = userRequest.get("userFirstName");
-        String userLastName = userRequest.get("userLastName");
-        String roleName = userRequest.get("roleName");
+        String userLastName  = userRequest.get("userLastName");
+        String userSexe      = userRequest.get("userSexe");
+        String roleName      = userRequest.get("roleName");
 
         // Vérifier si l'e-mail de l'utilisateur est vide ou nul
         if (userEmail == null || userEmail.isEmpty()) {
@@ -43,7 +53,7 @@ public class UserController {
         // Autres validations des données d'entrée
 
         // Enregistrer l'utilisateur avec son rôle en appelant le service utilisateur
-        Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, roleName);
+        Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, userSexe, roleName);
 
         // Générer et envoyer l'OTP à l'utilisateur
         userService.sendActivationEmail( userEmail, userFirstName, userLastName, userName);
@@ -52,30 +62,48 @@ public class UserController {
         return ResponseEntity.ok("Utilisateur enregistré avec succès. Un e-mail contenant un code OTP a été envoyé à " + userEmail + ".");
     }
 
-
+//pour permettre  a l'utilisateur de creer son mot de passe apres la creation du compte
     @PostMapping("/createPassword")
     public ResponseEntity<String> createPassword(@RequestBody Map<String, String> request) {
         String userEmail = request.get("userEmail");
-
-
-        String userFirstName = request.get("userFirstName");
-        String userLastName = request.get("userLastName");
-        String userName = request.get("userName");
         String newPassword = request.get("newPassword");
-        // Appel du service pour créer ou mettre à jour le mot de passe
-        if (newPassword != null && !newPassword.isEmpty()) {
-            userService.createPassword(userEmail, newPassword);
-        } else {
-            // Gérer le cas où aucun nouveau mot de passe n'est fourni
-            // Par exemple, vous pouvez ignorer la mise à jour du mot de passe
-            // ou définir un mot de passe par défaut, selon les besoins de votre application
-        }
-        userService.sendPasswordCreationEmail(userEmail,  userFirstName , userLastName , userName );
+        String confirmPassword = request.get("confirmPassword");
 
-        // Réponse indiquant que le mot de passe a été créé ou mis à jour avec succès
-        return ResponseEntity.ok("Mot de passe créé ou mis à jour avec succès pour l'utilisateur avec l'email : " + userEmail);
+        // Vérifier si les mots de passe correspondent
+        if (!newPassword.equals(confirmPassword)) {
+            return ResponseEntity.badRequest().body("Les mots de passe ne correspondent pas.");
+        }
+
+        // Créer un nouveau mot de passe pour l'utilisateur
+        userService.createNewPassword(userEmail, newPassword);
+
+        // Répondre pour indiquer que le mot de passe a été créé avec succès
+        return ResponseEntity.ok("Mot de passe créé avec succès pour l'utilisateur avec l'email : " + userEmail);
     }
 
+
+    //Apres les processus de verification pour forget password , l'utilisateur peut ajouter un password a nouveau
+    @PostMapping("/newPasswordRegister")
+    public ResponseEntity<String> createdPassword(@RequestBody Map<String, String> request) {
+        String userEmail = request.get("userEmail");
+        String newPassword = request.get("newPassword");
+        String confirmPassword = request.get("confirmPassword");
+
+        // Vérifier si les mots de passe correspondent
+        if (!newPassword.equals(confirmPassword)) {
+            return ResponseEntity.badRequest().body("Les mots de passe ne correspondent pas.");
+        }
+        userService.sendPasswordChangeConfirmation( userEmail);
+        // Créer un nouveau mot de passe pour l'utilisateur
+        userService.createNewPassword(userEmail, newPassword);
+
+
+
+        // Répondre pour indiquer que le mot de passe a été créé avec succès
+        return ResponseEntity.ok("Mot de passe créé avec succès pour l'utilisateur avec l'email : " + userEmail);
+    }
+
+// pour password oublier
 
     @PostMapping("/reset")
     public void resetPassword(@RequestBody Map<String, String> requestBody) {
@@ -118,41 +146,42 @@ public class UserController {
         }
     }
 
-    @PostMapping("/set-new-password")
-    public ResponseEntity<String> setNewPassword(@RequestBody Map<String, String> request) {
-        try {
-            String userEmail = request.get("userEmail");
-            String newPassword = request.get("newPassword");
-            String confirmPassword = request.get("confirmPassword");
 
-            // Vérifier si les mots de passe correspondent
-            if (!newPassword.equals(confirmPassword)) {
-                return ResponseEntity.badRequest().body("Les mots de passe ne correspondent pas.");
-            }
+    @PostMapping("/modifyPassword")
+    public ResponseEntity<String> modifyPassword(@RequestBody Map<String, String> request) {
+        String userEmail = request.get("userEmail");
+        String oldPassword = request.get("oldPassword");
+        String newPassword = request.get("newPassword");
+        String confirmPassword = request.get("confirmPassword");
 
-            // Appeler le service pour définir le nouveau mot de passe
-            userService.setNewPassword(userEmail, newPassword);
+        // Vérifier si les mots de passe correspondent
+        if (!newPassword.equals(confirmPassword)) {
+            return ResponseEntity.badRequest().body("Les nouveaux mots de passe ne correspondent pas.");
+        }
 
-            // Envoyer une réponse indiquant que le mot de passe a été mis à jour avec succès
-            return ResponseEntity.ok("Mot de passe mis à jour avec succès pour l'utilisateur avec l'e-mail : " + userEmail);
-        } catch (Exception e) {
-            // Gérer les erreurs
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Une erreur s'est produite lors de la mise à jour du mot de passe : " + e.getMessage());
+        // Modifier le mot de passe de l'utilisateur
+        userService.modifyPassword(userEmail, oldPassword, newPassword);
+        userService.sendPasswordChange( userEmail);
+
+        // Répondre pour indiquer que le mot de passe a été modifié avec succès
+        return ResponseEntity.ok("Mot de passe modifié avec succès pour l'utilisateur avec l'email : " + userEmail);
+    }
+
+
+
+    private String getCurrentUserName() {
+        // Obtenez les détails de l'utilisateur actuellement authentifié à partir du contexte de sécurité
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Vérifiez si l'utilisateur est authentifié et si ses détails peuvent être extraits
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            return userDetails.getUsername(); // Renvoie le nom d'utilisateur de l'utilisateur authentifié
+        } else {
+            return null; // Retourne null si aucun utilisateur n'est authentifié
         }
     }
 
-
-
-/*
-    @PostMapping("/update")
-    public void updatePassword(@RequestParam("email") String userEmail,
-                               @RequestParam("newPassword") String newPassword,
-                               @RequestParam("otpCode") String otpCode) {
-        userService.updatePassword(userEmail, newPassword, otpCode);
-    }
-
- */
 
     @GetMapping({"/forAdmin"})
     @PreAuthorize("hasRole('Admin')")

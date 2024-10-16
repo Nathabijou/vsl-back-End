@@ -1,11 +1,12 @@
 package com.natha.dev.Model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+
 import java.util.Set;
 
 @AllArgsConstructor
@@ -35,7 +36,4 @@ public class Role {
     public void addPrivilege(Privilege privilege) {
         privileges.add(privilege);
     }
-
-
-
 }

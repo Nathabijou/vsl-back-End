@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +41,12 @@ public class JwtService implements UserDetailsService {
         String newGeneratedToken = jwtUtil.generateToken(userDetails);
 
         Users user = userDao.findById(userName).get();
+
+        user.setLastLoginTime(LocalDateTime.now());
+
+        // Enregistrer les modifications dans la base de données
+        userDao.save(user);
+
         return new JwtResponse(user, newGeneratedToken);
     }
 
@@ -75,4 +82,41 @@ public class JwtService implements UserDetailsService {
             throw new Exception("INVALID_CREDENTIALS", e);
         }
     }
+
+
+
+    public JwtResponse login(JwtRequest jwtRequest) throws Exception {
+        String userName = jwtRequest.getUserName();
+        String userPassword = jwtRequest.getUserPassword();
+
+        // Vérifier les informations d'identification de l'utilisateur
+        authenticate(userName, userPassword);
+
+        // Si les informations d'identification sont valides, générer un token JWT
+        UserDetails userDetails = loadUserByUsername(userName);
+        String jwtToken = jwtUtil.generateToken(userDetails);
+
+        // Récupérer les détails de l'utilisateur
+        Users user = userDao.findByUserName(userName);
+
+        // Retourner la réponse avec le token JWT et les détails de l'utilisateur
+        return new JwtResponse(user, jwtToken);
+    }
+    public LocalDateTime getLastLoginTime(String userName) {
+        Users user = userDao.findByUserName(userName);
+        if (user != null) {
+            return user.getLastLoginTime();
+        }
+        return null;
+    }
+
+    public void logout(String userName) {
+        Users user = userDao.findByUserName(userName);
+        if (user != null) {
+            // Mettre à jour l'heure de déconnexion dans la base de données
+            user.setLastLogoutTime(LocalDateTime.now());
+            userDao.save(user);
+        }
+    }
+
 }
