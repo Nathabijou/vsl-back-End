@@ -1,12 +1,14 @@
 package com.natha.dev.Controller;
 
 import com.natha.dev.Configuration.EmailConfig;
+import com.natha.dev.Dao.GroupeDao;
 import com.natha.dev.Dao.UserDao;
-import com.natha.dev.Model.JwtRequest;
-import com.natha.dev.Model.JwtResponse;
-import com.natha.dev.Model.Users;
+import com.natha.dev.Dto.Groupe_UsersDto;
+import com.natha.dev.IService.Groupe_UsersIService;
+import com.natha.dev.Model.*;
 import com.natha.dev.ServiceImpl.JwtService;
 import com.natha.dev.ServiceImpl.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -32,6 +36,11 @@ public class UserController {
     private UserDao userDao;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private GroupeDao groupeDao;
+    @Autowired
+    private Groupe_UsersIService groupeUsersIService;
+
 
 
 //pour creer un compte
@@ -49,7 +58,6 @@ public class UserController {
         if (userEmail == null || userEmail.isEmpty()) {
             throw new IllegalArgumentException("L'e-mail de l'utilisateur est requis.");
         }
-
         // Autres validations des données d'entrée
 
         // Enregistrer l'utilisateur avec son rôle en appelant le service utilisateur
@@ -199,5 +207,20 @@ public class UserController {
     @PreAuthorize("hasRole('User')")
     public String forUser(){
         return "This URL is only accessible to the user";
+    }
+
+
+//    pour recuperer une lise de groupe pour un utilisateur specifique
+    @GetMapping("/groupe/{groupeId}/users")
+    public ResponseEntity<List<Users>> getUsersByGroupeId(@PathVariable Long groupeId) {
+        List<Users> users = userService.getUsersByGroupe(groupeId);
+        return ResponseEntity.ok(users);
+    }
+
+
+    @PostMapping("/{groupeId}/users/{username}")
+    public String addUserToGroupe(@PathVariable Long groupeId, @PathVariable String username) {
+        userService.addUserToGroupe(username, groupeId);
+        return "Utilisateur ajouté au groupe avec succès !";
     }
 }

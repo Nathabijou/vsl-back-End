@@ -1,10 +1,12 @@
 package com.natha.dev.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -47,6 +49,7 @@ public class Users {
                     @JoinColumn(name = "ROLE_ID")
             }
     )
+
     private Set<Role> role;
     public Set<Role> getRole() {
         return role;
@@ -63,4 +66,7 @@ public class Users {
     public void setOtpCode(String otpCode) {
         this.otpCode = otpCode;
     }
+
+
+
 }

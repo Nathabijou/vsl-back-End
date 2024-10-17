@@ -1,10 +1,11 @@
 package com.natha.dev.ServiceImpl;
 
+import com.natha.dev.Dao.GroupeDao;
+import com.natha.dev.Dao.Groupe_UserDao;
 import com.natha.dev.Dao.RoleDao;
 import com.natha.dev.Dao.UserDao;
 import com.natha.dev.Exeption.MessagingException;
-import com.natha.dev.Model.Role;
-import com.natha.dev.Model.Users;
+import com.natha.dev.Model.*;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.mail.internet.MimeMessage;
@@ -22,6 +23,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -36,6 +38,10 @@ public class UserService {
     private JavaMailSender emailSender;
     @Autowired
     private UserService userService;
+    @Autowired
+    private Groupe_UserDao groupeUserDao;
+    @Autowired
+    private GroupeDao groupeDao;
 
     // Initialiser les rôles et les utilisateurs
     public void initRoleAndUser() {
@@ -357,5 +363,36 @@ public class UserService {
     }
 
 
+   public List<Users> getUsersByGroupe(Long groupeId) {
 
+        List<Groupe_Users> groupeUsers = groupeUserDao.findByGroupeId(groupeId);
+        return groupeUsers.stream()
+                .map(Groupe_Users::getUsers)
+                .collect(Collectors.toList());
+    }
+
+//Pour ajouter une liste utilisateur dans un groupe specifique
+
+    public void addUserToGroupe(String username, Long groupeId) {
+        // Récupérer l'utilisateur par username
+        Optional<Users> optionalUser = Optional.ofNullable(userDao.findByUserName(username));
+        Users user = optionalUser.orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        // Récupérer le groupe
+        Optional<Groupe> optionalGroupe = groupeDao.findById(groupeId);
+        Groupe groupe = optionalGroupe.orElseThrow(() -> new RuntimeException("Groupe non trouvé"));
+
+        // Créer la relation Groupe_Users
+        Groupe_Users groupeUsers = new Groupe_Users();
+        groupeUsers.setUsers(user);
+        groupeUsers.setGroupe(groupe);
+
+        // Sauvegarder la relation
+        groupeUserDao.save(groupeUsers);
+    }
+
+
+    public Users findByUserName(String userName) {
+        return userDao.findByUserName(userName);
+    }
 }
