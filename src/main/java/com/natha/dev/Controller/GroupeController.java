@@ -20,10 +20,10 @@ public class GroupeController {
     @Autowired
     private GroupeDao groupeDao;
 
-    @GetMapping("/users/{usersId}/groupe")  // Changez groupeId en usersId
-    List<GroupeDto> groupeByUsers(@PathVariable Long usersId) {
-        return groupeIService.findByUsers(usersId);
-    }
+//    @GetMapping("/users/{usersId}/groupe")  // Changez groupeId en usersId
+//    List<GroupeDto> groupeByUsers(@PathVariable Long usersId) {
+//        return groupeIService.findByUsers(usersId);
+//    }
 
     @GetMapping("/commune/{communeId}/groupe")  // Changez groupeId en usersId
     List<GroupeDto> groupeByCommune(@PathVariable Long communeId) {
