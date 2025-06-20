@@ -114,20 +114,20 @@ public class UserController {
 // pour password oublier
 
     @PostMapping("/reset")
-    public void resetPassword(@RequestBody Map<String, String> requestBody) {
-        // Récupérer l'e-mail de l'utilisateur à partir du corps de la requête
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> requestBody) {
         String userEmail = requestBody.get("userEmail");
+        System.out.println("📩 Requête reçue pour réinitialiser: " + userEmail);
 
-        // Vérifier si l'e-mail existe dans la base de données
         Users user = userService.findByEmail(userEmail);
         if (user == null) {
-            throw new RuntimeException("Utilisateur non trouvé pour l'e-mail : " + userEmail);
+            System.out.println("❌ Email non trouvé: " + userEmail);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email non trouvé");
         }
 
-        // Réinitialiser le mot de passe
-        userService.resetPassword(userEmail);
+        userService.resetPassword(userEmail); // Fè ou voye OTP a
+        System.out.println("✅ OTP envoyé à: " + userEmail);
+        return ResponseEntity.ok("OTP envoyé est:");
     }
-
 
 
     @PostMapping("/verify-otp")
@@ -210,14 +210,14 @@ public class UserController {
     }
 
 
-//    pour recuperer une lise de groupe pour un utilisateur specifique
+//    pour recuperer une lise utilisateur  dans un groupe specifique
     @GetMapping("/groupe/{groupeId}/users")
     public ResponseEntity<List<Users>> getUsersByGroupeId(@PathVariable Long groupeId) {
         List<Users> users = userService.getUsersByGroupe(groupeId);
         return ResponseEntity.ok(users);
     }
 
-
+   //pour enregistrer une personne dans un groupe
     @PostMapping("/{groupeId}/users/{username}")
     public String addUserToGroupe(@PathVariable Long groupeId, @PathVariable String username) {
         userService.addUserToGroupe(username, groupeId);

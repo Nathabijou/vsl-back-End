@@ -10,7 +10,10 @@ import java.util.Optional;
 
 public interface GroupeIService  {
     Optional<GroupeDto> findById(Long id);
-    List<GroupeDto> findByUsers(Long users_id);
+
+
+    List<GroupeDto> findByUsers(String userName);
+
     List<GroupeDto> findAll();
     void deleteById(Long id);
     GroupeDto save(GroupeDto groupeDto);

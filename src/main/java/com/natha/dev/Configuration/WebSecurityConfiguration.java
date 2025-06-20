@@ -42,7 +42,12 @@ public class WebSecurityConfiguration {
         httpSecurity.cors().and()
                 .csrf().disable()
                 .authorizeHttpRequests()  // Remplacez authorizeRequests() par authorizeHttpRequests()
-                .requestMatchers("/authenticate", "/registerNewUser").permitAll()  // Remplacez antMatchers() par requestMatchers()
+                .requestMatchers(
+                        "/authenticate",
+                        "/registerNewUser",
+                        "/reset",
+                        "/verify-otp",
+                        "/newPasswordRegister").permitAll()  // Remplacez antMatchers() par requestMatchers()
                 .requestMatchers(HttpHeaders.ALLOW).permitAll()
                 .anyRequest().authenticated()
                 .and()

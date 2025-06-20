@@ -3,7 +3,8 @@ package com.natha.dev.Dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class GroupeDto {
@@ -12,8 +13,24 @@ public class GroupeDto {
     private String adresse;
     private String responsable;
     private String description;
+    private LocalDateTime datecreation;
 
-    private Long userId;
+
+
+
+    private double prixAction;
+    private double tauxInteret;
+
+    private Long userName;
     private Long compteId;
     private Long communeId;
+
+    // Getter & Setter
+    public LocalDateTime getDatecreation() {
+        return datecreation;
+    }
+
+    public void setDatecreation(LocalDateTime datecreation) {
+        this.datecreation = datecreation;
+    }
 }
