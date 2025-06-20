@@ -37,7 +37,7 @@ public class Compte {
     private Date createDate;
 
     @ManyToOne
-    @JoinColumn(name = "groupe_user_id")
+    @JoinColumn(name = "groupe_user_id", nullable = false)
     private Groupe_Users groupe_users;
 
     @Column(name = "user_name")
@@ -47,9 +47,5 @@ public class Compte {
     public void setGroupeUsers(Groupe_Users groupeUsers) {
         this.groupe_users = groupeUsers;
     }
-
-
-
-
 
 }

@@ -20,7 +20,7 @@ public class Commune {
     private Long id;
     private String nom;
 
-    @OneToMany(mappedBy = "commune")
+    @OneToMany(mappedBy = "commune", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Groupe> groupes;
 
 }
