@@ -21,6 +21,7 @@ public class UsersDto {
     private boolean status;
     private LocalDateTime lastLoginTime;
     private LocalDateTime lastLogoutTime;
+    private String createdBy;
 
     public UsersDto(String username, String email) {
         this.userName = username; // Initialiser l'attribut username

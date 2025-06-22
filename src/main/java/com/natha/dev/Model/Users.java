@@ -30,6 +30,7 @@ public class Users {
     private LocalDateTime lastLoginTime;
     private LocalDateTime lastLogoutTime;
 
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createDate")
     private Date createDate;
@@ -38,7 +39,8 @@ public class Users {
     protected void onCreate() {
         createDate = new Date();
     }
-
+    @Column(name = "createdBy")
+    private String createdBy;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "USER_ROLE",

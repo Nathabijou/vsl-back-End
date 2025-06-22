@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,11 @@ public class UserController {
 
 //pour creer un compte
     @PostMapping("/registerNewUser")
-    public ResponseEntity<String> registerNewUserWithRole(@RequestBody Map<String, String> userRequest) {
+    public ResponseEntity<String> registerNewUserWithRole(@RequestBody Map<String, String> userRequest, Principal principal) {
+
+
+//        String createdBy = principal.getName();
+        String createdBy = userRequest.get("createdBy");
         String userName      = userRequest.get("userName");
         String userEmail     = userRequest.get("userEmail");
         String userPassword  = userRequest.get("userPassword");
@@ -54,6 +59,8 @@ public class UserController {
         String userSexe      = userRequest.get("userSexe");
         String roleName      = userRequest.get("roleName");
 
+
+
         // Vérifier si l'e-mail de l'utilisateur est vide ou nul
         if (userEmail == null || userEmail.isEmpty()) {
             throw new IllegalArgumentException("L'e-mail de l'utilisateur est requis.");
@@ -61,13 +68,13 @@ public class UserController {
         // Autres validations des données d'entrée
 
         // Enregistrer l'utilisateur avec son rôle en appelant le service utilisateur
-        Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, userSexe, roleName);
+        Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, userSexe, roleName, createdBy);
 
         // Générer et envoyer l'OTP à l'utilisateur
         userService.sendActivationEmail( userEmail, userFirstName, userLastName, userName);
 
         // Retourner une réponse indiquant que l'utilisateur a été enregistré avec succès
-        return ResponseEntity.ok("Utilisateur enregistré avec succès. Un e-mail contenant un code OTP a été envoyé à " + userEmail + ".");
+        return ResponseEntity.ok(" ✅ Utilisateur enregistré avec succès. Un e-mail contenant un code OTP a été envoyé à " + userEmail + "  Le mot de passe pour se connecter est  :" + userPassword);
     }
 
 //pour permettre  a l'utilisateur de creer son mot de passe apres la creation du compte
@@ -223,4 +230,49 @@ public class UserController {
         userService.addUserToGroupe(username, groupeId);
         return "Utilisateur ajouté au groupe avec succès !";
     }
+    @GetMapping("/AllUser")
+    public List<Users> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/users/{userName}")  // 'users' olye de 'user'
+    public ResponseEntity<Users> getUserByUserName(@PathVariable String userName) {
+        Users user = userService.findByUserName(userName);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @PutMapping("/users/{userName}")
+    public ResponseEntity<Users> updateUser(
+            @PathVariable String userName,
+            @RequestBody Users updatedUserData) {
+
+        Users existingUser = userService.findByUserName(userName);
+
+        if (existingUser == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // ✅ Mete ajou sèlman chan ou vle modifye
+        existingUser.setUserFirstName(updatedUserData.getUserFirstName());
+        existingUser.setUserLastName(updatedUserData.getUserLastName());
+        existingUser.setUserEmail(updatedUserData.getUserEmail());
+        existingUser.setUserSexe(updatedUserData.getUserSexe());
+        existingUser.setStatus(updatedUserData.isStatus());
+
+        // Si w vle mete ajou role (optionnel)
+        if (updatedUserData.getRole() != null) {
+            existingUser.setRole(updatedUserData.getRole());
+        }
+
+        Users updatedUser = userService.saveUser(existingUser);
+
+        return ResponseEntity.ok(updatedUser);
+    }
+
+
+
+
 }

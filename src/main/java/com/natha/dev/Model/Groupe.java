@@ -24,10 +24,10 @@ public class Groupe {
     private String responsable;
     private LocalDateTime datecreation;
 
-
-
     private double prixAction;
     private double tauxInteret;
+
+
 
     @PrePersist
     public void setDatecreation() {

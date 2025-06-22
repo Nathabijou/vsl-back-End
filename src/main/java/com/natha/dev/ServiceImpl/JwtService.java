@@ -35,16 +35,22 @@ public class JwtService implements UserDetailsService {
     public JwtResponse createJwtToken(JwtRequest jwtRequest) throws Exception {
         String userName = jwtRequest.getUserName();
         String userPassword = jwtRequest.getUserPassword();
+
+        Users user = userDao.findByUserName(userName);
+        if (user == null) {
+            throw new UsernameNotFoundException("Utilisateur non trouvé.");
+        }
+
+        if (!user.isStatus()) {
+            throw new DisabledException("Votre compte est désactivé. Veuillez contacter l'administrateur.");
+        }
+
         authenticate(userName, userPassword);
 
         UserDetails userDetails = loadUserByUsername(userName);
         String newGeneratedToken = jwtUtil.generateToken(userDetails);
 
-        Users user = userDao.findById(userName).get();
-
         user.setLastLoginTime(LocalDateTime.now());
-
-        // Enregistrer les modifications dans la base de données
         userDao.save(user);
 
         return new JwtResponse(user, newGeneratedToken);
@@ -52,20 +58,17 @@ public class JwtService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users user = userDao.findById(username).get();
+        Users user = userDao.findById(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-        if (user != null) {
-            return new org.springframework.security.core.userdetails.User(
-                    user.getUserName(),
-                    user.getUserPassword(),
-                    getAuthority(user)
-            );
-        } else {
-            throw new UsernameNotFoundException("User not found with username: " + username);
-        }
+        return new org.springframework.security.core.userdetails.User(
+                user.getUserName(),
+                user.getUserPassword(),
+                getAuthority(user)
+        );
     }
 
-    private Set getAuthority(Users user) {
+    private Set<SimpleGrantedAuthority> getAuthority(Users user) {
         Set<SimpleGrantedAuthority> authorities = new HashSet<>();
         user.getRole().forEach(role -> {
             authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
@@ -77,31 +80,33 @@ public class JwtService implements UserDetailsService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, userPassword));
         } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
+            throw new DisabledException("USER_DISABLED");
         } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
+            throw new BadCredentialsException("INVALID_CREDENTIALS");
         }
     }
-
-
 
     public JwtResponse login(JwtRequest jwtRequest) throws Exception {
         String userName = jwtRequest.getUserName();
         String userPassword = jwtRequest.getUserPassword();
 
-        // Vérifier les informations d'identification de l'utilisateur
+        Users user = userDao.findByUserName(userName);
+        if (user == null) {
+            throw new UsernameNotFoundException("Utilisateur non trouvé.");
+        }
+
+        if (!user.isStatus()) {
+            throw new DisabledException("Votre compte est désactivé. Veuillez contacter l'administrateur.");
+        }
+
         authenticate(userName, userPassword);
 
-        // Si les informations d'identification sont valides, générer un token JWT
         UserDetails userDetails = loadUserByUsername(userName);
         String jwtToken = jwtUtil.generateToken(userDetails);
 
-        // Récupérer les détails de l'utilisateur
-        Users user = userDao.findByUserName(userName);
-
-        // Retourner la réponse avec le token JWT et les détails de l'utilisateur
         return new JwtResponse(user, jwtToken);
     }
+
     public LocalDateTime getLastLoginTime(String userName) {
         Users user = userDao.findByUserName(userName);
         if (user != null) {
@@ -113,10 +118,8 @@ public class JwtService implements UserDetailsService {
     public void logout(String userName) {
         Users user = userDao.findByUserName(userName);
         if (user != null) {
-            // Mettre à jour l'heure de déconnexion dans la base de données
             user.setLastLogoutTime(LocalDateTime.now());
             userDao.save(user);
         }
     }
-
 }

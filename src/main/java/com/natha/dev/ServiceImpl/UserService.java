@@ -71,54 +71,59 @@ public class UserService {
     }
 
 
-    public Users registerNewUserWithRole(String userName, String userEmail, String userPassword, String userFirstName, String userLastName, String userSexe, String roleName) {
-        // Vérifier si l'utilisateur avec le même nom d'utilisateur existe déjà
+    public Users registerNewUserWithRole(String userName, String userEmail, String userPassword,
+                                         String userFirstName, String userLastName, String userSexe,
+                                         String roleName, String createdBy) {
+
+        // Vérification utilisateur existant
         Users existingUser = userDao.findByUserName(userName);
         if (existingUser != null) {
             throw new RuntimeException("L'utilisateur avec le nom d'utilisateur '" + userName + "' existe déjà.");
         }
 
-        // Vérifier si l'email est déjà enregistré dans la base de données
         existingUser = userDao.findByUserEmail(userEmail);
         if (existingUser != null) {
-            throw new RuntimeException("L'email '" + userEmail + "'  est déjà enregistré.");
+            throw new RuntimeException("L'email '" + userEmail + "' est déjà enregistré.");
         }
 
-        // Récupérer le rôle associé au nom de rôle donné
+        // Récupération rôle
         Role role = roleDao.findByRoleName(roleName);
         if (role == null) {
             throw new RuntimeException("Rôle '" + roleName + "' non trouvé.");
         }
 
-        // Créer un nouvel ensemble de rôles et y ajouter le rôle
         Set<Role> userRoles = new HashSet<>();
         userRoles.add(role);
 
-        // Créer un nouvel utilisateur
+        // Création utilisateur
         Users user = new Users();
         user.setUserName(userName);
         user.setUserEmail(userEmail);
-        user.setUserPassword(getEncodedPassword(userPassword));
         user.setUserFirstName(userFirstName);
         user.setUserLastName(userLastName);
         user.setUserSexe(userSexe);
         user.setRole(userRoles);
-
-        // Définir la date de création
+        user.setCreatedBy(createdBy);
+        user.setStatus(true);
         user.setCreateDate(new Date());
 
-        user.setUserPassword(userPassword != null ? getEncodedPassword(userPassword) : "");
+        // Encode et set mot de passe (assure que userPassword != null)
+        if (userPassword != null && !userPassword.isEmpty()) {
+            user.setUserPassword(getEncodedPassword(userPassword));
+        } else {
+            throw new RuntimeException("Le mot de passe ne peut pas être vide.");
+        }
 
-        // Enregistrer l'utilisateur dans la base de données
+        // Sauvegarde utilisateur
         Users savedUser = userDao.save(user);
 
-        // Si l'enregistrement a réussi, envoyer le message d'activation par email
         if (savedUser != null) {
             sendActivationEmail(userEmail, userFirstName, userLastName, userName);
         }
 
         return savedUser;
     }
+
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -395,4 +400,15 @@ public class UserService {
     public Users findByUserName(String userName) {
         return userDao.findByUserName(userName);
     }
+    public List<Users> getAllUsers() {
+        List<Users> userList = new ArrayList<>();
+        userDao.findAll().forEach(userList::add);
+        return userList;
+    }
+
+
+    public Users saveUser(Users user) {
+        return userDao.save(user);
+    }
+
 }
