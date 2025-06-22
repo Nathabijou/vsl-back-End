@@ -6,10 +6,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class newVsl {
+public class Multitenant {
 
     public static void main(String[] args) {
-        SpringApplication.run(newVsl.class, args);
+        SpringApplication.run(Multitenant.class, args);
     }
 
 }
