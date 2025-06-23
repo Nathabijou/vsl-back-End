@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -53,4 +54,8 @@ public class MySystem {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+
+    @OneToMany(mappedBy = "mySystem")
+    private List<Organization> organizations;
 }
