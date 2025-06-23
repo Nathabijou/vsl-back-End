@@ -1,7 +1,5 @@
 package com.natha.dev.Dto;
 
-import com.natha.dev.Model.MySystem;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,25 +7,22 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Random;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-
 public class OrganizationDto {
 
-    @Id
-    @Column(length = 10)
     private String idorg;
 
-    @Column(nullable = false, unique = true)
+    private boolean status;
+
     private String name;
 
     private String type; // ONG, Finance, Health, etc.
 
     private String edition; // Basic, Pro, Enterprise...
-
-    private String status; // ACTIVE, INACTIVE, ARCHIVED...
 
     private Boolean isSandbox = false;
 
@@ -57,24 +52,8 @@ public class OrganizationDto {
 
     private LocalDateTime lastModifiedDate;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.startDate = LocalDateTime.now();
-        this.lastModifiedDate = LocalDateTime.now();
-
-        if (this.idorg == null) {
-            this.idorg = generateCustomIdOrg(10);
-        }
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-        this.lastModifiedDate = LocalDateTime.now();
-    }
-
-    private String generateCustomIdOrg(int length) {
+    // Metòd pou jenere ID nan backend si ou vle (men sa ka rete nan service/entity)
+    public String generateCustomIdOrg(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg0123456789";
         StringBuilder sb = new StringBuilder();
         Random rand = new Random();
@@ -82,7 +61,6 @@ public class OrganizationDto {
         for (int i = 0; i < length; i++) {
             sb.append(chars.charAt(rand.nextInt(chars.length())));
         }
-
         return sb.toString();
     }
 }

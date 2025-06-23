@@ -75,37 +75,39 @@ public class OrganizationImpl  implements OrganizationIService {
     public OrganizationDto saveById(OrganizationDto organizationDto, Long mySystemId) {
         MySystem mySystemParent = mySystemDao.findById(mySystemId).orElse(null);
 
-        if(mySystemParent != null){
-            Organization newOrganiZation = new Organization();
-            newOrganiZation.setIdorg(organizationDto.getIdorg());
-            newOrganiZation.setActive(organizationDto.getActive());
-            newOrganiZation.setContactEmail(organizationDto.getContactEmail());
-            newOrganiZation.setDescription(organizationDto.getDescription());
-            newOrganiZation.setAddress(organizationDto.getAddress());
-            newOrganiZation.setCurrency(organizationDto.getCurrency());
-            newOrganiZation.setEdition(organizationDto.getEdition());
-            newOrganiZation.setLanguage(organizationDto.getLanguage());
-            newOrganiZation.setCreatedAt(organizationDto.getCreatedAt());
-            newOrganiZation.setName(organizationDto.getName());
-            newOrganiZation.setCreatedBy(organizationDto.getCreatedBy());
-            newOrganiZation.setIsSandbox(organizationDto.getIsSandbox());
-            newOrganiZation.setLastModifiedDate(organizationDto.getLastModifiedDate());
-            newOrganiZation.setStartDate(organizationDto.getStartDate());
-            newOrganiZation.setPhoneNumber(organizationDto.getPhoneNumber());
-            newOrganiZation.setTrialExpirationDate(organizationDto.getTrialExpirationDate());
-            newOrganiZation.setType(organizationDto.getType());
-            newOrganiZation.setUpdatedAt(organizationDto.getUpdatedAt());
-            newOrganiZation.setStatus(organizationDto.getStatus());
-            newOrganiZation.setMySystem(mySystemParent);
-            Organization savedOrganization = organizationDao.save(newOrganiZation);
-            return convertToDto(savedOrganization);
+        if (mySystemParent == null) {
+            throw new OrganizationNotFoundException("MySystem introuvable avec l'ID : " + mySystemId);
         }
 
-        else {
-            throw new OrganizationNotFoundException("commune introuvable avec l'ID : " + mySystemId);
-        }
+        Organization organization = new Organization();
 
+        organization.setIdorg(organizationDto.getIdorg());
+        organization.setActive(organizationDto.getActive());              // boolean active
+        organization.setContactEmail(organizationDto.getContactEmail());
+        organization.setDescription(organizationDto.getDescription());
+        organization.setAddress(organizationDto.getAddress());
+        organization.setCurrency(organizationDto.getCurrency());
+        organization.setEdition(organizationDto.getEdition());
+        organization.setLanguage(organizationDto.getLanguage());
+        organization.setCreatedAt(organizationDto.getCreatedAt());
+        organization.setName(organizationDto.getName());
+        organization.setCreatedBy(organizationDto.getCreatedBy());
+        organization.setIsSandbox(organizationDto.getIsSandbox());
+        organization.setLastModifiedDate(organizationDto.getLastModifiedDate());
+        organization.setStartDate(organizationDto.getStartDate());
+        organization.setPhoneNumber(organizationDto.getPhoneNumber());
+        organization.setTrialExpirationDate(organizationDto.getTrialExpirationDate());
+        organization.setType(organizationDto.getType());
+        organization.setUpdatedAt(organizationDto.getUpdatedAt());
+
+        organization.setMySystem(mySystemParent);
+
+        Organization savedOrganization = organizationDao.save(organization);
+
+        return convertToDto(savedOrganization);
     }
+
+
 
     private Organization convertToEntity(OrganizationDto organizationDto) {
         Organization organization =  new Organization();
@@ -113,7 +115,7 @@ public class OrganizationImpl  implements OrganizationIService {
         organization.setTrialExpirationDate(organizationDto.getTrialExpirationDate());
         organization.setType(organizationDto.getType());
         organization.setName(organizationDto.getName());
-        organization.setStatus(organizationDto.getStatus());
+
         organization.setAddress(organizationDto.getAddress());
         organization.setEdition(organizationDto.getEdition());
         organization.setActive(organizationDto.getActive());
@@ -145,7 +147,7 @@ public class OrganizationImpl  implements OrganizationIService {
         dto.setType(organization.getType());
         dto.setContactEmail(organization.getContactEmail());
         dto.setPhoneNumber(organization.getPhoneNumber());
-        dto.setStatus(organization.getStatus());
+
         dto.setIsSandbox(organization.getIsSandbox());
         dto.setCreatedAt(organization.getCreatedAt());
         dto.setUpdatedAt(organization.getUpdatedAt());
@@ -168,7 +170,7 @@ public class OrganizationImpl  implements OrganizationIService {
             organization.setAddress(organizationDto.getAddress());
             organization.setContactEmail(organizationDto.getContactEmail());
             organization.setPhoneNumber(organizationDto.getPhoneNumber());
-            organization.setStatus(organizationDto.getStatus());
+
             organization.setActive(organizationDto.getActive());
             organization.setEdition(organizationDto.getEdition());
             organization.setLanguage(organizationDto.getLanguage());
@@ -191,7 +193,7 @@ public class OrganizationImpl  implements OrganizationIService {
         dto.setName(organization.getName());
         dto.setType(organization.getType());
         dto.setEdition(organization.getEdition());
-        dto.setStatus(organization.getStatus());
+
         dto.setIsSandbox(organization.getIsSandbox());
         dto.setContactEmail(organization.getContactEmail());
         dto.setPhoneNumber(organization.getPhoneNumber());

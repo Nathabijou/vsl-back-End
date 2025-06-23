@@ -1,6 +1,5 @@
 package com.natha.dev.Controller;
 
-import com.natha.dev.Dao.OrganizationDao;
 import com.natha.dev.Dto.OrganizationDto;
 import com.natha.dev.IService.OrganizationIService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,8 @@ public class OrganizationController {
     @Autowired
     private OrganizationIService organizationIService;
 
-    // 🔍 Wè yon òganizasyon: Admin & SuperAdmin
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
+    // 🔍see
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/mysystem/{mySystemId}/organization/{orgId}")
     public ResponseEntity<OrganizationDto> getOrganizationFromMySystem(
             @PathVariable Long mySystemId,
@@ -30,61 +29,85 @@ public class OrganizationController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ✅ Kreye òganizasyon: Admin & SuperAdmin
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
+    // ✅ Create Org : (Yes Verify)
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @PostMapping("/create/{mySystemId}")
-    public OrganizationDto createOrganizationByMySystem(
+    public ResponseEntity<?> createOrganizationByMySystem(
             @PathVariable Long mySystemId,
-            @RequestBody OrganizationDto organizationDto
-    ) {
-        return organizationIService.saveById(organizationDto, mySystemId);
+            @RequestBody OrganizationDto organizationDto) {
+        try {
+            OrganizationDto savedOrg = organizationIService.saveById(organizationDto, mySystemId);
+            return ResponseEntity.ok(savedOrg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error creating organization: " + e.getMessage());
+        }
     }
 
-    // 🔁 Wè tout òganizasyon: Admin & SuperAdmin
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
-    @GetMapping("/AllOrg")
+    // 🔁 See All Org (Yes Verify)
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    @GetMapping("/allOrganisations")
     public List<OrganizationDto> getAllOrganizations() {
         return organizationIService.findAll();
     }
 
-    // ❌ Efase òganizasyon: SuperAdmin sèlman
-    @PreAuthorize("hasAuthority('SUPERADMIN')")
-    @DeleteMapping("/{idorg}")
-    public void deleteOrganization(@PathVariable String idorg) {
-        organizationIService.deleteById(idorg);
+    // ✏️ Modify org: (Yes Verify)
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PutMapping("/mysystem/{mySystemId}/organization/{idorg}")
+    public ResponseEntity<OrganizationDto> updateOrganizationBySystem(
+            @PathVariable Long mySystemId,
+            @PathVariable String idorg,
+            @RequestBody OrganizationDto organizationDto) {
+
+        OrganizationDto updatedOrg = organizationIService.updateByIdAndSystemId(idorg, mySystemId, organizationDto);
+        return ResponseEntity.ok(updatedOrg);
     }
 
-    // 🔍 Wè org pa ID & system: Admin & SuperAdmin
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
-    @GetMapping("/{idorg}/system/{mySystemId}")
+    // 🔍 see org by Id  system: (Yes Verify)
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    @GetMapping("/{idorg}/mysystem/{mySystemId}")
     public Optional<OrganizationDto> getByIdAndSystem(
             @PathVariable String idorg,
-            @PathVariable Long mySystemId
-    ) {
+            @PathVariable Long mySystemId) {
         return organizationIService.findByIdAndMySystemId(idorg, mySystemId);
     }
 
-    // 🔍 Wè tout org nan yon system: Admin & SuperAdmin
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SUPERADMIN')")
+    // 🔍 see All prg on system (Yes Verify)
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
     @GetMapping("/mysystem/{mySystemId}/organizations")
     public List<OrganizationDto> getOrganizationsByMySystem(@PathVariable Long mySystemId) {
         return organizationIService.findByMySystemId(mySystemId);
     }
 
-    // ✏️ Modifye org: SuperAdmin sèlman
-    @PreAuthorize("hasAuthority('SUPERADMIN')")
-    @PutMapping("/mysystem/{mySystemId}/organization/{idorg}")
-    public ResponseEntity<OrganizationDto> updateOrganizationBySystem(
-            @PathVariable Long mySystemId,
-            @PathVariable String idorg,
-            @RequestBody OrganizationDto organizationDto
-    ) {
-        OrganizationDto updatedOrg = organizationIService.updateByIdAndSystemId(idorg, mySystemId, organizationDto);
-        return ResponseEntity.ok(updatedOrg);
+    // ❌ Delete ganizasyon: (Yes Verify)
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @DeleteMapping("/{idorg}")
+    public void deleteOrganization(@PathVariable String idorg) {
+        organizationIService.deleteById(idorg);
+    }
+
+    // 🚫 Dezaktive org (Yes Verify)
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PutMapping("/deactivate/{idorg}")
+    public ResponseEntity<OrganizationDto> deactivateOrganization(@PathVariable String idorg) {
+        Optional<OrganizationDto> optOrg = organizationIService.findById(idorg);
+        if (optOrg.isPresent()) {
+            OrganizationDto org = optOrg.get();
+            org.setActive(false); // ✅ Sipoze ou itilize 'active' olye de 'status'
+            return ResponseEntity.ok(organizationIService.save(org));
+        }
+        return ResponseEntity.notFound().build();
+    }
+    //Acivate Org (Yes Verify)
+    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    @PutMapping("/activate/{idorg}")
+    public ResponseEntity<OrganizationDto> ActiveOrganization(@PathVariable String idorg) {
+        Optional<OrganizationDto> optOrg = organizationIService.findById(idorg);
+        if (optOrg.isPresent()) {
+            OrganizationDto org = optOrg.get();
+            org.setActive(true); // ✅ Sipoze ou itilize 'active' olye de 'status'
+            return ResponseEntity.ok(organizationIService.save(org));
+        }
+        return ResponseEntity.notFound().build();
     }
 }
-
-
-
-
-

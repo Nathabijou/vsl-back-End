@@ -45,27 +45,34 @@ public class UserService {
 
     // Initialiser les rôles et les utilisateurs
     public void initRoleAndUser() {
+
+        // Créer le rôle Admin
+        Role superAadminRole = new Role();
+        superAadminRole.setRoleName("SUPERADMIN");
+        superAadminRole.setRoleDescription("Rôle super administrateur");
+        roleDao.save(superAadminRole);
+
         // Créer le rôle Admin
         Role adminRole = new Role();
-        adminRole.setRoleName("Admin");
+        adminRole.setRoleName("ADMIN");
         adminRole.setRoleDescription("Rôle d'administrateur");
         roleDao.save(adminRole);
 
         // Créer le rôle Manager
         Role managerRole = new Role();
-        managerRole.setRoleName("Manager");
+        managerRole.setRoleName("MANAGER");
         managerRole.setRoleDescription("Rôle de gestionnaire");
         roleDao.save(managerRole);
 
         // Créer le rôle User
         Role userRole = new Role();
-        userRole.setRoleName("User");
+        userRole.setRoleName("USER");
         userRole.setRoleDescription("Rôle utilisateur");
         roleDao.save(userRole);
 
         // Créer le rôle Moderant
         Role moderantRole = new Role();
-        moderantRole.setRoleName("Moderant");
+        moderantRole.setRoleName("MODERANT");
         moderantRole.setRoleDescription("Rôle de modérateur");
         roleDao.save(moderantRole);
     }
