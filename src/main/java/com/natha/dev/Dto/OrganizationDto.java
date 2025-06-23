@@ -26,6 +26,8 @@ public class OrganizationDto {
 
     private Boolean isSandbox = false;
 
+    private Integer maxAppsAllowed;
+
     private String contactEmail;
 
     private String phoneNumber;

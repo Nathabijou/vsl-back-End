@@ -34,6 +34,8 @@ import java.util.Random;
 
         private String phoneNumber;
 
+        private Integer maxAppsAllowed;
+
         private String address;
 
         private String description;

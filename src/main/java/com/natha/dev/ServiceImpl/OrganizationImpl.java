@@ -170,7 +170,7 @@ public class OrganizationImpl  implements OrganizationIService {
             organization.setAddress(organizationDto.getAddress());
             organization.setContactEmail(organizationDto.getContactEmail());
             organization.setPhoneNumber(organizationDto.getPhoneNumber());
-
+            organization.setMaxAppsAllowed(organizationDto.getMaxAppsAllowed());
             organization.setActive(organizationDto.getActive());
             organization.setEdition(organizationDto.getEdition());
             organization.setLanguage(organizationDto.getLanguage());
