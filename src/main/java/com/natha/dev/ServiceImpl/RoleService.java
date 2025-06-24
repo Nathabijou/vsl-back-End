@@ -62,6 +62,7 @@ public class RoleService {
         } else if ("USER".equalsIgnoreCase(roleName)) {
             privileges.add(getOrCreatePrivilege("CREATE", "Create privilege"));
             privileges.add(getOrCreatePrivilege("READ", "Read privilege"));
+            privileges.add(getOrCreatePrivilege("CREATE", "Create privilege"));
         } else if ("MODERANT".equalsIgnoreCase(roleName)) {
             privileges.add(getOrCreatePrivilege("READ", "Read privilege"));
         }

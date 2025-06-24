@@ -3,7 +3,10 @@ package com.natha.dev.Model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -36,6 +39,11 @@ public class ApplicationInstance {
     private String language; // eg. "en", "fr"
 
     private String themeColor; // eg. "#007bff"
+
+    @OneToMany(mappedBy = "applicationInstance")
+    private Set<Composante> composantes;
+
+
 
     // Relasyon avèk Organization
     @ManyToOne
