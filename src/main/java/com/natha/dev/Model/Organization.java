@@ -62,9 +62,9 @@ import java.util.Random;
         @JoinColumn(name = "system_id")
         private MySystem mySystem;
 
+        @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)
+        private List<ApplicationInstance> applications;
 
-//        @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL)
-//        private List<AppInstance> applications;
 
         @PrePersist
         protected void onCreate() {
