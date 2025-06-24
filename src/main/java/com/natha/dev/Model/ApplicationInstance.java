@@ -68,4 +68,9 @@ public class ApplicationInstance {
         }
         return sb.toString();
     }
+
+    public String getId() {
+        return this.idApp;
+    }
+
 }

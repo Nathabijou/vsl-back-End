@@ -18,7 +18,7 @@ import java.util.Set;
 public class Users {
 
     @Id
-    private String userName;
+    private String userName; // identifiant
     private String userEmail;
     private String userPassword;
     private String userFirstName;
