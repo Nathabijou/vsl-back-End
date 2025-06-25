@@ -76,6 +76,5 @@ public class BeneficiaireController {
         return ResponseEntity.ok("Beneficiaire efase nan pwojè avèk siksè");
     }
 
-
 }
 

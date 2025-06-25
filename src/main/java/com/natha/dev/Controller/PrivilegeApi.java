@@ -1,7 +1,7 @@
 package com.natha.dev.Controller;
 
 import com.natha.dev.Model.Privilege;
-import com.natha.dev.Dto.ServiceImpl.PrivilegeImpl;
+import com.natha.dev.ServiceImpl.PrivilegeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

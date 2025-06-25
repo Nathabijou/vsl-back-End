@@ -5,7 +5,7 @@ import com.natha.dev.Dao.GroupeDao;
 import com.natha.dev.Dao.UserDao;
 import com.natha.dev.IService.Groupe_UsersIService;
 import com.natha.dev.Model.*;
-import com.natha.dev.Dto.ServiceImpl.UserService;
+import com.natha.dev.ServiceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

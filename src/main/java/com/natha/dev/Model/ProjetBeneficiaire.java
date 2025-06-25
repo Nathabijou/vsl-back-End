@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "projet_beneficiaire")
@@ -24,6 +25,10 @@ public class ProjetBeneficiaire {
     @ManyToOne
     @JoinColumn(name = "beneficiaire_id", nullable = false)
     private Beneficiaire beneficiaire;
+
+    @OneToMany(mappedBy = "projetBeneficiaire", cascade = CascadeType.ALL)
+    private List<Payroll> payrolls;
+
 
 
 

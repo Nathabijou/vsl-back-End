@@ -1,4 +1,4 @@
-package com.natha.dev.Dto.ServiceImpl;
+package com.natha.dev.ServiceImpl;
 
 
 import com.natha.dev.Dao.*;
