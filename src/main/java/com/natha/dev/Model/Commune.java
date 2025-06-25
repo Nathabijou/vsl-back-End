@@ -20,6 +20,9 @@ public class Commune {
     private Long id;
     private String nom;
 
+    @ManyToOne
+    private Departement departement;
+
     @OneToMany(mappedBy = "commune", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Groupe> groupes;
 

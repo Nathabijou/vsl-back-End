@@ -1,9 +1,12 @@
 package com.natha.dev.ServiceImpl;
 
 import com.natha.dev.Dao.CommuneDao;
+import com.natha.dev.Dao.DepartementDao;
 import com.natha.dev.Dto.CommuneDto;
+import com.natha.dev.Dto.SectionCommunaleDto;
 import com.natha.dev.IService.CommuneIService;
 import com.natha.dev.Model.Commune;
+import com.natha.dev.Model.Departement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,8 @@ public class CommuneImpl implements CommuneIService {
 
     @Autowired
     private CommuneDao communeDao;
+    @Autowired
+    private DepartementDao departementDao;
 
 
     @Override
@@ -43,8 +48,19 @@ public class CommuneImpl implements CommuneIService {
         communeDao.deleteById(id);
     }
 
+    @Override
+    public void delete(Long id) {
+        communeDao.deleteById(id);
+    }
 
-
+    @Override
+    public List<CommuneDto> getAll() {
+        return communeDao.findAll().stream().map(this::convertToDto).toList();
+    }
+    @Override
+    public List<CommuneDto> getByDepartement(Long departementId) {
+        return communeDao.findByDepartementId(departementId).stream().map(this::convertToDto).toList();
+    }
 
     @Override
     public CommuneDto save(CommuneDto communeDto) {
@@ -68,6 +84,14 @@ public class CommuneImpl implements CommuneIService {
         commune.setId(dto.getId());
         commune.setNom(dto.getNom());
         // Vous pouvez ajouter d'autres attributs ici
+
+        if (dto.getDepartementId() != null) {
+            Departement departement = departementDao.findById(dto.getDepartementId())
+                    .orElseThrow(() -> new RuntimeException("Département non trouvé avec l'id: " + dto.getDepartementId()));
+            commune.setDepartement(departement);
+        } else {
+            throw new RuntimeException("departementId est requis pour créer une commune.");
+        }
 
         return commune;
     }

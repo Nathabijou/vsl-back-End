@@ -9,4 +9,5 @@ import java.util.List;
 public interface CommuneDao extends JpaRepository<Commune, Long> {
 
     CommuneDto findById(CommuneDto communeDto);
+    List<Commune> findByDepartementId(Long departementId);
 }

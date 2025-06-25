@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,6 +38,10 @@ public class Composante {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "composante", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Zone> zones;
+
 
     @PreUpdate
     protected void onUpdate() {

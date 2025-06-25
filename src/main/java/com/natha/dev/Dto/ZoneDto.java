@@ -5,8 +5,8 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommuneDto {
+public class ZoneDto {
     private Long id;
     private String nom;
-    private Long departementId;
+    private Long composanteId; // Pou fè lyezon an
 }
