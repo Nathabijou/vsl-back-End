@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 @Entity
@@ -18,8 +19,9 @@ public class Projet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(length = 15)
+    @Column(length = 36, columnDefinition = "varchar(36)") // match SQL Server
     private String idProjet;
+
 
     private String name;
     private String description;
@@ -52,12 +54,12 @@ public class Projet {
     @Column(nullable = false)
     private Boolean active = true;
 
-    @PrePersist
-    private void ensureId() {
-        if (this.idProjet == null || this.idProjet.isBlank()) {
-            this.idProjet = generateRandomId(15);
-        }
-    }
+//    @PrePersist
+//    private void ensureId() {
+//        if (this.idProjet == null || this.idProjet.isBlank()) {
+//            this.idProjet = generateRandomId(15);
+//        }
+//    }
 
     private static String generateRandomId(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -82,4 +84,25 @@ public class Projet {
     @ManyToOne
     @JoinColumn(name = "quartier_id")
     private Quartier quartier;
+
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "projet_beneficiaire",
+            joinColumns = @JoinColumn(
+                    name = "projet_id",
+                    referencedColumnName = "idProjet",
+                    columnDefinition = "varchar(36)" // match idProjet
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "beneficiaire_id",
+                    referencedColumnName = "idBeneficiaire",
+                    columnDefinition = "varchar(15)" // match idBeneficiaire
+            )
+    )
+    private List<Beneficiaire> beneficiaires;
+
+
+
 }

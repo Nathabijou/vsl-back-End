@@ -1,7 +1,9 @@
 package com.natha.dev.Controller;
 
+import com.natha.dev.Dto.BeneficiaireDto;
 import com.natha.dev.Dto.ProjetDto;
 import com.natha.dev.IService.ProjetIService;
+import com.natha.dev.Model.Projet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -110,6 +112,11 @@ public class ProjetController {
     public ResponseEntity<String> deactivateProjet(@PathVariable String idProjet) {
         projetIService.setProjetActiveStatus(idProjet, false);
         return ResponseEntity.ok("Projet désactivé avec succès");
+    }
+
+    @GetMapping("/{idProjet}/beneficiaires")
+    public ResponseEntity<List<BeneficiaireDto>> getBeneficiairesByProjet(@PathVariable String idProjet) {
+        return ResponseEntity.ok(projetIService.getBeneficiairesByProjetId(idProjet));
     }
 
 

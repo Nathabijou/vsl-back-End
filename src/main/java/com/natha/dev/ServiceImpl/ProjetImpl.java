@@ -1,11 +1,14 @@
 package com.natha.dev.ServiceImpl;
 
 
+import com.natha.dev.Dao.BeneficiaireDao;
 import com.natha.dev.Dao.ComposanteDao;
 import com.natha.dev.Dao.ProjetDao;
 import com.natha.dev.Dao.QuartierDao;
+import com.natha.dev.Dto.BeneficiaireDto;
 import com.natha.dev.Dto.ProjetDto;
 import com.natha.dev.IService.ProjetIService;
+import com.natha.dev.Model.Beneficiaire;
 import com.natha.dev.Model.Composante;
 import com.natha.dev.Model.Projet;
 import com.natha.dev.Model.Quartier;
@@ -25,6 +28,9 @@ public class ProjetImpl implements ProjetIService {
 
     @Autowired
     private ComposanteDao composanteDao;
+
+    @Autowired
+    private BeneficiaireDao beneficiaireDao;
 
     @Autowired
     private QuartierDao quartierDao;
@@ -80,6 +86,35 @@ public class ProjetImpl implements ProjetIService {
 
 
     @Override
+    public List<BeneficiaireDto> getBeneficiairesByProjetId(String idProjet) {
+        Projet projet = projetDao.findById(idProjet)
+                .orElseThrow(() -> new RuntimeException("Projet pa jwenn"));
+
+        List<Beneficiaire> beneficiaires = projet.getBeneficiaires();
+
+        return beneficiaires.stream()
+                .map(b -> {
+                    BeneficiaireDto dto = new BeneficiaireDto();
+                    dto.setIdBeneficiaire(b.getIdBeneficiaire());
+                    dto.setNom(b.getNom());
+                    dto.setPrenom(b.getPrenom());
+                    dto.setSexe(b.getSexe());
+                    dto.setDateNaissance(b.getDateNaissance());
+                    dto.setDomaineDeFormation(b.getDomaineDeFormation());
+                    dto.setTypeIdentification(b.getTypeIdentification());
+                    dto.setIdentification(b.getIdentification());
+                    dto.setLienNaissance(b.getLienNaissance());
+                    dto.setQualification(b.getQualification());
+                    dto.setTelephoneContact(b.getTelephoneContact());
+                    dto.setTelephonePaiement(b.getTelephonePaiement());
+                    dto.setOperateurPaiement(b.getOperateurPaiement());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
     public void setProjetActiveStatus(String idProjet, boolean active) {
         Projet p = projetDao.findById(idProjet)
                 .orElseThrow(() -> new RuntimeException("Projet non trouvé: " + idProjet));
@@ -87,6 +122,8 @@ public class ProjetImpl implements ProjetIService {
         p.setUpdatedAt(LocalDateTime.now());
         projetDao.save(p);
     }
+
+
 
     /** Helper pou copier chan ki modifye **/
     private void applyDtoToEntity(ProjetDto dto, Projet p) {
