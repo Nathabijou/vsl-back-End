@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -20,4 +22,8 @@ public class Quartier {
 
     @ManyToOne
     private SectionCommunale sectionCommunale;
+
+    @OneToMany(mappedBy = "quartier", cascade = CascadeType.ALL)
+    private List<Projet> projets;
+
 }

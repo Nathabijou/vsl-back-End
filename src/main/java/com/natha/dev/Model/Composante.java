@@ -42,6 +42,9 @@ public class Composante {
     @OneToMany(mappedBy = "composante", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Zone> zones;
 
+    @OneToMany(mappedBy = "composante", cascade = CascadeType.ALL)
+    private List<Projet> projets;
+
 
     @PreUpdate
     protected void onUpdate() {
