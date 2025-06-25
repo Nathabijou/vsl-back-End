@@ -1,4 +1,4 @@
-package com.natha.dev.ServiceImpl;
+package com.natha.dev.Dto.ServiceImpl;
 
 import com.natha.dev.Dao.CompteDao;
 import com.natha.dev.Dao.GroupeDao;
@@ -8,13 +8,9 @@ import com.natha.dev.Dto.CompteDto;
 import com.natha.dev.IService.CompteISercive;
 import com.natha.dev.IService.GroupeIService;
 import com.natha.dev.Model.Compte;
-import com.natha.dev.Model.Groupe;
-import com.natha.dev.Model.Groupe_Users;
-import com.natha.dev.Model.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

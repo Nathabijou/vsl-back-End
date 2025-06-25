@@ -1,4 +1,4 @@
-package com.natha.dev.ServiceImpl;
+package com.natha.dev.Dto.ServiceImpl;
 
 import com.natha.dev.Dao.QuartierDao;
 import com.natha.dev.Dao.SectionCommunaleDao;

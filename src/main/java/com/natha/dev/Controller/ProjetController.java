@@ -3,16 +3,13 @@ package com.natha.dev.Controller;
 import com.natha.dev.Dto.BeneficiaireDto;
 import com.natha.dev.Dto.ProjetDto;
 import com.natha.dev.IService.ProjetIService;
-import com.natha.dev.Model.Projet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/projets")
@@ -114,10 +111,20 @@ public class ProjetController {
         return ResponseEntity.ok("Projet désactivé avec succès");
     }
 
-    @GetMapping("/{idProjet}/beneficiaires")
-    public ResponseEntity<List<BeneficiaireDto>> getBeneficiairesByProjet(@PathVariable String idProjet) {
-        return ResponseEntity.ok(projetIService.getBeneficiairesByProjetId(idProjet));
-    }
+//    @GetMapping("/{idProjet}/beneficiaires")
+//    public ResponseEntity<List<BeneficiaireDto>> getBeneficiairesByProjet(@PathVariable String idProjet) {
+//        return ResponseEntity.ok(projetIService.getBeneficiairesByProjetId(idProjet));
+//    }
 
+
+    //Get Beneficiars with project
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    @GetMapping("/projets/{idProjet}/beneficiaires")
+    public ResponseEntity<List<BeneficiaireDto>> getBeneficiairesByProjet(
+            @PathVariable String idProjet) {
+
+        List<BeneficiaireDto> beneficiaires = projetIService.findBeneficiairesByProjetId(idProjet);
+        return new ResponseEntity<>(beneficiaires, HttpStatus.OK);
+    }
 
 }

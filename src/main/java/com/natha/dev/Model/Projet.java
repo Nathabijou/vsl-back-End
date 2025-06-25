@@ -86,23 +86,8 @@ public class Projet {
     private Quartier quartier;
 
 
-
-    @ManyToMany
-    @JoinTable(
-            name = "projet_beneficiaire",
-            joinColumns = @JoinColumn(
-                    name = "projet_id",
-                    referencedColumnName = "idProjet",
-                    columnDefinition = "varchar(36)" // match idProjet
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name = "beneficiaire_id",
-                    referencedColumnName = "idBeneficiaire",
-                    columnDefinition = "varchar(15)" // match idBeneficiaire
-            )
-    )
-    private List<Beneficiaire> beneficiaires;
-
+    @OneToMany(mappedBy = "projet")
+    private List<ProjetBeneficiaire> projetBeneficiaires;
 
 
 }

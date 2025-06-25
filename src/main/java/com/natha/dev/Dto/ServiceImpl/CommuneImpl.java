@@ -1,9 +1,8 @@
-package com.natha.dev.ServiceImpl;
+package com.natha.dev.Dto.ServiceImpl;
 
 import com.natha.dev.Dao.CommuneDao;
 import com.natha.dev.Dao.DepartementDao;
 import com.natha.dev.Dto.CommuneDto;
-import com.natha.dev.Dto.SectionCommunaleDto;
 import com.natha.dev.IService.CommuneIService;
 import com.natha.dev.Model.Commune;
 import com.natha.dev.Model.Departement;

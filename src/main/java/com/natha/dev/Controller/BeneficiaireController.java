@@ -3,6 +3,7 @@ package com.natha.dev.Controller;
 import com.natha.dev.Dto.BeneficiaireDto;
 import com.natha.dev.IService.BeneficiaireIService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,74 +25,55 @@ public class BeneficiaireController {
         return ResponseEntity.ok(beneficiaireIService.save(dto));
     }
 
-    //Get All Beneficiaire (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
-    @GetMapping("/all")
-    public List<BeneficiaireDto> getAll() {
-        return beneficiaireIService.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<BeneficiaireDto> getById(@PathVariable String idBeneficiaire) {
-        Optional<BeneficiaireDto> dto = beneficiaireIService.findById(idBeneficiaire);
-        return dto.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String idBeneficiaire) {
-        beneficiaireIService.deleteById(idBeneficiaire);
-        return ResponseEntity.noContent().build();
-    }
-    // Transfer beneficiares with anoter project ((Yes Verify))
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
-    @PostMapping("/{idBeneficiaire}/projets/{idProjet}")
-    public ResponseEntity<BeneficiaireDto> ajouterProjetDansBeneficiaire(
-            @PathVariable String idBeneficiaire,
-            @PathVariable String idProjet
-    ) {
-        return ResponseEntity.ok(beneficiaireIService.ajouterProjetDansBeneficiaire(idBeneficiaire, idProjet));
-    }
-
-    //Add Beneficiaire to project (Yes Verify)
+     //Add Beneficiaire to project (Yes Verify)
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
-    @PostMapping("/ajouterAvecProjet/{idProjet}")
-    public ResponseEntity<BeneficiaireDto> ajouterBeneficiaireAvecProjet(
-            @RequestBody BeneficiaireDto dto,
-            @PathVariable String idProjet
-    ) {
-        return ResponseEntity.ok(beneficiaireIService.ajouterAvecProjet(dto, idProjet));
-    }
+    @PostMapping("/projets/{idProjet}/beneficiaires")
+    public ResponseEntity<BeneficiaireDto> createBeneficiaireInProjet(
+            @RequestBody BeneficiaireDto beneficiaireDto,
+            @PathVariable String idProjet) {
 
-    //get beneficiaire with id (yes verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
-    @GetMapping("/projets/{idProjet}/beneficiaires/{idBeneficiaire}")
-    public ResponseEntity<BeneficiaireDto> getBeneficiaireByIdAndProjetId(
-            @PathVariable String idProjet,
-            @PathVariable String idBeneficiaire) {
-
-        Optional<BeneficiaireDto> dto = beneficiaireIService.findByIdAndProjetId(idBeneficiaire, idProjet);
-        return dto.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        BeneficiaireDto createdBeneficiaire = beneficiaireIService.creerBeneficiaireEtAssocierAuProjet(beneficiaireDto, idProjet);
+        return new ResponseEntity<>(createdBeneficiaire, HttpStatus.CREATED);
     }
 
     //Modify benerifiaire with project (yes Verify)
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
-    @PutMapping("/projets/{idProjet}/beneficiaires/{idBeneficiaire}")
+    @PutMapping("/projets/{projetId}/beneficiaires/{beneficiaireId}")
     public ResponseEntity<BeneficiaireDto> updateBeneficiaireDansProjet(
-            @PathVariable String idProjet,
-            @PathVariable String idBeneficiaire,
-            @RequestBody BeneficiaireDto dto
-    ) {
-        BeneficiaireDto updated = beneficiaireIService.updateBeneficiaireDansProjet(idProjet, idBeneficiaire, dto);
+            @PathVariable String projetId,
+            @PathVariable String beneficiaireId,
+            @RequestBody BeneficiaireDto dto) {
+        BeneficiaireDto updated = beneficiaireIService.updateBeneficiaireDansProjet(projetId, beneficiaireId, dto);
         return ResponseEntity.ok(updated);
     }
+
+    //get beneficiaire with id (yes verify)
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    @GetMapping("/projets/{projetId}/beneficiaires/{beneficiaireId}")
+    public ResponseEntity<BeneficiaireDto> getBeneficiaireInProjet(
+            @PathVariable String projetId,
+            @PathVariable String beneficiaireId) {
+        return beneficiaireIService.findBeneficiaireInProjet(projetId, beneficiaireId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+    //Transfer Beneficiares with anoter project
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    @PutMapping("/beneficiaires/{beneficiaireId}/transfer/{ancienProjetId}/{nouveauProjetId}")
+    public ResponseEntity<String> transfererBeneficiaire(
+            @PathVariable String beneficiaireId,
+            @PathVariable String ancienProjetId,
+            @PathVariable String nouveauProjetId) {
+        beneficiaireIService.transfererBeneficiaireDansProjet(beneficiaireId, ancienProjetId, nouveauProjetId);
+        return ResponseEntity.ok("Beneficiaire transfere soti nan pwojè " + ancienProjetId + " pou ale nan pwojè " + nouveauProjetId);
+    }
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
-    @DeleteMapping("/projets/{idProjet}/beneficiaires/{idBeneficiaire}")
-    public ResponseEntity<Void> retirerBeneficiaireDuProjet(
-            @PathVariable String idProjet,
-            @PathVariable String idBeneficiaire
-    ) {
-        beneficiaireIService.retirerBeneficiaireDuProjet(idProjet, idBeneficiaire);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/projets/{projetId}/beneficiaires/{beneficiaireId}")
+    public ResponseEntity<String> deleteBeneficiaireFromProjet(
+            @PathVariable String projetId,
+            @PathVariable String beneficiaireId) {
+        beneficiaireIService.deleteBeneficiaireFromProjet(beneficiaireId, projetId);
+        return ResponseEntity.ok("Beneficiaire efase nan pwojè avèk siksè");
     }
 
 

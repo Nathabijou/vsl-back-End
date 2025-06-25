@@ -1,4 +1,4 @@
-package com.natha.dev.ServiceImpl;
+package com.natha.dev.Dto.ServiceImpl;
 
 import com.natha.dev.Dao.PrivilegeDao;
 import com.natha.dev.Model.Privilege;

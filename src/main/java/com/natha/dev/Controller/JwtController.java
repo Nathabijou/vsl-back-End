@@ -2,7 +2,7 @@ package com.natha.dev.Controller;
 
 import com.natha.dev.Model.JwtRequest;
 import com.natha.dev.Model.JwtResponse;
-import com.natha.dev.ServiceImpl.JwtService;
+import com.natha.dev.Dto.ServiceImpl.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;

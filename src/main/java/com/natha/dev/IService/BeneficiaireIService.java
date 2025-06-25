@@ -5,19 +5,19 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BeneficiaireIService {
+
+
     BeneficiaireDto save(BeneficiaireDto dto);
-    List<BeneficiaireDto> findAll();
-    Optional<BeneficiaireDto> findById(String idBeneficiaire);
-    void deleteById(String idBeneficiaire);
 
-    BeneficiaireDto ajouterProjetDansBeneficiaire(String idBeneficiaire, String idProjet);
+    void deleteBeneficiaireFromProjet(String beneficiaireId, String projetId);
 
-    BeneficiaireDto ajouterAvecProjet(BeneficiaireDto dto, String idProjet);
 
-    Optional<BeneficiaireDto> findByIdAndProjetId(String idBeneficiaire, String idProjet);
 
-    BeneficiaireDto updateBeneficiaireDansProjet(String idProjet, String idBeneficiaire, BeneficiaireDto dto);
+    BeneficiaireDto creerBeneficiaireEtAssocierAuProjet(BeneficiaireDto dto, String idProjet);
 
-    void retirerBeneficiaireDuProjet(String idProjet, String idBeneficiaire);
+    BeneficiaireDto updateBeneficiaireDansProjet(String projetId, String beneficiaireId, BeneficiaireDto dto);
+    Optional<BeneficiaireDto> findBeneficiaireInProjet(String projetId, String beneficiaireId);
 
+
+    void transfererBeneficiaireDansProjet(String beneficiaireId, String ancienProjetId, String nouveauProjetId);
 }

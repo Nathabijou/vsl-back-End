@@ -1,6 +1,6 @@
 package com.natha.dev.Configuration;
 
-import com.natha.dev.ServiceImpl.JwtService;
+import com.natha.dev.Dto.ServiceImpl.JwtService;
 import com.natha.dev.Util.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;

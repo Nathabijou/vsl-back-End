@@ -1,7 +1,7 @@
 package com.natha.dev.Controller;
 
 import com.natha.dev.Model.Role;
-import com.natha.dev.ServiceImpl.RoleService;
+import com.natha.dev.Dto.ServiceImpl.RoleService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

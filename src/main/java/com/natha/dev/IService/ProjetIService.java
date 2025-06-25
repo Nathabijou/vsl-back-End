@@ -23,7 +23,10 @@ public interface ProjetIService {
 
     void setProjetActiveStatus(String idProjet, boolean active);
 
-    List<BeneficiaireDto> getBeneficiairesByProjetId(String idProjet);
+    List<BeneficiaireDto> findBeneficiairesByProjetId(String idProjet);
+
+
+
 
 
 

@@ -1,16 +1,13 @@
-package com.natha.dev.ServiceImpl;
+package com.natha.dev.Dto.ServiceImpl;
 
 
-import com.natha.dev.Dao.BeneficiaireDao;
-import com.natha.dev.Dao.ComposanteDao;
-import com.natha.dev.Dao.ProjetDao;
-import com.natha.dev.Dao.QuartierDao;
+import com.natha.dev.Dao.*;
 import com.natha.dev.Dto.BeneficiaireDto;
 import com.natha.dev.Dto.ProjetDto;
 import com.natha.dev.IService.ProjetIService;
-import com.natha.dev.Model.Beneficiaire;
 import com.natha.dev.Model.Composante;
 import com.natha.dev.Model.Projet;
+import com.natha.dev.Model.ProjetBeneficiaire;
 import com.natha.dev.Model.Quartier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +31,8 @@ public class ProjetImpl implements ProjetIService {
 
     @Autowired
     private QuartierDao quartierDao;
+    @Autowired
+    private ProjetBeneficiaireDao projetBeneficiaireDao;
 
     @Override
     public ProjetDto save(ProjetDto dto) {
@@ -85,33 +84,6 @@ public class ProjetImpl implements ProjetIService {
     }
 
 
-    @Override
-    public List<BeneficiaireDto> getBeneficiairesByProjetId(String idProjet) {
-        Projet projet = projetDao.findById(idProjet)
-                .orElseThrow(() -> new RuntimeException("Projet pa jwenn"));
-
-        List<Beneficiaire> beneficiaires = projet.getBeneficiaires();
-
-        return beneficiaires.stream()
-                .map(b -> {
-                    BeneficiaireDto dto = new BeneficiaireDto();
-                    dto.setIdBeneficiaire(b.getIdBeneficiaire());
-                    dto.setNom(b.getNom());
-                    dto.setPrenom(b.getPrenom());
-                    dto.setSexe(b.getSexe());
-                    dto.setDateNaissance(b.getDateNaissance());
-                    dto.setDomaineDeFormation(b.getDomaineDeFormation());
-                    dto.setTypeIdentification(b.getTypeIdentification());
-                    dto.setIdentification(b.getIdentification());
-                    dto.setLienNaissance(b.getLienNaissance());
-                    dto.setQualification(b.getQualification());
-                    dto.setTelephoneContact(b.getTelephoneContact());
-                    dto.setTelephonePaiement(b.getTelephonePaiement());
-                    dto.setOperateurPaiement(b.getOperateurPaiement());
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
 
 
     @Override
@@ -122,6 +94,16 @@ public class ProjetImpl implements ProjetIService {
         p.setUpdatedAt(LocalDateTime.now());
         projetDao.save(p);
     }
+
+    @Override
+    public List<BeneficiaireDto> findBeneficiairesByProjetId(String idProjet) {
+        List<ProjetBeneficiaire> relations = projetBeneficiaireDao.findByProjetIdProjet(idProjet);
+
+        return relations.stream()
+                .map(pb -> BeneficiaireImpl.convertToDto(pb.getBeneficiaire())) // ✅ OK
+                .collect(Collectors.toList());
+    }
+
 
 
 

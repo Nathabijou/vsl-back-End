@@ -37,14 +37,7 @@ public class Beneficiaire {
     private String telephonePaiement;
     private String operateurPaiement;
 
-    @ManyToMany
-    @JoinTable(
-            name = "projet_beneficiaire",
-            joinColumns = @JoinColumn(name = "beneficiaire_id"),
-            inverseJoinColumns = @JoinColumn(name = "projet_id")
-    )
-    @Builder.Default
-    private List<Projet> projets = new ArrayList<>();
+
 
     @PrePersist
     public void generateId() {
@@ -62,4 +55,9 @@ public class Beneficiaire {
         }
         return sb.toString();
     }
+
+
+    @OneToMany(mappedBy = "beneficiaire")
+    private List<ProjetBeneficiaire> projetBeneficiaires;
+
 }
