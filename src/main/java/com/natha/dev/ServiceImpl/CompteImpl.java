@@ -33,47 +33,6 @@ public class CompteImpl implements CompteISercive {
     @Autowired
     private GroupeDao groupeDao;
 
-//    @Override
-//    public CompteDto createCompteForUserInGroupe(String userName, Long groupeId, CompteDto compteDto) {
-//        // Vérifier si l'utilisateur existe
-//        Users users = userDao.findByUserName(userName);
-//        if (users == null) {
-//            throw new RuntimeException("Utilisateur non trouvé");
-//        }
-//
-//        // Vérifier si le groupe existe
-//        Groupe groupe = groupeDao.findById(groupeId)
-//                .orElseThrow(() -> new RuntimeException("Groupe non trouvé"));
-//
-//        // Vérifier que l'utilisateur appartient au groupe
-//        Optional<Groupe_Users> groupeUsersOpt = groupeUserDao.findByUsersAndGroupe(users, groupe);
-//        if (groupeUsersOpt.isEmpty()) {
-//            throw new RuntimeException("L'utilisateur n'appartient pas à ce groupe");
-//        }
-//
-//        Groupe_Users groupeUsers = groupeUsersOpt.get();
-//
-//        // Vérifier si un compte existe déjà
-//        if (groupeUsers.getCompte() != null) {
-//            throw new RuntimeException("Un compte existe déjà pour cet utilisateur dans ce groupe");
-//        }
-//
-//        // Créer le compte
-//        Compte compte = convertToEntity(compteDto);
-//
-//        // Associer le compte à groupeUsers (relation bidirectionnelle)
-//        compte.setGroupeUsers(groupeUsers);
-//        groupeUsers.setCompte(compte); // Important : synchroniser des deux côtés de la relation
-//
-//        // Sauvegarder le compte
-//        Compte savedCompte = compteDao.save(compte);
-//
-//        // Sauvegarder l'association dans groupe_users
-//        groupeUserDao.save(groupeUsers);
-//
-//        return convertToDto(savedCompte);
-//    }
-
     @Override
     public Optional<CompteDto> findById(Long id) {
         Optional<Compte> compte = compteDao.findById(id);
@@ -112,21 +71,10 @@ public class CompteImpl implements CompteISercive {
         compteDto.setBalance(compte.getBalance());
         compteDto.setInteret(compte.getInteret());
         compteDto.setBalanceDue(compte.getBalanceDue());
-        compteDto.setDatePret(compte.getDatePret());
-        compteDto.setPrixAction(compte.getPrixAction());
         compteDto.setNumeroCompte(compte.getNumeroCompte());
-
-//        compteDto.setGroupeuserId(compte.getGroupeUsers().getId());
-
-
 
         return compteDto;
     }
-
-//   if (compte.getGroupeUsers() != null) {
-//        compteDto.setGroupeuserId(compte.getGroupeUsers().getId());
-//    }
-
 
     private Compte convertToEntity(CompteDto compteDto) {
         Compte compte = new Compte();
@@ -135,7 +83,6 @@ public class CompteImpl implements CompteISercive {
         compte.setBalance(compteDto.getBalance());
         compte.setInteret(compteDto.getInteret());
         compte.setBalanceDue(compteDto.getBalanceDue());
-        compte.setRemboursement(compteDto.getRemboursement());
 
         return compte;
     }

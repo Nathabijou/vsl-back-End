@@ -2,6 +2,7 @@ package com.natha.dev.Model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,5 +32,10 @@ public class Presence {
 
     @ManyToOne
     private ProjetBeneficiaire projetBeneficiaire;
+
+    @ManyToOne
+    @JoinColumn(name = "projet_beneficiaire_formation_id")
+    private ProjetBeneficiaireFormation projetBeneficiaireFormation;
+
 }
 

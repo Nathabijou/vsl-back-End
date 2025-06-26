@@ -13,13 +13,12 @@ public class CompteDto {
     private String  nom;
     private int numeroCompte;
     private BigDecimal balance;
-    private BigDecimal pret;
+
     private BigDecimal interet;
     private BigDecimal balanceDue;
-    private Date datePret;
-    private Date remboursement;
+
     private  int nombreDaction;
-    private BigDecimal prixAction;
+
 
     private Long userId;
     private Long groupeuserId;

@@ -1,13 +1,9 @@
 package com.natha.dev.ServiceImpl;
 
-import com.natha.dev.Dao.BeneficiaireDao;
-import com.natha.dev.Dao.ProjetBeneficiaireDao;
-import com.natha.dev.Dao.ProjetDao;
+import com.natha.dev.Dao.*;
 import com.natha.dev.Dto.BeneficiaireDto;
 import com.natha.dev.IService.BeneficiaireIService;
-import com.natha.dev.Model.Beneficiaire;
-import com.natha.dev.Model.Projet;
-import com.natha.dev.Model.ProjetBeneficiaire;
+import com.natha.dev.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -23,6 +19,38 @@ public class BeneficiaireImpl implements BeneficiaireIService {
     private ProjetDao projetDao;
     @Autowired
     private ProjetBeneficiaireDao projetBeneficiaireDao;
+    @Autowired
+    private ProjetBeneficiaireFormationDao projetBeneficiaireFormationDao;
+    @Autowired
+    private FormationDao formationDao;
+
+
+    @Override
+    public void ajouterBeneficiaireDansFormation(String idBeneficiaire, String idProjet, String idFormation) {
+        // 1. Récupérer ProjetBeneficiaire
+        ProjetBeneficiaire projetBeneficiaire = projetBeneficiaireDao
+                .findByProjetIdProjetAndBeneficiaireIdBeneficiaire(idProjet, idBeneficiaire)
+                .orElseThrow(() -> new RuntimeException("Bénéficiaire pa nan pwojè sa!"));
+
+        // 2. Récupérer Formation
+        Formation formation = formationDao.findById(idFormation)
+                .orElseThrow(() -> new RuntimeException("Formation pa jwenn"));
+
+        // 3. Vérifier si deja ajoute
+        boolean dejaAjoute = projetBeneficiaireFormationDao
+                .existsByProjetBeneficiaireAndFormation(projetBeneficiaire, formation);
+
+        if (dejaAjoute) {
+            throw new RuntimeException("Bénéficiaire deja nan formation sa a.");
+        }
+
+        // 4. Créer nouvel enregistrement ProjetBeneficiaireFormation
+        ProjetBeneficiaireFormation relation = new ProjetBeneficiaireFormation();
+        relation.setProjetBeneficiaire(projetBeneficiaire);
+        relation.setFormation(formation);
+
+        projetBeneficiaireFormationDao.save(relation);
+    }
 
 
     @Override

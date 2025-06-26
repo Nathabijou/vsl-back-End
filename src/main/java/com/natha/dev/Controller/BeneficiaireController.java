@@ -76,5 +76,18 @@ public class BeneficiaireController {
         return ResponseEntity.ok("Beneficiaire efase nan pwojè avèk siksè");
     }
 
+    //Transferer un beneficiaire dans formation
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+    @PostMapping("/beneficiaires/{idBeneficiaire}/formation/{idProjet}/{idFormation}")
+    public ResponseEntity<?> ajouterBeneficiaireDansFormation(
+            @PathVariable String idBeneficiaire,
+            @PathVariable String idProjet,
+            @PathVariable String idFormation) {
+        beneficiaireIService.ajouterBeneficiaireDansFormation(idBeneficiaire, idProjet, idFormation);
+        return ResponseEntity.ok("Successfully");
+    }
+
+
+
 }
 

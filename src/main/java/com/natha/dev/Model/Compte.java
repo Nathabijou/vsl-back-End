@@ -23,18 +23,18 @@ public class Compte {
     private String  nom;
     private int numeroCompte;
     private BigDecimal balance;
-    private BigDecimal pret;
     private BigDecimal interet;
     private BigDecimal balanceDue;
-    private Date datePret;
-    private Date remboursement;
+
+
     private  int nombreDaction;
-    private BigDecimal prixAction;
+
     private BigDecimal montant;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createDate")
     private Date createDate;
+    private String createBy;
 
     @ManyToOne
     @JoinColumn(name = "groupe_user_id", nullable = false)

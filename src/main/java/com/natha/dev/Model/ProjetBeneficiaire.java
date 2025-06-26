@@ -2,8 +2,6 @@ package com.natha.dev.Model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -28,10 +26,6 @@ public class ProjetBeneficiaire {
 
     @OneToMany(mappedBy = "projetBeneficiaire", cascade = CascadeType.ALL)
     private List<Payroll> payrolls;
-
-
-
-
 
 
 }

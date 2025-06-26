@@ -20,4 +20,7 @@ public interface BeneficiaireIService {
 
 
     void transfererBeneficiaireDansProjet(String beneficiaireId, String ancienProjetId, String nouveauProjetId);
+
+    void ajouterBeneficiaireDansFormation(String idBeneficiaire, String idProjet, String idFormation);
+
 }

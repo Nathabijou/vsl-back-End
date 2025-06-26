@@ -2,10 +2,12 @@ package com.natha.dev.ServiceImpl;
 
 import com.natha.dev.Dao.PresenceDao;
 import com.natha.dev.Dao.ProjetBeneficiaireDao;
+import com.natha.dev.Dao.ProjetBeneficiaireFormationDao;
 import com.natha.dev.Dto.PresenceDto;
 import com.natha.dev.IService.PresenceIService;
 import com.natha.dev.Model.Presence;
 import com.natha.dev.Model.ProjetBeneficiaire;
+import com.natha.dev.Model.ProjetBeneficiaireFormation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ public class PresenceImpl implements PresenceIService {
 
     @Autowired
     private ProjetBeneficiaireDao projetBeneficiaireDao;
+    @Autowired
+    private ProjetBeneficiaireFormationDao projetBeneficiaireFormationDao;
 
     @Override
     public PresenceDto ajouterPresence(String projetId, String beneficiaireId, PresenceDto dto) {
@@ -51,6 +55,48 @@ public class PresenceImpl implements PresenceIService {
                 .collect(Collectors.toList());
     }
 
+
+    // Nouvo metòd pou Presence Formation
+    public PresenceDto ajouterPresenceFormation(String projetId, String beneficiaireId, String idFormation, PresenceDto dto) {
+        ProjetBeneficiaire pb = projetBeneficiaireDao
+                .findByProjetIdProjetAndBeneficiaireIdBeneficiaire(projetId, beneficiaireId)
+                .orElseThrow(() -> new RuntimeException("Relation Projet-Bénéficiaire pa jwenn"));
+
+        ProjetBeneficiaireFormation pbf = (ProjetBeneficiaireFormation) projetBeneficiaireFormationDao
+                .findByProjetBeneficiaireAndFormationIdFormation(pb, idFormation)
+                .orElseThrow(() -> new RuntimeException("Relation ProjetBeneficiaire-Formation pa jwenn"));
+
+        Presence presence = new Presence();
+        presence.setIdPresence(UUID.randomUUID().toString());
+        presence.setDatePresence(dto.getDatePresence());
+        presence.setHeurEntrer(dto.getHeurEntrer());
+        presence.setHeureSorti(dto.getHeureSorti());
+        presence.setCreateBy(dto.getCreateBy());
+        presence.setProjetBeneficiaireFormation(pbf);
+
+        return convertToDto(presenceDao.save(presence));
+    }
+
+
+
+    // Metòd pou jwenn presence formation (egzanp)
+    public List<PresenceDto> getPresencesByProjetBeneficiaireFormation(String projetId, String beneficiaireId, String idFormation) {
+        ProjetBeneficiaire pb = projetBeneficiaireDao
+                .findByProjetIdProjetAndBeneficiaireIdBeneficiaire(projetId, beneficiaireId)
+                .orElseThrow(() -> new RuntimeException("Relation Projet-Bénéficiaire pa jwenn"));
+
+        ProjetBeneficiaireFormation pbf = (ProjetBeneficiaireFormation) projetBeneficiaireFormationDao
+                .findByProjetBeneficiaireAndFormationIdFormation(pb, idFormation)
+                .orElseThrow(() -> new RuntimeException("Relation ProjetBeneficiaire-Formation pa jwenn"));
+
+        return presenceDao.findByProjetBeneficiaireFormationId(pbf.getId())
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+
+
     @Override
     public PresenceDto modifierPresence(String idPresence, PresenceDto dto) {
         Presence presence = presenceDao.findById(idPresence)
@@ -76,5 +122,10 @@ public class PresenceImpl implements PresenceIService {
                 p.getCreateBy()
         );
     }
+
+
+
+
+
 }
 
