@@ -4,6 +4,8 @@ import com.natha.dev.Model.Account;
 import com.natha.dev.Model.Groupe_Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.swing.*;
+import java.util.List;
 import java.util.Optional;
 
 public interface AccountDao extends JpaRepository<Account, String> {
@@ -15,6 +17,6 @@ public interface AccountDao extends JpaRepository<Account, String> {
     boolean existsByGroupeUsers(Groupe_Users groupeUsers);
 
 
-
+    Optional<Account> findByUserNameAndGroupeUsers_Groupe_Id(String username, Long groupId);
 
 }

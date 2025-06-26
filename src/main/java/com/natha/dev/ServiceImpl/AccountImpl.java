@@ -7,10 +7,7 @@ import com.natha.dev.Dao.UserDao;
 import com.natha.dev.Dto.AccountDto;
 import com.natha.dev.IService.AccountISercive;
 import com.natha.dev.IService.GroupeIService;
-import com.natha.dev.Model.Account;
-import com.natha.dev.Model.Groupe;
-import com.natha.dev.Model.Groupe_Users;
-import com.natha.dev.Model.Users;
+import com.natha.dev.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +51,6 @@ public class AccountImpl implements AccountISercive {
     @Override
     public void deleteById(String accountId) {
         accountDao.deleteById(accountId);
-
     }
 
     @Override
@@ -75,27 +71,27 @@ public class AccountImpl implements AccountISercive {
         String accountNumber;
 
         do {
-            int part1 = random.nextInt(10000); // 0000–9999
-            int part2 = random.nextInt(10000); // 0000–9999
-            int part3 = random.nextInt(100);   // 00–99
+            int part1 = random.nextInt(10000);
+            int part2 = random.nextInt(10000);
+            int part3 = random.nextInt(100);
 
             accountNumber = String.format("%04d-%04d-%02d", part1, part2, part3);
-
         } while (accountDao.existsByNumeroCompte(accountNumber));
 
         return accountNumber;
     }
+
     public AccountDto createAccount(Long groupeUserId, AccountDto dto) {
         Groupe_Users groupeUsers = groupeUserDao.findById(groupeUserId)
                 .orElseThrow(() -> new RuntimeException("GroupeUser not found"));
 
         Account account = new Account();
         account.setNom(dto.getNom());
-        account.setBalance(dto.getBalance());
-        account.setNombreDaction(dto.getNombreDaction());
+        account.setBalance(BigDecimal.ZERO); // pa mete balans la lè w ap kreye
+        account.setNombreDaction(0); // menm jan
         account.setBalanceDue(BigDecimal.ZERO);
         account.setInteret(BigDecimal.ZERO);
-        account.setNumeroCompte(generateUniqueAccountNumber()); // 👈 mete li la
+        account.setNumeroCompte(generateUniqueAccountNumber());
         account.setGroupe_users(groupeUsers);
         account.setUserName(groupeUsers.getUsers().getUserName());
         account.setGroupeId(groupeUsers.getGroupe().getId());
@@ -103,7 +99,7 @@ public class AccountImpl implements AccountISercive {
 
         Account saved = accountDao.save(account);
 
-        dto.setIdAccount(saved.getIdAccount());
+        dto.setIdAccount(saved.getId());
         dto.setNumeroCompte(saved.getNumeroCompte());
         return dto;
     }
@@ -117,47 +113,28 @@ public class AccountImpl implements AccountISercive {
         return convertToDto(saved);
     }
 
-    private AccountDto convertToDto(Account account) {
-        AccountDto accountDto = new AccountDto();
-        accountDto.setIdAccount(account.getIdAccount());
-        accountDto.setBalance(account.getBalance());
-        accountDto.setInteret(account.getInteret());
-        accountDto.setBalanceDue(account.getBalanceDue());
-        accountDto.setNumeroCompte(account.getNumeroCompte());
-        accountDto.setActive(account.isActive());  // ajoute sa
-        return accountDto;
-    }
-
-
-
     public AccountDto createAccountForUserInGroup(String username, Long groupId, AccountDto dto) {
-        // 1. Verifye si user egziste
         Users user = userDao.findById(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 2. Verifye si group egziste
         Groupe group = groupeDao.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Groupe not found"));
 
-        // 3. Verifye si user fè pati group lan (Groupe_Users)
         Groupe_Users gu = groupeUserDao.findByUsersAndGroupe(user, group)
                 .orElseThrow(() -> new RuntimeException("User is not on the group"));
 
-        // 4. Verifye si kont deja egziste pou Groupe_Users sa a
         if (gu.getAccount() != null) {
-            throw new RuntimeException("Account already exist on group");
+            throw new RuntimeException("Account already exists on group");
         }
 
-        // 5. Jenere nimewo kont inik
         String generatedAccountNumber = generateUniqueAccountNumber();
 
-        // 6. Kreye kont lan
         Account account = new Account();
         account.setNom(dto.getNom());
-        account.setBalance(dto.getBalance());
-        account.setInteret(dto.getInteret());
+        account.setBalance(BigDecimal.ZERO);
+        account.setInteret(BigDecimal.ZERO);
         account.setBalanceDue(BigDecimal.ZERO);
-        account.setNombreDaction(dto.getNombreDaction());
+        account.setNombreDaction(0);
         account.setCreateDate(new Date());
         account.setNumeroCompte(generatedAccountNumber);
         account.setGroupe_users(gu);
@@ -166,24 +143,61 @@ public class AccountImpl implements AccountISercive {
 
         accountDao.save(account);
 
-        dto.setNumeroCompte(generatedAccountNumber); // mete nimewo kont nan DTO a
+        dto.setNumeroCompte(generatedAccountNumber);
         return dto;
     }
 
-
-
-
-
     private Account convertToEntity(AccountDto accountDto) {
         Account account = new Account();
-        account.setIdAccount(accountDto.getIdAccount());
+        account.setId(accountDto.getIdAccount());
         account.setNumeroCompte(accountDto.getNumeroCompte());
         account.setBalance(accountDto.getBalance());
         account.setInteret(accountDto.getInteret());
         account.setBalanceDue(accountDto.getBalanceDue());
-
         return account;
     }
 
+    @Override
+    public BigDecimal calculerBalanceTotaleParUserEtGroupe(String username, Long groupId) {
+        Optional<Account> optionalAccount = accountDao.findByUserNameAndGroupeUsers_Groupe_Id(username, groupId);
 
+        if (optionalAccount.isPresent()) {
+            Account account = optionalAccount.get();
+            int nombreDaction = getTotalNombreAksyonParAccount(account);
+            BigDecimal prixAction = account.getGroupeUsers().getGroupe().getPrixAction();
+            return prixAction.multiply(BigDecimal.valueOf(nombreDaction));
+        }
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal getMontantTotalParAccount(Account account) {
+        return account.getActions().stream()
+                .map(Action::getMontant)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public int getTotalNombreAksyonParAccount(Account account) {
+        return account.getActions().stream()
+                .mapToInt(Action::getNombre)
+                .sum();
+    }
+
+    private AccountDto convertToDto(Account account) {
+        AccountDto accountDto = new AccountDto();
+        accountDto.setIdAccount(account.getId());
+        accountDto.setBalance(getMontantTotalParAccount(account));
+        accountDto.setNombreDaction(getTotalNombreAksyonParAccount(account));
+        accountDto.setInteret(account.getInteret());
+        accountDto.setBalanceDue(account.getBalanceDue());
+        accountDto.setNumeroCompte(account.getNumeroCompte());
+        accountDto.setActive(account.isActive());
+        return accountDto;
+    }
+
+    @Override
+    public AccountDto getAccountDetails(String username, Long groupId) {
+        Optional<Account> optionalAccount = accountDao.findByUserNameAndGroupeUsers_Groupe_Id(username, groupId);
+        return optionalAccount.map(this::convertToDto)
+                .orElseThrow(() -> new RuntimeException("Account not found for user in group"));
+    }
 }

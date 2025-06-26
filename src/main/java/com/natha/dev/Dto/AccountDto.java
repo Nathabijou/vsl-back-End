@@ -25,6 +25,6 @@ public class AccountDto {
     private Long userId;
     private Long groupeuserId;
 
-//    public void setGroupeUsersId(Long id) {
-//    }
+
+
 }

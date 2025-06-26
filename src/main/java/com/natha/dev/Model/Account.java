@@ -1,5 +1,6 @@
 package com.natha.dev.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.natha.dev.Dao.AccountDao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,8 +9,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.swing.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 
@@ -21,7 +25,7 @@ import java.util.Random;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idAccount;
+    private Long id;
     private String  nom;
     private String numeroCompte;
     private BigDecimal balance;
@@ -32,7 +36,8 @@ public class Account {
 
 
 
-    private  int nombreDaction;
+    private Integer nombreDaction;
+
 
     private BigDecimal montant;
 
@@ -40,6 +45,11 @@ public class Account {
     @Column(name = "createDate")
     private Date createDate;
     private String createBy;
+
+    @OneToMany(mappedBy = "account")
+    @JsonManagedReference
+    private List<Action> actions;
+
 
     @OneToOne
     @JoinColumn(name = "groupe_users_id", referencedColumnName = "id")

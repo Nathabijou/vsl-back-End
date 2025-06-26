@@ -25,6 +25,7 @@ public class Loan {
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
+
     private BigDecimal principalAmount;
     private BigDecimal interestRate;
     private LocalDate startDate;

@@ -35,7 +35,7 @@ public class LoanImpl implements LoanIService {
 
     @Override
     public List<Loan> getLoansByAccount(String accountId) {
-        return loanDao.findByAccountIdAccount(accountId);
+        return loanDao.findByAccount_Id(String.valueOf(Long.valueOf(accountId)));
     }
 
     @Override

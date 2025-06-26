@@ -32,5 +32,10 @@ public class Groupe_Users {
     @OneToOne(mappedBy = "groupeUsers", cascade = CascadeType.ALL)
     private Account account;
 
+    @Column(nullable = false)
+    private Integer nombreDaction = 0;  // itilize `Integer` (Objè), non primitive, epi mete default 0
+
+
+
 
 }

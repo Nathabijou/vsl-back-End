@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 
@@ -24,8 +25,11 @@ public class Groupe {
     private String responsable;
     private LocalDateTime datecreation;
 
-    private double prixAction;
-    private double tauxInteret;
+    @Column(nullable = false)
+    private BigDecimal prixAction;
+
+    @Column(nullable = false)
+    private BigDecimal tauxInteret;
 
 
 

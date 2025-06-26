@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface LoanDao extends JpaRepository<Loan, String > {
 
-    List<Loan> findByAccountIdAccount(String accountId);
+    List<Loan> findByAccount_Id(String accountId);
 }

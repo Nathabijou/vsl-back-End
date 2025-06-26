@@ -3,6 +3,7 @@ package com.natha.dev.Dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -18,8 +19,8 @@ public class GroupeDto {
 
 
 
-    private double prixAction;
-    private double tauxInteret;
+    private BigDecimal prixAction;
+    private BigDecimal tauxInteret;
 
     private Long userName;
     private Long compteId;
