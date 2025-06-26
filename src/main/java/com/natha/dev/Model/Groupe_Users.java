@@ -1,6 +1,5 @@
 package com.natha.dev.Model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,26 +29,8 @@ public class Groupe_Users {
     @JoinColumn(name = "groupe_id", nullable = false)
     private Groupe groupe; // Référence au groupe
 
-//    @OneToOne
-//    @JoinColumn(name = "groupe_users_id", nullable = false)
-//    private Groupe_Users groupeUsers;
-
-//    @OneToOne
-//    @JoinColumn(name = "comte_id")
-//    private Compte compte;
-
-    @OneToMany(mappedBy = "groupe_users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Compte> comptes;
+    @OneToOne(mappedBy = "groupeUsers", cascade = CascadeType.ALL)
+    private Account account;
 
 
-
-
-    // Méthode statique pour créer une instance de Groupe_Users
-//    public static Groupe_Users createGroupeUser(Users user, Groupe groupe, Compte compte) {
-//        Groupe_Users groupeUser = new Groupe_Users();
-//        groupeUser.setUsers(user);
-//        groupeUser.setGroupe(groupe);
-////        groupeUser.setCompte(compte);
-//        return groupeUser;
-//    }
 }

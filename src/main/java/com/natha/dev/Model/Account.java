@@ -1,12 +1,16 @@
 package com.natha.dev.Model;
 
+import com.natha.dev.Dao.AccountDao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Random;
 
 
 @AllArgsConstructor
@@ -14,17 +18,18 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-public class Compte {
-
+public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    private Long id;
+    private Long idAccount;
     private String  nom;
-    private int numeroCompte;
+    private String numeroCompte;
     private BigDecimal balance;
     private BigDecimal interet;
     private BigDecimal balanceDue;
+    @Column(nullable = false)
+    private boolean active = true;
+
 
 
     private  int nombreDaction;
@@ -36,16 +41,27 @@ public class Compte {
     private Date createDate;
     private String createBy;
 
-    @ManyToOne
-    @JoinColumn(name = "groupe_user_id", nullable = false)
-    private Groupe_Users groupe_users;
+    @OneToOne
+    @JoinColumn(name = "groupe_users_id", referencedColumnName = "id")
+    private Groupe_Users groupeUsers;
+
+    public Groupe_Users getGroupeUsers() {
+        return groupeUsers;
+    }
+
+    public void setGroupeUsers(Groupe_Users groupeUsers) {
+        this.groupeUsers = groupeUsers;
+    }
+
+
 
     @Column(name = "user_name")
     private String userName;
     private Long groupeId;
 
-    public void setGroupeUsers(Groupe_Users groupeUsers) {
-        this.groupe_users = groupeUsers;
+
+    public void setGroupe_users(Groupe_Users groupeUsers) {
+        this.groupeUsers = groupeUsers;
     }
 
 }

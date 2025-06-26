@@ -6,6 +6,7 @@ import com.natha.dev.IService.GroupeIService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,14 +21,16 @@ public class GroupeController {
     @Autowired
     private GroupeDao groupeDao;
 
+
     // rekipere tout gwoup pou yon moun specifiqie
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
     @GetMapping("/users/{userName}/groupe")
     List<GroupeDto> groupeByUsers(@PathVariable("userName") String userName) {
         return groupeIService.findByUsers(userName);
     }
 
     // rekipere tout group
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/allgroups")
     public ResponseEntity<List<GroupeDto>> getAllGroupes() {
         List<GroupeDto> groupes = groupeIService.findAll();
