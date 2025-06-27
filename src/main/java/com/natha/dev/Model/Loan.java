@@ -1,9 +1,8 @@
 package com.natha.dev.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +10,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,8 +23,13 @@ public class Loan {
     private String idLoan;
 
     @ManyToOne
-    @JoinColumn(name = "account_id", nullable = false)
+    @JoinColumn(name = "account_id")
+    @JsonBackReference
     private Account account;
+
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Refund> refunds = new ArrayList<>();
 
 
     private BigDecimal principalAmount;

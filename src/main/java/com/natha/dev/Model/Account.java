@@ -30,7 +30,8 @@ public class Account {
     private String numeroCompte;
     private BigDecimal balance;
     private BigDecimal interet;
-    private BigDecimal balanceDue;
+    private BigDecimal balanceDue = BigDecimal.ZERO;
+
     @Column(nullable = false)
     private boolean active = true;
 
@@ -50,6 +51,9 @@ public class Account {
     @JsonManagedReference
     private List<Action> actions;
 
+    @OneToMany(mappedBy = "account")
+    @JsonManagedReference
+    private List<Loan> loans;
 
     @OneToOne
     @JoinColumn(name = "groupe_users_id", referencedColumnName = "id")

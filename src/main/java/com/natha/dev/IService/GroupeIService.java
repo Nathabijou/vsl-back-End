@@ -3,7 +3,6 @@ package com.natha.dev.IService;
 import com.natha.dev.Dto.GroupeDto;
 import com.natha.dev.Model.Groupe;
 import com.natha.dev.Model.Users;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
