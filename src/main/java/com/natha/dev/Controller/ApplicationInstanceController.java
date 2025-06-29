@@ -2,6 +2,8 @@ package com.natha.dev.Controller;
 
 import com.natha.dev.Dto.ApplicationInstanceDto;
 import com.natha.dev.IService.ApplicationInstanceIService;
+import com.natha.dev.Model.ApplicationInstance;
+import com.natha.dev.Model.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,8 +19,45 @@ public class ApplicationInstanceController {
     @Autowired
     private ApplicationInstanceIService applicationInstanceService;
 
+
+
+
+    //create app single
+    @PostMapping("/create-standalone")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    public ResponseEntity<ApplicationInstanceDto> createStandaloneApp(@RequestBody ApplicationInstanceDto dto) {
+        ApplicationInstanceDto saved = applicationInstanceService.createStandaloneApp(dto);
+        return ResponseEntity.ok(saved);
+    }
+
+
+    //recuperer list user nan yon app
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    @GetMapping("/applications/{idApp}/users")
+    public ResponseEntity<List<Users>> getUsersByApplication(@PathVariable String idApp) {
+        List<Users> users = applicationInstanceService.getUsersByApplication(idApp);
+        return ResponseEntity.ok(users);
+    }
+// ajouter user nan yon app
+    @PostMapping("/application/{appId}/addUser/{userName}")
+    public ResponseEntity<ApplicationInstanceDto> addUserToApplication(
+            @PathVariable String appId,
+            @PathVariable String userName) {
+
+        ApplicationInstanceDto updatedApp = applicationInstanceService.addUserToApplication(userName, appId);
+        return ResponseEntity.ok(updatedApp);
+    }
+    //Get List App from user
+    @GetMapping("/users/{userName}/applications")
+    public ResponseEntity<List<ApplicationInstanceDto>> getApplicationsByUser(@PathVariable String userName) {
+        List<ApplicationInstanceDto> apps = applicationInstanceService.getApplicationsByUser(userName);
+        return ResponseEntity.ok(apps);
+    }
+
+
+
     // 🔍 Get tout aplikasyon yo
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/allApplicationInstance")
     public List<ApplicationInstanceDto> getAll() {
         return applicationInstanceService.findAll();
@@ -26,7 +65,7 @@ public class ApplicationInstanceController {
 
     // ➕ Create Application With Org( Verify)
     @PostMapping("/organization/{orgId}/create")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     public ResponseEntity<ApplicationInstanceDto> createAppInOrg(
             @PathVariable String orgId,
             @RequestBody ApplicationInstanceDto dto) {
@@ -38,13 +77,14 @@ public class ApplicationInstanceController {
 
 
     // 🔍 Get All App ( Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
-    @GetMapping("/{idApp}")
-    public ResponseEntity<ApplicationInstanceDto> getById(@PathVariable String idApp) {
-        return applicationInstanceService.findById(idApp)
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    @GetMapping("/applications/{id}")
+    public ResponseEntity<ApplicationInstanceDto> getById(@PathVariable String id) {
+        return applicationInstanceService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
 
 
 

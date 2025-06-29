@@ -18,7 +18,7 @@ public class OrganizationController {
     private OrganizationIService organizationIService;
 
     // 🔍see
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/mysystem/{mySystemId}/organization/{orgId}")
     public ResponseEntity<OrganizationDto> getOrganizationFromMySystem(
             @PathVariable Long mySystemId,
@@ -29,8 +29,14 @@ public class OrganizationController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/users/{userName}/organizations")
+    public List<OrganizationDto> getOrganizationsByUser(@PathVariable String userName) {
+        return organizationIService.findByUserName(userName);
+    }
+
+
     // ✅ Create Org : (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @PostMapping("/create/{mySystemId}")
     public ResponseEntity<?> createOrganizationByMySystem(
             @PathVariable Long mySystemId,
@@ -45,14 +51,14 @@ public class OrganizationController {
     }
 
     // 🔁 See All Org (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+   // @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/allOrganisations")
     public List<OrganizationDto> getAllOrganizations() {
         return organizationIService.findAll();
     }
 
     // ✏️ Modify org: (Yes Verify)
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('SUPERADMIN')")
     @PutMapping("/mysystem/{mySystemId}/organization/{idorg}")
     public ResponseEntity<OrganizationDto> updateOrganizationBySystem(
             @PathVariable Long mySystemId,
@@ -64,7 +70,7 @@ public class OrganizationController {
     }
 
     // 🔍 see org by Id  system: (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/{idorg}/mysystem/{mySystemId}")
     public Optional<OrganizationDto> getByIdAndSystem(
             @PathVariable String idorg,
@@ -73,21 +79,21 @@ public class OrganizationController {
     }
 
     // 🔍 see All prg on system (Yes Verify)
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('SUPERADMIN')")
     @GetMapping("/mysystem/{mySystemId}/organizations")
     public List<OrganizationDto> getOrganizationsByMySystem(@PathVariable Long mySystemId) {
         return organizationIService.findByMySystemId(mySystemId);
     }
 
     // ❌ Delete ganizasyon: (Yes Verify)
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('SUPERADMIN')")
     @DeleteMapping("/{idorg}")
     public void deleteOrganization(@PathVariable String idorg) {
         organizationIService.deleteById(idorg);
     }
 
     // 🚫 Dezaktive org (Yes Verify)
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('SUPERADMIN')")
     @PutMapping("/deactivate/{idorg}")
     public ResponseEntity<OrganizationDto> deactivateOrganization(@PathVariable String idorg) {
         Optional<OrganizationDto> optOrg = organizationIService.findById(idorg);
@@ -99,7 +105,7 @@ public class OrganizationController {
         return ResponseEntity.notFound().build();
     }
     //Acivate Org (Yes Verify)
-    @PreAuthorize("hasAnyRole('SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('SUPERADMIN')")
     @PutMapping("/activate/{idorg}")
     public ResponseEntity<OrganizationDto> ActiveOrganization(@PathVariable String idorg) {
         Optional<OrganizationDto> optOrg = organizationIService.findById(idorg);
@@ -110,4 +116,14 @@ public class OrganizationController {
         }
         return ResponseEntity.notFound().build();
     }
+
+
+    // ✅ Get org by ID (SAN mySystemId)
+    @GetMapping("/programs/{idorg}")
+    public ResponseEntity<OrganizationDto> findOrganizationById(@PathVariable String idorg) {
+        return organizationIService.findById(idorg)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }

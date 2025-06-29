@@ -19,4 +19,5 @@ public interface OrganizationIService {
     OrganizationDto updateByIdAndSystemId(String idorg, Long mySystemId, OrganizationDto organizationDto);
 
 
+    List<OrganizationDto> findByUserName(String userName);
 }

@@ -1,11 +1,13 @@
 package com.natha.dev.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -68,6 +70,24 @@ public class Users {
     public void setOtpCode(String otpCode) {
         this.otpCode = otpCode;
     }
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "user_application_instance",
+            joinColumns = @JoinColumn(name = "user_name"),       // verifye si user_name egziste
+            inverseJoinColumns = @JoinColumn(name = "id_app")    // verifye si id_app egziste nan tab join la
+    )
+    private Set<ApplicationInstance> applicationInstances;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_composante_access",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "composante_id")
+    )
+    private Set<Composante> composantes = new HashSet<>();
 
 
 

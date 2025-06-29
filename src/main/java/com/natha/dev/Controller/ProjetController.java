@@ -20,7 +20,7 @@ public class ProjetController {
     private ProjetIService projetIService;
 
     //Create Project with component and Quatier (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
     @PostMapping("/composante/{composanteId}/quartier/{quartierId}")
     public ResponseEntity<ProjetDto> createProjet(
             @PathVariable Long composanteId,
@@ -31,13 +31,13 @@ public class ProjetController {
     }
 
     //Get List Project with component  (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
     @GetMapping("/composante/{composanteId}")
     public List<ProjetDto> getProjetsByComposante(@PathVariable Long composanteId) {
         return projetIService.findByComposante(composanteId);
     }
     // Get List project with component and Quartier (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
     @GetMapping("/composante/{composanteId}/quartier/{quartierId}")
     public List<ProjetDto> getProjetsByComposanteAndQuartier(
             @PathVariable Long composanteId,
@@ -47,7 +47,7 @@ public class ProjetController {
 
 
     //Modify Project with component (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN','MANAGER')")
+    //@PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN','MANAGER')")
     @PutMapping("/composante/{composanteId}/projet/{idProjet}")
     public ResponseEntity<ProjetDto> updateByComposante(
             @PathVariable Long composanteId,
@@ -59,7 +59,7 @@ public class ProjetController {
     }
 
     // 2) Update project with Component and Quartier
-    @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN','MANAGER')")
+    //@PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN','MANAGER')")
     @PutMapping("/composante/{composanteId}/quartier/{quartierId}/projet/{idProjet}")
     public ResponseEntity<ProjetDto> updateByComposanteAndQuartier(
             @PathVariable Long composanteId,
@@ -73,7 +73,7 @@ public class ProjetController {
 
 
     //Get All project in the App (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
     @GetMapping("/All")
     public ResponseEntity<List<ProjetDto>> getAllProjets() {
         return ResponseEntity.ok(projetIService.findAll());

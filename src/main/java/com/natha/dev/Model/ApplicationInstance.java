@@ -1,12 +1,12 @@
 package com.natha.dev.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -41,7 +41,14 @@ public class ApplicationInstance {
     private String themeColor; // eg. "#007bff"
 
     @OneToMany(mappedBy = "applicationInstance")
+    @JsonManagedReference
     private Set<Composante> composantes;
+
+
+    @ManyToMany(mappedBy = "applicationInstances")
+    @JsonIgnore  // pral inyore 'users' lè serializé ApplicationInstance
+    private Set<Users> users;
+
 
 
 

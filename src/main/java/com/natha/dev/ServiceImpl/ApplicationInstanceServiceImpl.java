@@ -2,13 +2,16 @@ package com.natha.dev.ServiceImpl;
 
 import com.natha.dev.Dao.ApplicationInstanceDao;
 import com.natha.dev.Dao.OrganizationDao;
+import com.natha.dev.Dao.UserDao;
 import com.natha.dev.Dto.ApplicationInstanceDto;
 import com.natha.dev.IService.ApplicationInstanceIService;
 import com.natha.dev.Model.ApplicationInstance;
 import com.natha.dev.Model.Organization;
+import com.natha.dev.Model.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +23,59 @@ public class ApplicationInstanceServiceImpl implements ApplicationInstanceIServi
     private ApplicationInstanceDao applicationInstanceDao;
     @Autowired
     private OrganizationDao organizationDao;
+    @Autowired
+    private UserDao userDao;
+
+    @Override
+    public List<ApplicationInstanceDto> getApplicationsByUser(String userName) {
+        // Jwenn aplikasyon yo soti nan repo
+        List<ApplicationInstance> apps = applicationInstanceDao.findByUsersUserName(userName);
+
+        // Map entities ApplicationInstance -> ApplicationInstanceDto
+        return apps.stream()
+                .map(app -> convertToDto(app))
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public ApplicationInstanceDto createStandaloneApp(ApplicationInstanceDto dto) {
+        // Asire `organizationId` pa obligatwa
+        dto.setOrganizationId(null);
+        // mete default pou active, themeColor, status si ou vle
+        if (dto.getActive() == null) dto.setActive(true);
+        if (dto.getStatus() == null) dto.setStatus("ACTIVE");
+        if (dto.getThemeColor() == null) dto.setThemeColor("default");
+
+        return save(dto); // ap rele metòd save(dto)
+    }
+
+
+    @Override
+    public ApplicationInstanceDto addUserToApplication(String userName, String appId) {
+        Users user = userDao.findById(userName)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ApplicationInstance app = applicationInstanceDao.findById(appId)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+
+        user.getApplicationInstances().add(app); // ajoute app a user la
+        app.getUsers().add(user); // ajoute user lan app la
+
+        userDao.save(user); // oswa applicationInstanceRepository.save(app)
+        return convertToDto(app);
+
+    }
+
+
+    @Override
+    public List<Users> getUsersByApplication(String idApp) {
+        ApplicationInstance app = applicationInstanceDao.findById(idApp)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+
+        return new ArrayList<>(app.getUsers()); // Si ou pa vle Set
+    }
+
 
     @Override
     public Optional<ApplicationInstanceDto> findById(String idApp) {

@@ -1,13 +1,18 @@
 package com.natha.dev.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.userdetails.User;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,8 +30,14 @@ public class Composante {
     private String type; // e.g. "ZONE_BASED", "CENTER_BASED", "DIRECT_PROJECT"
 
     @ManyToOne
-    @JoinColumn(name = "application_id")
+    @JoinColumn(name = "application_instance_id")
+    @JsonBackReference
     private ApplicationInstance applicationInstance;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "composantes")
+    private Set<Users> users = new HashSet<>();
+
 
     private String description;
     private String createdBy;

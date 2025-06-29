@@ -186,6 +186,11 @@ public class OrganizationImpl  implements OrganizationIService {
         }
     }
 
+    @Override
+    public List<OrganizationDto> findByUserName(String userName) {
+        return null;
+    }
+
 
     public OrganizationDtoLimited convertToLimitedDto(Organization organization) {
         OrganizationDtoLimited dto = new OrganizationDtoLimited();

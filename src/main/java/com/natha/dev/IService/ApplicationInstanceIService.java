@@ -1,6 +1,7 @@
 package com.natha.dev.IService;
 
 import com.natha.dev.Dto.ApplicationInstanceDto;
+import com.natha.dev.Model.Users;
 
 
 import java.util.List;
@@ -17,4 +18,14 @@ public interface ApplicationInstanceIService {
 
 
     ApplicationInstanceDto saveByOrg(ApplicationInstanceDto dto, String orgId);
+
+    List<Users> getUsersByApplication(String idApp);
+    ApplicationInstanceDto addUserToApplication(String userName, String appId);
+    ApplicationInstanceDto createStandaloneApp(ApplicationInstanceDto dto);
+
+    List<ApplicationInstanceDto> getApplicationsByUser(String userName);
+
+
+
+
 }

@@ -6,8 +6,6 @@ import com.natha.dev.Dao.ProjetBeneficiaireFormationDao;
 import com.natha.dev.Dto.FormationDto;
 import com.natha.dev.IService.FormationIService;
 import com.natha.dev.Model.Formation;
-import com.natha.dev.Model.ProjetBeneficiaire;
-import com.natha.dev.Model.ProjetBeneficiaireFormation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

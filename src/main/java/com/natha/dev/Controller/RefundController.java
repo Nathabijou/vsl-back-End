@@ -3,7 +3,6 @@ package com.natha.dev.Controller;
 import com.natha.dev.Dao.AccountDao;
 import com.natha.dev.IService.LoanIService;
 import com.natha.dev.IService.RefundIService;
-import com.natha.dev.Model.Account;
 import com.natha.dev.Model.Loan;
 import com.natha.dev.Model.Refund;
 import jakarta.transaction.Transactional;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/refunds")
