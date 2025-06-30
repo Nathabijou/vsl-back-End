@@ -28,7 +28,7 @@ public class RoleService {
 
         Set<Privilege> privileges = new HashSet<>();
 
-        if ("SUPERADNIM".equalsIgnoreCase(roleName)) {
+        if ("ADMIN".equalsIgnoreCase(roleName)) {
             privileges.add(getOrCreatePrivilege("CREATE", "Create privilege"));
             privileges.add(getOrCreatePrivilege("UPDATE", "Update privilege"));
             privileges.add(getOrCreatePrivilege("READ", "Read privilege"));
@@ -50,21 +50,19 @@ public class RoleService {
             privileges.add(getOrCreatePrivilege("ACCESS_API", "Access system APIs"));
 
 
-    } else if ("ADMIN".equalsIgnoreCase(roleName)) {
+    } else if ("MANAGER".equalsIgnoreCase(roleName)) {
             privileges.add(getOrCreatePrivilege("CREATE", "Create privilege"));
             privileges.add(getOrCreatePrivilege("UPDATE", "Update privilege"));
             privileges.add(getOrCreatePrivilege("READ", "Read privilege"));
-            privileges.add(getOrCreatePrivilege("DELETE", "Delete privilege"));
-        } else if ("MANAGER".equalsIgnoreCase(roleName)) {
-            privileges.add(getOrCreatePrivilege("CREATE", "Create privilege"));
-            privileges.add(getOrCreatePrivilege("UPDATE", "Update privilege"));
-            privileges.add(getOrCreatePrivilege("READ", "Read privilege"));
+
         } else if ("USER".equalsIgnoreCase(roleName)) {
             privileges.add(getOrCreatePrivilege("CREATE", "Create privilege"));
+            privileges.add(getOrCreatePrivilege("UPDATE", "Update privilege"));
+            privileges.add(getOrCreatePrivilege("READ", "Read privilege"));
+        } else if ("MODERANT".equalsIgnoreCase(roleName)) {
+            privileges.add(getOrCreatePrivilege("CREATE", "Create privilege"));
             privileges.add(getOrCreatePrivilege("READ", "Read privilege"));
             privileges.add(getOrCreatePrivilege("CREATE", "Create privilege"));
-        } else if ("MODERANT".equalsIgnoreCase(roleName)) {
-            privileges.add(getOrCreatePrivilege("READ", "Read privilege"));
         }
 
         role.setPrivileges(privileges);

@@ -18,8 +18,8 @@ import java.util.Set;
 @Entity
 //@Builder
 public class Users {
-
     @Id
+
     private String userName; // identifiant
     private String userEmail;
     private String userPassword;
@@ -45,16 +45,17 @@ public class Users {
     private String createdBy;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "USER_ROLE",
+    @JoinTable(name = "user_role",
             joinColumns = {
-                    @JoinColumn(name = "USER_ID")
+                    @JoinColumn(name = "user_name")  // Chanje isit la
             },
             inverseJoinColumns = {
-                    @JoinColumn(name = "ROLE_ID")
+                    @JoinColumn(name = "role_name")
             }
     )
-
     private Set<Role> role;
+
+
     public Set<Role> getRole() {
         return role;
     }
@@ -75,16 +76,18 @@ public class Users {
     @ManyToMany
     @JoinTable(
             name = "user_application_instance",
-            joinColumns = @JoinColumn(name = "user_name"),       // verifye si user_name egziste
-            inverseJoinColumns = @JoinColumn(name = "id_app")    // verifye si id_app egziste nan tab join la
+            joinColumns = @JoinColumn(name = "user_name"), // byen matche
+            inverseJoinColumns = @JoinColumn(name = "id_app")
     )
+
     private Set<ApplicationInstance> applicationInstances;
 
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "user_composante_access",
-            joinColumns = @JoinColumn(name = "user_id"),
+            joinColumns = @JoinColumn(name = "user_name"),
             inverseJoinColumns = @JoinColumn(name = "composante_id")
     )
     private Set<Composante> composantes = new HashSet<>();

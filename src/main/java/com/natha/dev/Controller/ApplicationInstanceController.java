@@ -2,7 +2,6 @@ package com.natha.dev.Controller;
 
 import com.natha.dev.Dto.ApplicationInstanceDto;
 import com.natha.dev.IService.ApplicationInstanceIService;
-import com.natha.dev.Model.ApplicationInstance;
 import com.natha.dev.Model.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

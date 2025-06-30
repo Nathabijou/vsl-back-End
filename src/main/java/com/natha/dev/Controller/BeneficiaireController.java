@@ -8,26 +8,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-
 @RestController
 @CrossOrigin("http://localhost:4200")
-@RequestMapping("/beneficiaires")
 public class BeneficiaireController {
 
     @Autowired
     private BeneficiaireIService beneficiaireIService;
 
+    @GetMapping("/beneficiaires/beneficiaires/{beneficiaireId}")
+    public ResponseEntity<BeneficiaireDto> getBeneficiaireById(@PathVariable String beneficiaireId) {
+        return beneficiaireIService.findById(beneficiaireId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     //Get All Beneficiaire (Yes Verify)
-    @PostMapping("/create")
+    @PostMapping("/beneficiaires/create")
     public ResponseEntity<BeneficiaireDto> create(@RequestBody BeneficiaireDto dto) {
         return ResponseEntity.ok(beneficiaireIService.save(dto));
     }
 
      //Add Beneficiaire to project (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
-    @PostMapping("/projets/{idProjet}/beneficiaires")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    @PostMapping("/beneficiaires/projets/{idProjet}/beneficiaires")
     public ResponseEntity<BeneficiaireDto> createBeneficiaireInProjet(
             @RequestBody BeneficiaireDto beneficiaireDto,
             @PathVariable String idProjet) {
@@ -37,8 +40,8 @@ public class BeneficiaireController {
     }
 
     //Modify benerifiaire with project (yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
-    @PutMapping("/projets/{projetId}/beneficiaires/{beneficiaireId}")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    @PutMapping("/beneficiaires/projets/{projetId}/beneficiaires/{beneficiaireId}")
     public ResponseEntity<BeneficiaireDto> updateBeneficiaireDansProjet(
             @PathVariable String projetId,
             @PathVariable String beneficiaireId,
@@ -48,8 +51,8 @@ public class BeneficiaireController {
     }
 
     //get beneficiaire with id (yes verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
-    @GetMapping("/projets/{projetId}/beneficiaires/{beneficiaireId}")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    @GetMapping("/beneficiaires/projets/{projetId}/beneficiaires/{beneficiaireId}")
     public ResponseEntity<BeneficiaireDto> getBeneficiaireInProjet(
             @PathVariable String projetId,
             @PathVariable String beneficiaireId) {
@@ -58,8 +61,8 @@ public class BeneficiaireController {
                 .orElse(ResponseEntity.notFound().build());
     }
     //Transfer Beneficiares with anoter project
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
-    @PutMapping("/beneficiaires/{beneficiaireId}/transfer/{ancienProjetId}/{nouveauProjetId}")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    @PutMapping("/beneficiaires/beneficiaires/{beneficiaireId}/transfer/{ancienProjetId}/{nouveauProjetId}")
     public ResponseEntity<String> transfererBeneficiaire(
             @PathVariable String beneficiaireId,
             @PathVariable String ancienProjetId,
@@ -67,8 +70,8 @@ public class BeneficiaireController {
         beneficiaireIService.transfererBeneficiaireDansProjet(beneficiaireId, ancienProjetId, nouveauProjetId);
         return ResponseEntity.ok("Beneficiaire transfere soti nan pwojè " + ancienProjetId + " pou ale nan pwojè " + nouveauProjetId);
     }
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
-    @DeleteMapping("/projets/{projetId}/beneficiaires/{beneficiaireId}")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    @DeleteMapping("/beneficiaires/projets/{projetId}/beneficiaires/{beneficiaireId}")
     public ResponseEntity<String> deleteBeneficiaireFromProjet(
             @PathVariable String projetId,
             @PathVariable String beneficiaireId) {
@@ -77,8 +80,8 @@ public class BeneficiaireController {
     }
 
     //Transferer un beneficiaire dans formation
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
-    @PostMapping("/beneficiaires/{idBeneficiaire}/formation/{idProjet}/{idFormation}")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+    @PostMapping("/beneficiaires/beneficiaires/{idBeneficiaire}/formation/{idProjet}/{idFormation}")
     public ResponseEntity<?> ajouterBeneficiaireDansFormation(
             @PathVariable String idBeneficiaire,
             @PathVariable String idProjet,

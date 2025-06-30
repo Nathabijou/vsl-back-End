@@ -22,12 +22,12 @@ public class Role {
     private String roleDescription;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "ROLE_PRIVILEGE",
+    @JoinTable(name = "role_privilege",
             joinColumns = {
-                    @JoinColumn(name = "ROLE_ID")
+                    @JoinColumn(name = "role_name")
             },
             inverseJoinColumns = {
-                    @JoinColumn(name = "PRIVILEGE_ID")
+                    @JoinColumn(name = "privilege_name")
             }
     )
     private Set<Privilege> privileges;

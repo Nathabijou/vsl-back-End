@@ -25,6 +25,16 @@ public class BeneficiaireImpl implements BeneficiaireIService {
 
 
     @Override
+    public Optional<BeneficiaireDto> findById(String beneficiaireId) {
+        // Itilize dao a pou jwenn Beneficiaire nan bazdone
+        Beneficiaire beneficiaire = dao.findById(beneficiaireId)
+                .orElseThrow(() -> new RuntimeException("Beneficiaire not found with ID: " + beneficiaireId));
+        return Optional.of(convertToDto(beneficiaire)); // Retounen DTO Beneficiaire a
+    }
+
+
+
+    @Override
     public void ajouterBeneficiaireDansFormation(String idBeneficiaire, String idProjet, String idFormation) {
         // 1. Récupérer ProjetBeneficiaire
         ProjetBeneficiaire projetBeneficiaire = projetBeneficiaireDao

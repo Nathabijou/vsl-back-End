@@ -83,7 +83,7 @@ public class ComposanteController {
     }
 
     // Find composante with Application ID (Yes Verify)
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
     @GetMapping("/composantes/by-application/{applicationId}")
     public List<ComposanteDto> getByApp(@PathVariable String applicationId) {
         return composanteIService.findByApplication(applicationId);
