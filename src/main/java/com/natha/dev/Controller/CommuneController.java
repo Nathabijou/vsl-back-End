@@ -13,27 +13,27 @@ import java.util.List;
 public class CommuneController {
     @Autowired
     private CommuneIService communeIService;
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/commune")
     List<CommuneDto> communeList(){
         return communeIService.findAll();
     }
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @PostMapping("/communes/create")
     public CommuneDto create(@RequestBody CommuneDto dto) {
         return communeIService.save(dto);
     }
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
     @GetMapping("/communes/departement/{id}")
     public List<CommuneDto> getByDepartement(@PathVariable Long id) {
         return communeIService.getByDepartement(id);
     }
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/communes/all")
     public List<CommuneDto> all() {
         return communeIService.getAll();
     }
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @DeleteMapping("/communes/{id}")
     public void delete(@PathVariable Long id) {
         communeIService.delete(id);

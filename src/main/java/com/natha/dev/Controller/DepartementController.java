@@ -15,24 +15,24 @@ public class DepartementController {
 
     @Autowired
     private DepartementIService service;
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @PostMapping("/create")
     public DepartementDto create(@RequestBody DepartementDto dto) {
         return service.save(dto);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
     @GetMapping("/zone/{zoneId}")
     public List<DepartementDto> getByZone(@PathVariable Long zoneId) {
         return service.getByZone(zoneId);
     }
 
-    @PreAuthorize("hasAnyRole( 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole( 'SUPERADMIN')")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/all")
     public List<DepartementDto> all() {
         return service.getAll();
