@@ -1,5 +1,3 @@
-// DashboardImpl.java
-
 package com.natha.dev.ServiceImpl;
 
 import com.natha.dev.Dao.BeneficiaireDao;
@@ -31,15 +29,11 @@ public class DashboardImpl implements DashboardIService {
         Long zoneId = filter.getZoneId();
         Long departementId = filter.getDepartementId();
         Long communeId = filter.getCommuneId();
-        Long sectionId = filter.getSectionCommunaleId();
+        Long sectionId = filter.getSectionId();
         Long quartierId = filter.getQuartierId();
         String projetId = filter.getProjetId();
         LocalDate dateDebut = LocalDate.of(2025, 11, 1);
         LocalDate dateFin = LocalDate.of(2025, 12, 31);
-
-        Double totalMontantFilleQMonCash = projetBeneficiaireDao.sumMontantPayeAvecFiltres(
-                "F", "Q", "MonCash", dateDebut, dateFin
-        );
 
         long totalBeneficiaires = projetBeneficiaireDao.countBeneficiairesByFilters(
                 composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId);
@@ -56,17 +50,16 @@ public class DashboardImpl implements DashboardIService {
         long totalNonQualifier = projetBeneficiaireDao.countByQualification(
                 composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId, "NQ");
 
-        // Nouvo done yo (count pa sexe & qualification)
         int totalFilleQualifier = projetBeneficiaireDao.countBySexeAndQualification(
                 composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId, "F", "Q");
 
         int totalFilleNonQualifier = projetBeneficiaireDao.countBySexeAndQualification(
                 composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId, "F", "NQ");
 
-        int totalGasonQualifier = projetBeneficiaireDao.countBySexeAndQualification(
+        int totalGarconQualifier = projetBeneficiaireDao.countBySexeAndQualification(
                 composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId, "M", "Q");
 
-        int totalGasonNonQualifier = projetBeneficiaireDao.countBySexeAndQualification(
+        int totalGarconNonQualifier = projetBeneficiaireDao.countBySexeAndQualification(
                 composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId, "M", "NQ");
 
         double totalMonCash = payrollDao.sumByMethodePaiement(
@@ -75,20 +68,80 @@ public class DashboardImpl implements DashboardIService {
         double totalLajanCash = payrollDao.sumByMethodePaiement(
                 "LajanCash", composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId);
 
-        // Egzanp itilize countBySexeQualificationAndMethodePaiement nan PayrollDao:
-        int totalFilleQualifierMoncash = (int) payrollDao.countBySexeQualificationAndMethodePaiement(
+        int totalFilleMoncash = (int) payrollDao.countBySexeAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "F", "MonCash",
+                dateDebut, dateFin
+        );
+
+        int totalFilleCash = (int) payrollDao.countBySexeAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "F", "LajanCash", dateDebut, dateFin
+        );
+
+        int totalGarconMoncash = (int) payrollDao.countBySexeAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "M", "MonCash", dateDebut, dateFin
+        );
+
+        int totalGarconCash = (int) payrollDao.countBySexeAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "M", "LajanCash", dateDebut, dateFin
+        );
+
+        double totalFilleQualifierMoncash = payrollDao.sumBySexeQualificationAndMethodePaiement(
                 composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
                 "F", "Q", "MonCash"
         );
 
-        int totalFilleQualifierLajanCash = (int) payrollDao.countBySexeQualificationAndMethodePaiement(
+        double totalFilleQualifierLajanCash = payrollDao.sumBySexeQualificationAndMethodePaiement(
                 composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
                 "F", "Q", "LajanCash"
         );
 
-        // Ou ka kontinye ajoute lòt varyasyon menm jan si bezwen
+        double totalFilleNonQualifierMoncash = payrollDao.sumBySexeQualificationAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "F", "NQ", "MonCash"
+        );
 
-        // Retounen tout sa nan KpiResponse (modifye KpiResponse si ou vle ajoute chan sa yo)
+        double totalFilleNonQualifierLajanCash = payrollDao.sumBySexeQualificationAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "F", "NQ", "LajanCash"
+        );
+
+        double totalGarconQualifierMoncash = payrollDao.sumBySexeQualificationAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "M", "Q", "MonCash"
+        );
+
+        double totalGarconQualifierLajanCash = payrollDao.sumBySexeQualificationAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "M", "Q", "LajanCash"
+        );
+
+        // **Ajoute sa yo tou ki manke nan vèsyon ou te bay la**
+
+        double totalFilleMonCashMontant = payrollDao.sumBySexeAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "F", "MonCash"
+        );
+
+        double totalFilleLajanCashMontant = payrollDao.sumBySexeAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "F", "LajanCash"
+        );
+
+        double totalGarconMonCashMontant = payrollDao.sumBySexeAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "M", "MonCash"
+        );
+
+        double totalGarconLajanCashMontant = payrollDao.sumBySexeAndMethodePaiement(
+                composanteId, zoneId, departementId, communeId, sectionId, quartierId, projetId,
+                "M", "LajanCash"
+        );
+
+
         return new KpiResponse(
                 totalBeneficiaires,
                 totalFemmes,
@@ -99,9 +152,18 @@ public class DashboardImpl implements DashboardIService {
                 totalLajanCash,
                 totalFilleQualifier,
                 totalFilleNonQualifier,
-                totalGasonQualifier,
-                totalGasonNonQualifier
-                // Ajoute lòt done nan KpiResponse si ou modifye li
+                totalGarconQualifier,
+                totalGarconNonQualifier,
+                totalFilleMoncash,
+                totalFilleCash,
+                totalGarconMoncash,
+                totalGarconCash,
+                totalFilleQualifierMoncash,
+                totalFilleQualifierLajanCash,
+                totalFilleNonQualifierMoncash,
+                totalFilleNonQualifierLajanCash,
+                totalGarconQualifierMoncash,
+                totalGarconQualifierLajanCash
         );
     }
 }

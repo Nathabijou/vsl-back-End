@@ -36,12 +36,73 @@ WHERE p.methodePaiement = :methode
     );
 
     @Query("""
-    SELECT COUNT(p) FROM Payroll p
+SELECT COALESCE(SUM(p.montantPayer), 0) FROM Payroll p
+JOIN p.projetBeneficiaire pb
+JOIN pb.beneficiaire b
+WHERE b.sexe = :sexe
+  AND p.methodePaiement = :methodePaiement
+  AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
+  AND (:zoneId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.zone.id = :zoneId)
+  AND (:departementId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.id = :departementId)
+  AND (:communeId IS NULL OR pb.projet.quartier.sectionCommunale.commune.id = :communeId)
+  AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId)
+  AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
+  AND (:projetId IS NULL OR pb.projet.id = :projetId)
+""")
+    double sumBySexeAndMethodePaiement(
+            @Param("composanteId") Long composanteId,
+            @Param("zoneId") Long zoneId,
+            @Param("departementId") Long departementId,
+            @Param("communeId") Long communeId,
+            @Param("sectionId") Long sectionId,
+            @Param("quartierId") Long quartierId,
+            @Param("projetId") String projetId,
+            @Param("sexe") String sexe,
+            @Param("methodePaiement") String methodePaiement
+    );
+
+
+
+    @Query("""
+                SELECT COUNT(p) FROM Payroll p
+                JOIN p.projetBeneficiaire pb
+                JOIN pb.beneficiaire b
+                WHERE b.sexe IS NOT NULL
+                  AND (:sexe IS NULL OR b.sexe = :sexe)
+                  AND (:methodePaiement IS NULL OR p.methodePaiement = :methodePaiement)
+                  AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
+                  AND (:zoneId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.zone.id = :zoneId)
+                  AND (:departementId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.id = :departementId)
+                  AND (:communeId IS NULL OR pb.projet.quartier.sectionCommunale.commune.id = :communeId)
+                  AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId)
+                  AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
+                  AND (:projetId IS NULL OR pb.projet.id = :projetId)
+                 AND p.debutPeriode >= :startDate
+                             AND p.debutPeriode <= :endDate
+                             
+            """)
+    long countBySexeAndMethodePaiement(
+            @Param("composanteId") Long composanteId,
+            @Param("zoneId") Long zoneId,
+            @Param("departementId") Long departementId,
+            @Param("communeId") Long communeId,
+            @Param("sectionId") Long sectionId,
+            @Param("quartierId") Long quartierId,
+            @Param("projetId") String projetId,
+            @Param("sexe") String sexe,
+            @Param("methodePaiement") String methodePaiement,
+            @Param("startDate") java.time.LocalDate startDate,
+            @Param("endDate") java.time.LocalDate endDate
+    );
+
+    @Query("""
+    SELECT COALESCE(SUM(p.montantPayer), 0)
+    FROM Payroll p
     JOIN p.projetBeneficiaire pb
     JOIN pb.beneficiaire b
-    WHERE (:sexe IS NULL OR b.sexe = :sexe)
-      AND (:qualification IS NULL OR b.qualification = :qualification)
-      AND (:methodePaiement IS NULL OR p.methodePaiement = :methodePaiement)
+    WHERE b.sexe = :sexe
+      AND b.qualification = :qualification
+      AND p.methodePaiement = :methode
       AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
       AND (:zoneId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.zone.id = :zoneId)
       AND (:departementId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.id = :departementId)
@@ -50,7 +111,7 @@ WHERE p.methodePaiement = :methode
       AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
       AND (:projetId IS NULL OR pb.projet.id = :projetId)
 """)
-    long countBySexeQualificationAndMethodePaiement(
+    double sumBySexeQualificationAndMethodePaiement(
             @Param("composanteId") Long composanteId,
             @Param("zoneId") Long zoneId,
             @Param("departementId") Long departementId,
@@ -60,8 +121,9 @@ WHERE p.methodePaiement = :methode
             @Param("projetId") String projetId,
             @Param("sexe") String sexe,
             @Param("qualification") String qualification,
-            @Param("methodePaiement") String methodePaiement
+            @Param("methode") String methode
     );
+
 
 
 

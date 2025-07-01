@@ -35,8 +35,9 @@ public class DashboardFilter {
     public Long getCommuneId() { return communeId; }
     public void setCommuneId(Long communeId) { this.communeId = communeId; }
 
-    public Long getSectionCommunaleId() { return sectionId; }
-    public void setSectionCummualeId(Long sectionId) { this.sectionId = sectionId; }
+    public Long getSectionId() { return sectionId; }
+    public void setSectionId(Long sectionId) { this.sectionId = sectionId; }
+
 
     public Long getQuartierId() { return quartierId; }
     public void setQuartierId(Long quartierId) { this.quartierId = quartierId; }

@@ -18,9 +18,10 @@ public class DashboardController {
     private DashboardIService dashboardIService;
 
     @GetMapping("/dashboard")
-    public ResponseEntity<KpiResponse> getDashboard(DashboardFilter filter, Principal principal) {
+    public ResponseEntity<KpiResponse> getDashboard(@ModelAttribute DashboardFilter filter, Principal principal) {
         String username = principal.getName();
         KpiResponse response = dashboardIService.getKpiData(filter, username);
         return ResponseEntity.ok(response);
     }
+
 }
