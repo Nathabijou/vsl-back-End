@@ -21,4 +21,6 @@ public class PayrollDto {
     private Double montantPayer;
     private String statut;
     private LocalDate datePaiement;
+    private int nbrejourTravail;
+    private Double montantParJour;
 }

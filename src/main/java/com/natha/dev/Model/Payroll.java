@@ -29,6 +29,10 @@ public class Payroll {
 
     private Double montantPayer;
 
+    @Column(nullable = false)
+    private Integer nbreJourTravail = 0; // default value
+
+
     private String statut; // eg: payé, en attente, rejeté
 
     private LocalDate datePaiement;

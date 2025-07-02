@@ -1,5 +1,7 @@
 package com.natha.dev.Dao;
 
+import com.natha.dev.Dto.BeneficiairePayrollMatrixDTO;
+import com.natha.dev.Dto.PayrollFlatData;
 import com.natha.dev.Model.Payroll;
 import com.natha.dev.Model.ProjetBeneficiaire;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -123,6 +125,15 @@ WHERE b.sexe = :sexe
             @Param("qualification") String qualification,
             @Param("methode") String methode
     );
+
+
+    @Query("SELECT new com.natha.dev.Dto.PayrollFlatData(pr.name, p.debutPeriode, p.finPeriode, b.nom, b.prenom, b.sexe, b.qualification, p.nbreJourTravail, p.montantPayer, b.identification, b.telephonePaiement) " +
+            "FROM Payroll p " +
+            "JOIN p.projetBeneficiaire pb " +
+            "JOIN pb.beneficiaire b " +
+            "JOIN pb.projet pr " +
+            "WHERE pr.idProjet = :projetId")
+    List<PayrollFlatData> findPayrollDataByProjet(@Param("projetId") String projetId);
 
 
 

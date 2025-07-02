@@ -32,14 +32,18 @@ public class PayrollImpl implements PayrollIService {
         payroll.setMethodePaiement(dto.getMethodePaiement());
         payroll.setDebutPeriode(dto.getDebutPeriode());
         payroll.setFinPeriode(dto.getFinPeriode());
-        payroll.setMontantPayer(dto.getMontantPayer());
+        payroll.setNbreJourTravail(dto.getNbrejourTravail());
         payroll.setStatut(dto.getStatut());
         payroll.setDatePaiement(dto.getDatePaiement());
         payroll.setProjetBeneficiaire(pb);
 
+        // Kalkile montantPayer otomatik
+        double montantParJour = dto.getMontantParJour() != null ? dto.getMontantParJour() : 0.0;
+        payroll.setMontantPayer(payroll.getNbreJourTravail() * montantParJour);
+
         Payroll saved = payrollDao.save(payroll);
 
-        return convertToDto(saved);
+        return convertToDto(saved, montantParJour);
     }
 
     @Override
@@ -48,15 +52,34 @@ public class PayrollImpl implements PayrollIService {
                 .findByProjetIdProjetAndBeneficiaireIdBeneficiaire(projetId, beneficiaireId)
                 .orElseThrow(() -> new RuntimeException("Relasyon Beneficiaire-Projet pa jwenn"));
 
-        return payrollDao.findByProjetBeneficiaire(pb) // ← VOYE objè a, pa id li
+        return payrollDao.findByProjetBeneficiaire(pb)
                 .stream()
-                .map(this::convertToDto)
+                .map(p -> convertToDto(p, p.getMontantPayer() / (p.getNbreJourTravail() == 0 ? 1 : p.getNbreJourTravail())))
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public PayrollDto updatePayroll(String payrollId, PayrollDto dto) {
+        Payroll payroll = payrollDao.findById(payrollId)
+                .orElseThrow(() -> new RuntimeException("Payroll pa jwenn"));
 
+        payroll.setIdTransaction(dto.getIdTransaction());
+        payroll.setMethodePaiement(dto.getMethodePaiement());
+        payroll.setDebutPeriode(dto.getDebutPeriode());
+        payroll.setFinPeriode(dto.getFinPeriode());
+        payroll.setNbreJourTravail(dto.getNbrejourTravail());
+        payroll.setStatut(dto.getStatut());
+        payroll.setDatePaiement(dto.getDatePaiement());
 
-    private PayrollDto convertToDto(Payroll p) {
+        double montantParJour = dto.getMontantParJour() != null ? dto.getMontantParJour() : 0.0;
+        payroll.setMontantPayer(payroll.getNbreJourTravail() * montantParJour);
+
+        Payroll saved = payrollDao.save(payroll);
+
+        return convertToDto(saved, montantParJour);
+    }
+
+    private PayrollDto convertToDto(Payroll p, double montantParJour) {
         return new PayrollDto(
                 p.getIdPayroll(),
                 p.getIdTransaction(),
@@ -65,29 +88,9 @@ public class PayrollImpl implements PayrollIService {
                 p.getFinPeriode(),
                 p.getMontantPayer(),
                 p.getStatut(),
-                p.getDatePaiement()
+                p.getDatePaiement(),
+                p.getNbreJourTravail(),
+                montantParJour
         );
     }
-
-    @Override
-    public PayrollDto updatePayroll(String payrollId, PayrollDto dto) {
-        Payroll payroll = payrollDao.findById(payrollId)
-                .orElseThrow(() -> new RuntimeException("Payroll pa jwenn"));
-
-        // Mete ajou tout champs
-        payroll.setIdTransaction(dto.getIdTransaction());
-        payroll.setMethodePaiement(dto.getMethodePaiement());
-        payroll.setDebutPeriode(dto.getDebutPeriode());
-        payroll.setFinPeriode(dto.getFinPeriode());
-        payroll.setMontantPayer(dto.getMontantPayer());
-        payroll.setStatut(dto.getStatut());
-        payroll.setDatePaiement(dto.getDatePaiement());
-
-        // Sove li
-        Payroll saved = payrollDao.save(payroll);
-
-        // Retounen DTO a
-        return convertToDto(saved);
-    }
-
 }
