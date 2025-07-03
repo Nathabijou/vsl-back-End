@@ -1,7 +1,6 @@
 package com.natha.dev.Dao;
 
 import com.natha.dev.Model.Projet;
-import com.natha.dev.Model.ProjetBeneficiaire;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

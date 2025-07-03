@@ -1,13 +1,5 @@
 package com.natha.dev.Model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-
-
-
 
 public class JwtResponse {
 

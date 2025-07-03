@@ -4,7 +4,10 @@ import com.natha.dev.Dao.GroupeDao;
 import com.natha.dev.Dao.Groupe_UserDao;
 import com.natha.dev.Dao.RoleDao;
 import com.natha.dev.Dao.UserDao;
-import com.natha.dev.Model.*;
+import com.natha.dev.Model.Groupe;
+import com.natha.dev.Model.Groupe_Users;
+import com.natha.dev.Model.Role;
+import com.natha.dev.Model.Users;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +78,7 @@ public class UserService {
 
     public Users registerNewUserWithRole(String userName, String userEmail, String userPassword,
                                          String userFirstName, String userLastName, String userSexe,
-                                         String roleName, String createdBy) {
+                                         String roleName, String createdBy, String userTelephone) {
 
         // Vérification utilisateur existant
         Users existingUser = userDao.findByUserName(userName);
@@ -108,6 +111,7 @@ public class UserService {
         user.setCreatedBy(createdBy);
         user.setStatus(true);
         user.setCreateDate(new Date());
+        user.setUserTelephone(userTelephone);
 
         // Encode et set mot de passe (assure que userPassword != null)
         if (userPassword != null && !userPassword.isEmpty()) {

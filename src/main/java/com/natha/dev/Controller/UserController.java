@@ -4,7 +4,7 @@ import com.natha.dev.Configuration.EmailConfig;
 import com.natha.dev.Dao.GroupeDao;
 import com.natha.dev.Dao.UserDao;
 import com.natha.dev.IService.Groupe_UsersIService;
-import com.natha.dev.Model.*;
+import com.natha.dev.Model.Users;
 import com.natha.dev.ServiceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,6 +52,7 @@ public class UserController {
         String userLastName  = userRequest.get("userLastName");
         String userSexe      = userRequest.get("userSexe");
         String roleName      = userRequest.get("roleName");
+        String userTelephone = userRequest.get("userTelephone");
 
 
 
@@ -62,7 +63,7 @@ public class UserController {
         // Autres validations des données d'entrée
 
         // Enregistrer l'utilisateur avec son rôle en appelant le service utilisateur
-        Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, userSexe, roleName, createdBy);
+        Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, userSexe, roleName, createdBy, userTelephone);
 
         // Générer et envoyer l'OTP à l'utilisateur
         userService.sendActivationEmail( userEmail, userFirstName, userLastName, userName);

@@ -1,6 +1,5 @@
 package com.natha.dev.Dao;
 
-import com.natha.dev.Dto.BeneficiairePayrollMatrixDTO;
 import com.natha.dev.Dto.PayrollFlatData;
 import com.natha.dev.Model.Payroll;
 import com.natha.dev.Model.ProjetBeneficiaire;

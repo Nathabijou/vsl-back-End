@@ -17,6 +17,13 @@ public class ApplicationInstanceDto {
     private String status;
     private Boolean active;
 
+
+    private String code;
+    private String mdod;
+    private String bailleur;
+    private String mo;
+    private String partenaire;
+
     private Boolean isSandbox;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -1,6 +1,5 @@
 package com.natha.dev.Model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -23,6 +22,11 @@ public class ApplicationInstance {
     private String name;
 
     private String description;
+    private String code;
+    private String mdod;
+    private String bailleur;
+    private String mo;
+    private String partenaire;
 
     private String logo;
 

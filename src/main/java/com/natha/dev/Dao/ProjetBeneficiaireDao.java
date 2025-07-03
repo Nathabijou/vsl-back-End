@@ -15,15 +15,17 @@ public interface ProjetBeneficiaireDao extends JpaRepository<ProjetBeneficiaire,
     Optional<ProjetBeneficiaire> findByProjetIdProjetAndBeneficiaireIdBeneficiaire(String projetId, String beneficiaireId);
 
     @Query("""
-    SELECT COUNT(pb) FROM ProjetBeneficiaire pb
-    WHERE pb.beneficiaire.sexe = :sexe
-      AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
-      AND (:zoneId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.zone.id = :zoneId)
-      AND (:departementId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.id = :departementId)
-      AND (:communeId IS NULL OR pb.projet.quartier.sectionCommunale.commune.id = :communeId)
-      AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId)
-      AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
-      AND (:projetId IS NULL OR pb.projet.id = :projetId)
+SELECT COUNT(pb) FROM ProjetBeneficiaire pb
+JOIN pb.projet.quartier.sectionCommunale.commune.departement d
+JOIN d.zones z
+WHERE pb.beneficiaire.sexe = :sexe
+  AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
+  AND (:zoneId IS NULL OR z.id = :zoneId)
+  AND (:departementId IS NULL OR d.id = :departementId)
+  AND (:communeId IS NULL OR pb.projet.quartier.sectionCommunale.commune.id = :communeId)
+  AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId)
+  AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
+  AND (:projetId IS NULL OR pb.projet.id = :projetId)
 """)
     long countBySexe(
             @Param("composanteId") Long composanteId,
@@ -36,17 +38,20 @@ public interface ProjetBeneficiaireDao extends JpaRepository<ProjetBeneficiaire,
             @Param("sexe") String sexe
     );
 
+
     // Dao
     @Query("""
-    SELECT COUNT(pb) FROM ProjetBeneficiaire pb
-    WHERE pb.beneficiaire.qualification = :qualification
-      AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
-      AND (:zoneId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.zone.id = :zoneId)
-      AND (:departementId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.id = :departementId)
-      AND (:communeId IS NULL OR pb.projet.quartier.sectionCommunale.commune.id = :communeId)
-      AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId)
-      AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
-      AND (:projetId IS NULL OR pb.projet.id = :projetId)
+SELECT COUNT(pb) FROM ProjetBeneficiaire pb
+JOIN pb.projet.quartier.sectionCommunale.commune.departement d
+JOIN d.zones z
+WHERE pb.beneficiaire.qualification = :qualification
+  AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
+  AND (:zoneId IS NULL OR z.id = :zoneId)
+  AND (:departementId IS NULL OR d.id = :departementId)
+  AND (:communeId IS NULL OR pb.projet.quartier.sectionCommunale.commune.id = :communeId)
+  AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId)
+  AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
+  AND (:projetId IS NULL OR pb.projet.id = :projetId)
 """)
     long countByQualification(
             @Param("composanteId") Long composanteId,
@@ -60,11 +65,14 @@ public interface ProjetBeneficiaireDao extends JpaRepository<ProjetBeneficiaire,
     );
 
 
+
     @Query("""
     SELECT COUNT(pb) FROM ProjetBeneficiaire pb
+    JOIN pb.projet.quartier.sectionCommunale.commune.departement d
+    JOIN d.zones z
     WHERE (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
-      AND (:zoneId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.zone.id = :zoneId)
-      AND (:departementId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.id = :departementId)
+      AND (:zoneId IS NULL OR z.id = :zoneId)
+      AND (:departementId IS NULL OR d.id = :departementId)
       AND (:communeId IS NULL OR pb.projet.quartier.sectionCommunale.commune.id = :communeId)
       AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId)
       AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
@@ -80,18 +88,24 @@ public interface ProjetBeneficiaireDao extends JpaRepository<ProjetBeneficiaire,
             @Param("projetId") String projetId
     );
 
+
     // Dao
 
-    @Query("SELECT COUNT(pb) FROM ProjetBeneficiaire pb " +
-            "WHERE (:sexe IS NULL OR pb.beneficiaire.sexe = :sexe) " +
-            "AND (:qualification IS NULL OR pb.beneficiaire.qualification = :qualification) " +
-            "AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId) " +
-            "AND (:zoneId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.zone.id = :zoneId) " +
-            "AND (:departementId IS NULL OR pb.projet.quartier.sectionCommunale.commune.departement.id = :departementId) " +
-            "AND (:communeId IS NULL OR pb.projet.quartier.sectionCommunale.commune.id = :communeId) " +
-            "AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId) " +
-            "AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId) " +
-            "AND (:projetId IS NULL OR pb.projet.id = :projetId)")
+    @Query("""
+    SELECT COUNT(DISTINCT pb)
+    FROM ProjetBeneficiaire pb
+    JOIN pb.projet.quartier.sectionCommunale.commune.departement d
+    JOIN d.zones z
+    WHERE (:sexe IS NULL OR pb.beneficiaire.sexe = :sexe)
+      AND (:qualification IS NULL OR pb.beneficiaire.qualification = :qualification)
+      AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
+      AND (:zoneId IS NULL OR z.id = :zoneId)
+      AND (:departementId IS NULL OR d.id = :departementId)
+      AND (:communeId IS NULL OR pb.projet.quartier.sectionCommunale.commune.id = :communeId)
+      AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId)
+      AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
+      AND (:projetId IS NULL OR pb.projet.id = :projetId)
+""")
     int countBySexeAndQualification(
             @Param("composanteId") Long composanteId,
             @Param("zoneId") Long zoneId,
@@ -103,6 +117,7 @@ public interface ProjetBeneficiaireDao extends JpaRepository<ProjetBeneficiaire,
             @Param("sexe") String sexe,
             @Param("qualification") String qualification
     );
+
 
 
 

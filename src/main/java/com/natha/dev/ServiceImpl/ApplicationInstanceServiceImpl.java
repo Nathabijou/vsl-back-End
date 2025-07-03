@@ -136,6 +136,11 @@ public class ApplicationInstanceServiceImpl implements ApplicationInstanceIServi
         app.setStatus(dto.getStatus());
         app.setIsSandbox(dto.getIsSandbox());
         app.setCreatedBy(dto.getCreatedBy());
+        app.setBailleur(dto.getBailleur());
+        app.setMo(dto.getMo());
+        app.setCode(dto.getCode());
+        app.setMdod(dto.getMdod());
+        app.setPartenaire(dto.getPartenaire());
 
 
         // 4. Asosye org lan
@@ -161,6 +166,11 @@ public class ApplicationInstanceServiceImpl implements ApplicationInstanceIServi
         dto.setCreatedBy(app.getCreatedBy());
         dto.setLanguage(app.getLanguage());
         dto.setThemeColor(app.getThemeColor());
+        dto.setMo(app.getMo());
+        dto.setCode(app.getCode());
+        dto.setBailleur(app.getBailleur());
+        dto.setPartenaire(app.getPartenaire());
+        dto.setMdod(app.getMdod());
 
         if (app.getOrganization() != null) {
             dto.setOrganizationId(app.getOrganization().getIdorg());
@@ -184,6 +194,11 @@ public class ApplicationInstanceServiceImpl implements ApplicationInstanceIServi
         app.setCreatedBy(dto.getCreatedBy());
         app.setLanguage(dto.getLanguage());
         app.setThemeColor(dto.getThemeColor());
+        app.setPartenaire(dto.getPartenaire());
+        app.setCode(dto.getCode());
+        app.setMo(dto.getMo());
+        app.setBailleur(dto.getBailleur());
+        app.setMdod(dto.getMdod());
 
         if (dto.getOrganizationId() != null) {
             Organization org = new Organization();

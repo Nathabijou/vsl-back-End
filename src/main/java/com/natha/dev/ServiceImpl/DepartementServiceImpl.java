@@ -5,6 +5,7 @@ import com.natha.dev.Dao.ZoneDao;
 import com.natha.dev.Dto.DepartementDto;
 import com.natha.dev.IService.DepartementIService;
 import com.natha.dev.Model.Departement;
+import com.natha.dev.Model.Zone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +24,16 @@ public class DepartementServiceImpl implements DepartementIService {
     public DepartementDto save(DepartementDto dto) {
         Departement d = new Departement();
         d.setName(dto.getName());
-        d.setZone(zoneDao.findById(dto.getZoneId()).orElse(null));
+
+        Zone zone = zoneDao.findById(dto.getZoneId()).orElse(null);
+
+        if (zone != null) {
+            d.setZones(List.of(zone));  // ✅ Chanje Set -> List
+        }
+
         return convertToDto(dao.save(d));
     }
+
 
     @Override
     public List<DepartementDto> getByZone(Long zoneId) {
@@ -39,11 +47,20 @@ public class DepartementServiceImpl implements DepartementIService {
 
     @Override
     public List<DepartementDto> getAll() {
-        return dao.findAll().stream().map(this::convertToDto).toList();
+        return dao.findAll().stream()
+                .map(this::convertToDto)
+                .toList();
     }
 
-    private DepartementDto convertToDto(Departement d) {
-        return new DepartementDto(d.getId(), d.getName(), d.getZone().getId());
+
+    @Override
+    public DepartementDto convertToDto(Departement d) {
+        Long zoneId = null;
+        if (d.getZones() != null && !d.getZones().isEmpty()) {
+            zoneId = d.getZones().iterator().next().getId(); // pran premye zone a
+        }
+        return new DepartementDto(d.getId(), d.getName(), zoneId);
     }
+
 }
 

@@ -1,14 +1,12 @@
 package com.natha.dev.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -25,6 +23,7 @@ public class Users {
     private String userPassword;
     private String userFirstName;
     private String userLastName;
+    private String userTelephone;
     private String otpCode;
     private String userSexe;
 

@@ -1,8 +1,6 @@
 package com.natha.dev.Dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-
 
 @Data
 public class KpiResponse {
@@ -14,24 +12,26 @@ public class KpiResponse {
     private double totalMonCash;
     private double totalLajanCash;
 
-    private int totalFilleQualifier;
-    private int totalFilleNonQualifier;
-    private int totalGasonQualifier;
-    private int totalGasonNonQualifier;
+    private long totalFilleQualifier;
+    private long totalFilleNonQualifier;
+    private long totalGarconQualifier;
+    private long totalGarconNonQualifier;
 
-    private int totalFilleMoncash;
-    private int totalFilleCash;
-    private int totalGasonMoncash;
-    private int totalGasonCash;
+    private long totalFilleMoncash;
+    private long totalFilleCash;
+    private long totalGarconMoncash;
+    private long totalGarconCash;
 
     private double totalFilleMonCashMontant;
     private double totalFilleLajanCashMontant;
     private double totalFilleNonQualifierMoncash;
     private double totalFilleNonQualifierLajanCash;
-    private double totalGasonMonCashMontant;
-    private double totalGasonLajanCashMontant;
+    private double totalGarconMonCashMontant;
+    private double totalGarconLajanCashMontant;
+    private long totalGasonQualifier;
+    private long totalGasonNonQualifier;
 
-    // ✅ Konstriktè manyèl ak tout 22 paramèt yo
+    // Konstriktè ak tout chan yo
     public KpiResponse(long totalBeneficiaires,
                        long totalFemmes,
                        long totalHommes,
@@ -39,20 +39,20 @@ public class KpiResponse {
                        long totalNonQualifier,
                        double totalMonCash,
                        double totalLajanCash,
-                       int totalFilleQualifier,
-                       int totalFilleNonQualifier,
-                       int totalGasonQualifier,
-                       int totalGasonNonQualifier,
-                       int totalFilleMoncash,
-                       int totalFilleCash,
-                       int totalGasonMoncash,
-                       int totalGasonCash,
+                       long totalFilleQualifier,
+                       long totalFilleNonQualifier,
+                       long totalGarconQualifier,
+                       long totalGarconNonQualifier,
+                       long totalFilleMoncash,
+                       long totalFilleCash,
+                       long totalGarconMoncash,
+                       long totalGarconCash,
                        double totalFilleMonCashMontant,
                        double totalFilleLajanCashMontant,
                        double totalFilleNonQualifierMoncash,
                        double totalFilleNonQualifierLajanCash,
-                       double totalGasonMonCashMontant,
-                       double totalGasonLajanCashMontant) {
+                       double totalGarconMonCashMontant,
+                       double totalGarconLajanCashMontant) {
         this.totalBeneficiaires = totalBeneficiaires;
         this.totalFemmes = totalFemmes;
         this.totalHommes = totalHommes;
@@ -62,18 +62,18 @@ public class KpiResponse {
         this.totalLajanCash = totalLajanCash;
         this.totalFilleQualifier = totalFilleQualifier;
         this.totalFilleNonQualifier = totalFilleNonQualifier;
-        this.totalGasonQualifier = totalGasonQualifier;
-        this.totalGasonNonQualifier = totalGasonNonQualifier;
+        this.totalGarconQualifier = totalGarconQualifier;
+        this.totalGarconNonQualifier = totalGarconNonQualifier;
         this.totalFilleMoncash = totalFilleMoncash;
         this.totalFilleCash = totalFilleCash;
-        this.totalGasonMoncash = totalGasonMoncash;
-        this.totalGasonCash = totalGasonCash;
+        this.totalGarconMoncash = totalGarconMoncash;
+        this.totalGarconCash = totalGarconCash;
         this.totalFilleMonCashMontant = totalFilleMonCashMontant;
         this.totalFilleLajanCashMontant = totalFilleLajanCashMontant;
         this.totalFilleNonQualifierMoncash = totalFilleNonQualifierMoncash;
         this.totalFilleNonQualifierLajanCash = totalFilleNonQualifierLajanCash;
-        this.totalGasonMonCashMontant = totalGasonMonCashMontant;
-        this.totalGasonLajanCashMontant = totalGasonLajanCashMontant;
+        this.totalGarconMonCashMontant = totalGarconMonCashMontant;
+        this.totalGarconLajanCashMontant = totalGarconLajanCashMontant;
     }
 
     // (Opsyonèl) Ajoute constructor san paramèt si w ap itilize Jackson pou désérialization
@@ -105,15 +105,24 @@ public class KpiResponse {
     public double getTotalLajanCash() { return totalLajanCash; }
     public void setTotalLajanCash(double totalLajanCash) { this.totalLajanCash = totalLajanCash; }
 
-    public int getTotalFilleQualifier() { return totalFilleQualifier; }
+    public long getTotalFilleQualifier() { return totalFilleQualifier; }
     public void setTotalFilleQualifier(int totalFilleQualifier) { this.totalFilleQualifier = totalFilleQualifier; }
 
-    public int getTotalFilleNonQualifier() { return totalFilleNonQualifier; }
+    public long getTotalFilleNonQualifier() { return totalFilleNonQualifier; }
     public void setTotalFilleNonQualifier(int totalFilleNonQualifier) { this.totalFilleNonQualifier = totalFilleNonQualifier; }
 
-    public int getTotalGasonQualifier() { return totalGasonQualifier; }
-    public void setTotalGasonQualifier(int totalGasonQualifier) { this.totalGasonQualifier = totalGasonQualifier; }
+    public long getTotalGasonQualifier() {
+        return totalGasonQualifier;
+    }
+    public void setTotalGasonQualifier(long totalGasonQualifier) {
+        this.totalGasonQualifier = totalGasonQualifier;
+    }
 
-    public int getTotalGasonNonQualifier() { return totalGasonNonQualifier; }
-    public void setTotalGasonNonQualifier(int totalGasonNonQualifier) { this.totalGasonNonQualifier = totalGasonNonQualifier; }
+    public long getTotalGasonNonQualifier() {
+        return totalGasonNonQualifier;
+    }
+    public void setTotalGasonNonQualifier(long totalGasonNonQualifier) {
+        this.totalGasonNonQualifier = totalGasonNonQualifier;
+    }
+
 }

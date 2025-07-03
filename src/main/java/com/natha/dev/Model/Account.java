@@ -1,7 +1,6 @@
 package com.natha.dev.Model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.natha.dev.Dao.AccountDao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

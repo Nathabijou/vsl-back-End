@@ -2,6 +2,7 @@ package com.natha.dev.ServiceImpl;
 
 import com.natha.dev.Dao.*;
 import com.natha.dev.Dto.UserApplicationPrivilegeDto;
+import com.natha.dev.IService.Model.*;
 import com.natha.dev.IService.UserApplicationPrivilegeIService;
 import com.natha.dev.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;

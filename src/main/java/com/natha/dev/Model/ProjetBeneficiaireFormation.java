@@ -1,8 +1,5 @@
 package com.natha.dev.Model;
 
-import com.natha.dev.Model.Formation;
-import com.natha.dev.Model.Presence;
-import com.natha.dev.Model.ProjetBeneficiaire;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

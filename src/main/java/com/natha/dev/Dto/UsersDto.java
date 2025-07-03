@@ -18,6 +18,8 @@ public class UsersDto {
     private String userEmail;
     private String userPassword;
     private String userFirstName;
+    private String userTelephone;
+
     private String userLastName;
     private String otpCode;
     private String userSexe;
