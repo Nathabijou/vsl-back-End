@@ -23,8 +23,8 @@ public class GroupeDto {
     private BigDecimal tauxInteret;
 
     private Long userName;
-    private Long compteId;
-    private Long communeId;
+//    private Long compteId;
+//    private Long communeId;
 
     // Getter & Setter
     public LocalDateTime getDatecreation() {

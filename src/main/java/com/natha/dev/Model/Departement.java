@@ -26,6 +26,10 @@ public class Departement {
     @JoinColumn(name = "zone_id") // mete non kolòn ki konekte departement ak zone nan baz done a
     private Zone zone;
 
+
+    @OneToMany(mappedBy = "departement", cascade = CascadeType.ALL)
+    private List<Arrondissement> arrondissements;
+
     // getter and setter pou zone
     public Zone getZone() {
         return zone;

@@ -21,6 +21,7 @@ public class DashboardFilter {
     private Long sectionId;
     private Long quartierId;
     private String projetId;
+    private Long arrondissementId;
 
     // 🛠️ Add getters and setters
     public Long getComposanteId() { return composanteId; }
@@ -44,4 +45,9 @@ public class DashboardFilter {
 
     public String getProjetId() { return projetId; }
     public void setProjetId(String projetId) { this.projetId = projetId; }
+
+
+    public Long getArrondissementId() { return arrondissementId; }
+    public void setArrondissementId(Long arrondissementId) { this.arrondissementId = arrondissementId; }
+
 }

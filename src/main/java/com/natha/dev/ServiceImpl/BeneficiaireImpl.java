@@ -3,7 +3,6 @@ package com.natha.dev.ServiceImpl;
 import com.natha.dev.Dao.*;
 import com.natha.dev.Dto.BeneficiaireDto;
 import com.natha.dev.IService.BeneficiaireIService;
-import com.natha.dev.IService.Model.*;
 import com.natha.dev.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

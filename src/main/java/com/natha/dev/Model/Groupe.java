@@ -37,8 +37,6 @@ public class Groupe {
         this.datecreation = LocalDateTime.now();
     }
 
-    @ManyToOne
-    @JoinColumn(name = "commune_id")
-    private Commune commune;
+
 
 }

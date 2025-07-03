@@ -13,27 +13,19 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-public class Commune {
+
+public class Arrondissement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nom;
-
-
-
-
+    private String name;
 
     @ManyToOne
-    @JoinColumn(name = "arrondissement_id")
-    private Arrondissement arrondissement;
+    @JoinColumn(name = "departement_id")
+    private Departement departement;
 
-    public Arrondissement getArrondissement() {
-        return arrondissement;
-    }
-
-    public void setArrondissement(Arrondissement arrondissement) {
-        this.arrondissement = arrondissement;
-    }
+    @OneToMany(mappedBy = "arrondissement")
+    private List<Commune> communes;
 
 }

@@ -39,16 +39,16 @@ public class GroupeController {
 
 
     // rekipere tout gwoup pou yon Commune specifiqie
-    @GetMapping("/commune/{communeId}/groupe")  // Changez groupeId en usersId
-    List<GroupeDto> groupeByCommune(@PathVariable Long communeId) {
-        return groupeIService.findByCommuneId(communeId);
-    }
-
-    // kreye gwoup nan yon  commune specifiqie
-    @PostMapping("/groupe/commune/{communeId}")
-    public ResponseEntity<GroupeDto> NewGroupe(@RequestBody GroupeDto groupeDto, @PathVariable Long communeId) {
-        GroupeDto newComposanteDto = groupeIService.saveById(groupeDto, communeId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newComposanteDto);
-    }
+//    @GetMapping("/commune/{communeId}/groupe")  // Changez groupeId en usersId
+//    List<GroupeDto> groupeByCommune(@PathVariable Long communeId) {
+//        return groupeIService.findByCommuneId(communeId);
+//    }
+//
+//    // kreye gwoup nan yon  commune specifiqie
+//    @PostMapping("/groupe/commune/{communeId}")
+//    public ResponseEntity<GroupeDto> NewGroupe(@RequestBody GroupeDto groupeDto, @PathVariable Long communeId) {
+//        GroupeDto newComposanteDto = groupeIService.saveById(groupeDto, communeId);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(newComposanteDto);
+//    }
 
 }

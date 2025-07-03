@@ -1,11 +1,11 @@
 package com.natha.dev.ServiceImpl;
 
+import com.natha.dev.Dao.ArrondissementDao;
 import com.natha.dev.Dao.CommuneDao;
-import com.natha.dev.Dao.DepartementDao;
 import com.natha.dev.Dto.CommuneDto;
 import com.natha.dev.IService.CommuneIService;
+import com.natha.dev.Model.Arrondissement;
 import com.natha.dev.Model.Commune;
-import com.natha.dev.Model.Departement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class CommuneImpl implements CommuneIService {
     @Autowired
     private CommuneDao communeDao;
     @Autowired
-    private DepartementDao departementDao;
+    private ArrondissementDao arrondissmentDao;
 
 
     @Override
@@ -56,10 +56,19 @@ public class CommuneImpl implements CommuneIService {
     public List<CommuneDto> getAll() {
         return communeDao.findAll().stream().map(this::convertToDto).toList();
     }
+
     @Override
-    public List<CommuneDto> getByDepartement(Long departementId) {
-        return communeDao.findByDepartementId(departementId).stream().map(this::convertToDto).toList();
+    public List<CommuneDto> getByArrondissmentId(Long arrondissmentId) {
+        return communeDao.findByArrondissementId(arrondissmentId).stream().map(this::convertToDto).toList();
     }
+
+
+    @Override
+    public List<CommuneDto> findByArrondissementId(Long arrondissementId) {
+        return communeDao.findByArrondissementId(arrondissementId).stream().map(this::convertToDto).toList();
+    }
+
+
 
     @Override
     public CommuneDto save(CommuneDto communeDto) {
@@ -85,9 +94,9 @@ public class CommuneImpl implements CommuneIService {
         // Vous pouvez ajouter d'autres attributs ici
 
         if (dto.getDepartementId() != null) {
-            Departement departement = departementDao.findById(dto.getDepartementId())
+            Arrondissement arrondissement = arrondissmentDao.findById(dto.getDepartementId())
                     .orElseThrow(() -> new RuntimeException("Département non trouvé avec l'id: " + dto.getDepartementId()));
-            commune.setDepartement(departement);
+            commune.setArrondissement(arrondissement);
         } else {
             throw new RuntimeException("departementId est requis pour créer une commune.");
         }
