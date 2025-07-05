@@ -15,7 +15,7 @@ public interface PayrollDao extends JpaRepository<Payroll, String> {
     Optional<Payroll> findById(String id);
 
     @Query("""
-SELECT COALESCE(SUM(p.montantPayer), 0) FROM Payroll p
+SELECT COALESCE(SUM(p.montantPayer * p.nbreJourTravail), 0) FROM Payroll p
 WHERE p.methodePaiement = :methode
   AND (:composanteId IS NULL OR p.projetBeneficiaire.projet.composante.id = :composanteId)
   AND (:zoneId IS NULL OR p.projetBeneficiaire.projet.quartier.sectionCommunale.commune.arrondissement.departement.zone.id = :zoneId)

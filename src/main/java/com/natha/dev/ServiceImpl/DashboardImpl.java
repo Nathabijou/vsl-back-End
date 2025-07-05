@@ -34,8 +34,9 @@ public class DashboardImpl implements DashboardIService {
         Long arrondissementId = filter.getArrondissementId();
 
         String projetId = filter.getProjetId();
-        LocalDate dateDebut = LocalDate.of(2025, 11, 1);
-        LocalDate dateFin = LocalDate.of(2025, 12, 31);
+        LocalDate dateDebut = LocalDate.of(2019, 1, 1); // oswa pi bonè si ou gen done pi ansyen
+        LocalDate dateFin = LocalDate.now(); // jiska jodi a
+
 
         long totalBeneficiaires = projetBeneficiaireDao.countBeneficiairesByFilters(
                 composanteId, zoneId, departementId,arrondissementId, communeId, sectionId, quartierId, projetId);
@@ -46,23 +47,25 @@ public class DashboardImpl implements DashboardIService {
         long totalHommes = projetBeneficiaireDao.countBySexe(
                 composanteId, zoneId, departementId,arrondissementId, communeId, sectionId, quartierId, projetId, "M");
 
+
         long totalQualifier = projetBeneficiaireDao.countByQualification(
                 composanteId, zoneId, departementId,arrondissementId, communeId, sectionId, quartierId, projetId, "Q");
 
         long totalNonQualifier = projetBeneficiaireDao.countByQualification(
                 composanteId, zoneId, departementId,arrondissementId, communeId, sectionId, quartierId, projetId, "NQ");
 
-        int totalFilleQualifier = projetBeneficiaireDao.countBySexeAndQualification(
+        long totalFilleQualifier = projetBeneficiaireDao.countBySexeAndQualification(
                 "F", "Q", composanteId, zoneId, departementId, arrondissementId, communeId, sectionId, quartierId, projetId);
 
-        int totalFilleNonQualifier = projetBeneficiaireDao.countBySexeAndQualification(
+        long totalFilleNonQualifier = projetBeneficiaireDao.countBySexeAndQualification(
                 "F", "NQ", composanteId, zoneId, departementId, arrondissementId, communeId, sectionId, quartierId, projetId);
 
-        int totalGarconQualifier = projetBeneficiaireDao.countBySexeAndQualification(
+        long totalGarconQualifier = projetBeneficiaireDao.countBySexeAndQualification(
                 "M", "Q", composanteId, zoneId, departementId, arrondissementId, communeId, sectionId, quartierId, projetId);
 
-        int totalGarconNonQualifier = projetBeneficiaireDao.countBySexeAndQualification(
+        long totalGarconNonQualifier = projetBeneficiaireDao.countBySexeAndQualification(
                 "M", "NQ", composanteId, zoneId, departementId, arrondissementId, communeId, sectionId, quartierId, projetId);
+
 
 
         double totalMonCash = payrollDao.sumByMethodePaiement(
@@ -154,6 +157,8 @@ public class DashboardImpl implements DashboardIService {
         );
 
 
+
+
         return new KpiResponse(
                 totalBeneficiaires,
                 totalFemmes,
@@ -178,4 +183,5 @@ public class DashboardImpl implements DashboardIService {
                 totalGarconQualifierLajanCash
         );
     }
+
 }

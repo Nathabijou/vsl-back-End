@@ -106,23 +106,29 @@ public class KpiResponse {
     public void setTotalLajanCash(double totalLajanCash) { this.totalLajanCash = totalLajanCash; }
 
     public long getTotalFilleQualifier() { return totalFilleQualifier; }
-    public void setTotalFilleQualifier(int totalFilleQualifier) { this.totalFilleQualifier = totalFilleQualifier; }
+    public void setTotalFilleQualifier(long totalFilleQualifier) {
+        this.totalFilleQualifier = totalFilleQualifier;
+    }
 
     public long getTotalFilleNonQualifier() { return totalFilleNonQualifier; }
-    public void setTotalFilleNonQualifier(int totalFilleNonQualifier) { this.totalFilleNonQualifier = totalFilleNonQualifier; }
+    public void setTotalFilleNonQualifier(long totalFilleNonQualifier) {
+        this.totalFilleNonQualifier = totalFilleNonQualifier;
+    }
 
     public long getTotalGasonQualifier() {
         return totalGasonQualifier;
     }
-    public void setTotalGasonQualifier(long totalGasonQualifier) {
-        this.totalGasonQualifier = totalGasonQualifier;
+    public void setTotalGarconQualifier(long totalGarconQualifier) {
+        this.totalGarconQualifier = totalGarconQualifier;
     }
 
     public long getTotalGasonNonQualifier() {
         return totalGasonNonQualifier;
     }
-    public void setTotalGasonNonQualifier(long totalGasonNonQualifier) {
-        this.totalGasonNonQualifier = totalGasonNonQualifier;
+    public void setTotalGarconNonQualifier(long totalGarconNonQualifier) {
+        this.totalGarconNonQualifier = totalGarconNonQualifier;
     }
+
+
 
 }

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.tools.Diagnostic;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -60,6 +61,8 @@ public class Composante {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+
 
 
 }

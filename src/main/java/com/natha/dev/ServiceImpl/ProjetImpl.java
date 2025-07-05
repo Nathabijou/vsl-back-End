@@ -257,6 +257,20 @@ public class ProjetImpl implements ProjetIService {
         dto.setUpdatedAt(p.getUpdatedAt());
         dto.setComposanteId(p.getComposante() != null ? p.getComposante().getId() : null);
         dto.setQuartierId(p.getQuartier() != null ? p.getQuartier().getId() : null);
+
+        dto.setComposanteId(p.getComposante() != null ? p.getComposante().getId() : null);
+        dto.setQuartierId(p.getQuartier() != null ? p.getQuartier().getId() : null);
+
+        if (p.getComposante() != null) {
+    dto.setComposanteId(p.getComposante().getId());
+    dto.setComposanteCode(p.getComposante().getCode());
+    dto.setComposanteNom(p.getComposante().getNom());
+
+    if (p.getComposante().getApplicationInstance() != null) {
+        dto.setApplicationCode(p.getComposante().getApplicationInstance().getCode());
+//        dto.setApplicationNom(p.getComposante().getApplicationInstance().getNom());
+    }
+}
         return dto;
     }
 }

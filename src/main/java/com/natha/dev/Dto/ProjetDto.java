@@ -41,4 +41,8 @@ public class ProjetDto {
     private LocalDateTime updatedAt;
     private Long composanteId;
     private Long quartierId;
+    private String applicationCode;
+    private String composanteNom;
+    private String composanteCode;
+
 }

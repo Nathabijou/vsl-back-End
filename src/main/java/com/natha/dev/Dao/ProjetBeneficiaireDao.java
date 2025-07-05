@@ -18,9 +18,9 @@ public interface ProjetBeneficiaireDao extends JpaRepository<ProjetBeneficiaire,
     @Query("""
 SELECT COUNT(pb) FROM ProjetBeneficiaire pb
 JOIN pb.projet.quartier.sectionCommunale.commune c
-JOIN c.arrondissement a
-JOIN a.departement d
-JOIN d.zones z
+LEFT JOIN c.arrondissement a
+LEFT JOIN a.departement d
+LEFT JOIN d.zones z
 WHERE pb.beneficiaire.sexe = :sexe
   AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
   AND (:zoneId IS NULL OR z.id = :zoneId)
@@ -45,25 +45,27 @@ WHERE pb.beneficiaire.sexe = :sexe
 
 
 
+
+
     // Dao
 
 
-        @Query("""
-        SELECT COUNT(pb) FROM ProjetBeneficiaire pb
-        JOIN pb.projet.quartier.sectionCommunale.commune c
-        JOIN c.arrondissement a
-        JOIN a.departement d
-        JOIN d.zones z
-        WHERE pb.beneficiaire.qualification = :qualification
-          AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
-          AND (:zoneId IS NULL OR z.id = :zoneId)
-          AND (:departementId IS NULL OR d.id = :departementId)
-          AND (:arrondissementId IS NULL OR a.id = :arrondissementId)
-          AND (:communeId IS NULL OR c.id = :communeId)
-          AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId)
-          AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
-          AND (:projetId IS NULL OR pb.projet.id = :projetId)
-    """)
+    @Query("""
+SELECT COUNT(pb) FROM ProjetBeneficiaire pb
+JOIN pb.projet.quartier.sectionCommunale.commune c
+LEFT JOIN c.arrondissement a
+LEFT JOIN a.departement d
+LEFT JOIN d.zones z
+WHERE pb.beneficiaire.qualification = :qualification
+  AND (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
+  AND (:zoneId IS NULL OR z.id = :zoneId)
+  AND (:departementId IS NULL OR d.id = :departementId)
+  AND (:arrondissementId IS NULL OR a.id = :arrondissementId)
+  AND (:communeId IS NULL OR c.id = :communeId)
+  AND (:sectionId IS NULL OR pb.projet.quartier.sectionCommunale.id = :sectionId)
+  AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
+  AND (:projetId IS NULL OR pb.projet.id = :projetId)
+""")
         long countByQualification(
                 @Param("composanteId") Long composanteId,
                 @Param("zoneId") Long zoneId,
@@ -83,9 +85,9 @@ WHERE pb.beneficiaire.sexe = :sexe
     @Query("""
     SELECT COUNT(pb) FROM ProjetBeneficiaire pb
     JOIN pb.projet.quartier.sectionCommunale.commune c
-    JOIN c.arrondissement a
-    JOIN a.departement d
-    JOIN d.zones z
+    LEFT JOIN c.arrondissement a
+    LEFT JOIN a.departement d
+    LEFT JOIN d.zones z
     WHERE (:composanteId IS NULL OR pb.projet.composante.id = :composanteId)
       AND (:zoneId IS NULL OR z.id = :zoneId)
       AND (:departementId IS NULL OR d.id = :departementId)
@@ -95,6 +97,8 @@ WHERE pb.beneficiaire.sexe = :sexe
       AND (:quartierId IS NULL OR pb.projet.quartier.id = :quartierId)
       AND (:projetId IS NULL OR pb.projet.id = :projetId)
 """)
+
+
     long countBeneficiairesByFilters(
             @Param("composanteId") Long composanteId,
             @Param("zoneId") Long zoneId,
@@ -111,25 +115,29 @@ WHERE pb.beneficiaire.sexe = :sexe
 
     // Dao
 
-    @Query("SELECT COUNT(DISTINCT pb) " +
-            "FROM ProjetBeneficiaire pb " +
-            "JOIN pb.projet.quartier q " +
-            "JOIN q.sectionCommunale sc " +
-            "JOIN sc.commune c " +
-            "JOIN c.arrondissement a " +
-            "JOIN a.departement d " +
-            "JOIN d.zones z " +
-            "JOIN pb.projet.composante comp " +
-            "WHERE (:sexe IS NULL OR pb.beneficiaire.sexe = :sexe) " +
-            "AND (:qualification IS NULL OR pb.beneficiaire.qualification = :qualification) " +
-            "AND (:composanteId IS NULL OR comp.id = :composanteId) " +
-            "AND (:zoneId IS NULL OR z.id = :zoneId) " +
-            "AND (:departementId IS NULL OR d.id = :departementId) " +
-            "AND (:arrondissementId IS NULL OR a.id = :arrondissementId) " +
-            "AND (:communeId IS NULL OR c.id = :communeId) " +
-            "AND (:sectionId IS NULL OR sc.id = :sectionId) " +
-            "AND (:quartierId IS NULL OR q.id = :quartierId) " +
-            "AND (:projetId IS NULL OR pb.projet.id = :projetId)")
+    @Query(value = """
+    SELECT COUNT(DISTINCT pb.id_projet_beneficiaire)
+    FROM projet_beneficiaire pb
+    JOIN beneficiaire b ON pb.beneficiaire_id = b.id_beneficiaire
+    JOIN projet p ON pb.projet_id = p.id_projet
+    JOIN quartier q ON p.quartier_id = q.id
+    JOIN section_communale sc ON q.section_communale_id = sc.id
+    JOIN commune c ON sc.commune_id = c.id
+    JOIN arrondissement a ON c.arrondissement_id = a.id
+    JOIN departement d ON a.departement_id = d.id
+    JOIN zone_departement z ON d.id = z.departement_id
+    JOIN composante comp ON p.composante_id = comp.id
+    WHERE (:sexe IS NULL OR TRIM(b.sexe) = :sexe)
+      AND (:qualification IS NULL OR TRIM(b.qualification) = :qualification)
+      AND (:composanteId IS NULL OR comp.id = :composanteId)
+      AND (:zoneId IS NULL OR z.zone_id = :zoneId)
+      AND (:departementId IS NULL OR d.id = :departementId)
+      AND (:arrondissementId IS NULL OR a.id = :arrondissementId)
+      AND (:communeId IS NULL OR c.id = :communeId)
+      AND (:sectionId IS NULL OR sc.id = :sectionId)
+      AND (:quartierId IS NULL OR q.id = :quartierId)
+      AND (:projetId IS NULL OR p.id_projet = :projetId)
+""", nativeQuery = true)
     int countBySexeAndQualification(
             @Param("sexe") String sexe,
             @Param("qualification") String qualification,
@@ -142,6 +150,8 @@ WHERE pb.beneficiaire.sexe = :sexe
             @Param("quartierId") Long quartierId,
             @Param("projetId") String projetId
     );
+
+
 
 
 
@@ -179,6 +189,42 @@ WHERE pb.beneficiaire.sexe = :sexe
 
 
 
+    @Query(value = """
+    SELECT 
+      TRIM(b.sexe) AS sexe,
+      TRIM(b.qualification) AS qualification,
+      COUNT(DISTINCT pb.id_projet_beneficiaire) AS total
+    FROM projet_beneficiaire pb
+    JOIN beneficiaire b ON pb.beneficiaire_id = b.id_beneficiaire
+    JOIN projet p ON pb.projet_id = p.id_projet
+    JOIN quartier q ON p.quartier_id = q.id
+    JOIN section_communale sc ON q.section_communale_id = sc.id
+    JOIN commune c ON sc.commune_id = c.id
+    JOIN arrondissement a ON c.arrondissement_id = a.id
+    JOIN departement d ON a.departement_id = d.id
+    JOIN zone_departement z ON d.id = z.departement_id
+    JOIN composante comp ON p.composante_id = comp.id
+    WHERE (:composanteId IS NULL OR comp.id = :composanteId)
+      AND (:zoneId IS NULL OR z.zone_id = :zoneId)
+      AND (:departementId IS NULL OR d.id = :departementId)
+      AND (:arrondissementId IS NULL OR a.id = :arrondissementId)
+      AND (:communeId IS NULL OR c.id = :communeId)
+      AND (:sectionId IS NULL OR sc.id = :sectionId)
+      AND (:quartierId IS NULL OR q.id = :quartierId)
+      AND (:projetId IS NULL OR p.id_projet = :projetId)
+    GROUP BY TRIM(b.sexe), TRIM(b.qualification)
+    """, nativeQuery = true)
+    <SexeQualificationStat>
+    List<SexeQualificationStat> countBySexeAndQualificationGrouped(
+            @Param("composanteId") Long composanteId,
+            @Param("zoneId") Long zoneId,
+            @Param("departementId") Long departementId,
+            @Param("arrondissementId") Long arrondissementId,
+            @Param("communeId") Long communeId,
+            @Param("sectionId") Long sectionId,
+            @Param("quartierId") Long quartierId,
+            @Param("projetId") String projetId
+    );
 
 
 }
