@@ -1,10 +1,8 @@
 package com.natha.dev.ServiceImpl;
 
 import com.natha.dev.Dao.MySystemDao;
-import com.natha.dev.Dto.CommuneDto;
 import com.natha.dev.Dto.MySystemDto;
 import com.natha.dev.IService.MySystemIService;
-import com.natha.dev.Model.Commune;
 import com.natha.dev.Model.MySystem;
 import com.natha.dev.Model.Users;
 import org.springframework.beans.factory.annotation.Autowired;

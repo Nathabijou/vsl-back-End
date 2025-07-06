@@ -1,12 +1,12 @@
 package com.natha.dev.Model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -16,13 +16,14 @@ import java.util.Set;
 @Entity
 //@Builder
 public class Users {
-
     @Id
-    private String userName;
+
+    private String userName; // identifiant
     private String userEmail;
     private String userPassword;
     private String userFirstName;
     private String userLastName;
+    private String userTelephone;
     private String otpCode;
     private String userSexe;
 
@@ -43,16 +44,17 @@ public class Users {
     private String createdBy;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "USER_ROLE",
+    @JoinTable(name = "user_role",
             joinColumns = {
-                    @JoinColumn(name = "USER_ID")
+                    @JoinColumn(name = "user_name")  // Chanje isit la
             },
             inverseJoinColumns = {
-                    @JoinColumn(name = "ROLE_ID")
+                    @JoinColumn(name = "role_name")
             }
     )
-
     private Set<Role> role;
+
+
     public Set<Role> getRole() {
         return role;
     }
@@ -68,6 +70,26 @@ public class Users {
     public void setOtpCode(String otpCode) {
         this.otpCode = otpCode;
     }
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "user_application_instance",
+            joinColumns = @JoinColumn(name = "user_name"), // byen matche
+            inverseJoinColumns = @JoinColumn(name = "id_app")
+    )
+
+    private Set<ApplicationInstance> applicationInstances;
+
+
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(
+            name = "user_composante_access",
+            joinColumns = @JoinColumn(name = "user_name"),
+            inverseJoinColumns = @JoinColumn(name = "composante_id")
+    )
+    private Set<Composante> composantes = new HashSet<>();
 
 
 

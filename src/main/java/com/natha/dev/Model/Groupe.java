@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.DateTimeException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -24,8 +24,11 @@ public class Groupe {
     private String responsable;
     private LocalDateTime datecreation;
 
-    private double prixAction;
-    private double tauxInteret;
+    @Column(nullable = false)
+    private BigDecimal prixAction;
+
+    @Column(nullable = false)
+    private BigDecimal tauxInteret;
 
 
 
@@ -34,8 +37,6 @@ public class Groupe {
         this.datecreation = LocalDateTime.now();
     }
 
-    @ManyToOne
-    @JoinColumn(name = "commune_id")
-    private Commune commune;
+
 
 }

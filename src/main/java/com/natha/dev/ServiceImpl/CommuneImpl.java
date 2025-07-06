@@ -1,8 +1,10 @@
 package com.natha.dev.ServiceImpl;
 
+import com.natha.dev.Dao.ArrondissementDao;
 import com.natha.dev.Dao.CommuneDao;
 import com.natha.dev.Dto.CommuneDto;
 import com.natha.dev.IService.CommuneIService;
+import com.natha.dev.Model.Arrondissement;
 import com.natha.dev.Model.Commune;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ public class CommuneImpl implements CommuneIService {
 
     @Autowired
     private CommuneDao communeDao;
+    @Autowired
+    private ArrondissementDao arrondissmentDao;
 
 
     @Override
@@ -43,6 +47,26 @@ public class CommuneImpl implements CommuneIService {
         communeDao.deleteById(id);
     }
 
+    @Override
+    public void delete(Long id) {
+        communeDao.deleteById(id);
+    }
+
+    @Override
+    public List<CommuneDto> getAll() {
+        return communeDao.findAll().stream().map(this::convertToDto).toList();
+    }
+
+    @Override
+    public List<CommuneDto> getByArrondissmentId(Long arrondissmentId) {
+        return communeDao.findByArrondissementId(arrondissmentId).stream().map(this::convertToDto).toList();
+    }
+
+
+    @Override
+    public List<CommuneDto> findByArrondissementId(Long arrondissementId) {
+        return communeDao.findByArrondissementId(arrondissementId).stream().map(this::convertToDto).toList();
+    }
 
 
 
@@ -68,6 +92,14 @@ public class CommuneImpl implements CommuneIService {
         commune.setId(dto.getId());
         commune.setNom(dto.getNom());
         // Vous pouvez ajouter d'autres attributs ici
+
+        if (dto.getDepartementId() != null) {
+            Arrondissement arrondissement = arrondissmentDao.findById(dto.getDepartementId())
+                    .orElseThrow(() -> new RuntimeException("Département non trouvé avec l'id: " + dto.getDepartementId()));
+            commune.setArrondissement(arrondissement);
+        } else {
+            throw new RuntimeException("departementId est requis pour créer une commune.");
+        }
 
         return commune;
     }

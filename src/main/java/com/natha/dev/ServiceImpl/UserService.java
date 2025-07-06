@@ -4,20 +4,18 @@ import com.natha.dev.Dao.GroupeDao;
 import com.natha.dev.Dao.Groupe_UserDao;
 import com.natha.dev.Dao.RoleDao;
 import com.natha.dev.Dao.UserDao;
-import com.natha.dev.Exeption.MessagingException;
-import com.natha.dev.Model.*;
+import com.natha.dev.Model.Groupe;
+import com.natha.dev.Model.Groupe_Users;
+import com.natha.dev.Model.Role;
+import com.natha.dev.Model.Users;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -45,27 +43,34 @@ public class UserService {
 
     // Initialiser les rôles et les utilisateurs
     public void initRoleAndUser() {
+
+        // Créer le rôle Admin
+        Role superAadminRole = new Role();
+        superAadminRole.setRoleName("SUPERADMIN");
+        superAadminRole.setRoleDescription("Rôle super administrateur");
+        roleDao.save(superAadminRole);
+
         // Créer le rôle Admin
         Role adminRole = new Role();
-        adminRole.setRoleName("Admin");
+        adminRole.setRoleName("ADMIN");
         adminRole.setRoleDescription("Rôle d'administrateur");
         roleDao.save(adminRole);
 
         // Créer le rôle Manager
         Role managerRole = new Role();
-        managerRole.setRoleName("Manager");
+        managerRole.setRoleName("MANAGER");
         managerRole.setRoleDescription("Rôle de gestionnaire");
         roleDao.save(managerRole);
 
         // Créer le rôle User
         Role userRole = new Role();
-        userRole.setRoleName("User");
+        userRole.setRoleName("USER");
         userRole.setRoleDescription("Rôle utilisateur");
         roleDao.save(userRole);
 
         // Créer le rôle Moderant
         Role moderantRole = new Role();
-        moderantRole.setRoleName("Moderant");
+        moderantRole.setRoleName("MODERANT");
         moderantRole.setRoleDescription("Rôle de modérateur");
         roleDao.save(moderantRole);
     }
@@ -73,7 +78,7 @@ public class UserService {
 
     public Users registerNewUserWithRole(String userName, String userEmail, String userPassword,
                                          String userFirstName, String userLastName, String userSexe,
-                                         String roleName, String createdBy) {
+                                         String roleName, String createdBy, String userTelephone) {
 
         // Vérification utilisateur existant
         Users existingUser = userDao.findByUserName(userName);
@@ -106,6 +111,7 @@ public class UserService {
         user.setCreatedBy(createdBy);
         user.setStatus(true);
         user.setCreateDate(new Date());
+        user.setUserTelephone(userTelephone);
 
         // Encode et set mot de passe (assure que userPassword != null)
         if (userPassword != null && !userPassword.isEmpty()) {

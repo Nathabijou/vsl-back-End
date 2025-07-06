@@ -1,12 +1,12 @@
 package com.natha.dev.Dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CommuneDto {
-
     private Long id;
     private String nom;
+    private Long departementId;
 }

@@ -20,7 +20,20 @@ public class Commune {
     private Long id;
     private String nom;
 
-    @OneToMany(mappedBy = "commune", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Groupe> groupes;
+
+
+
+
+    @ManyToOne
+    @JoinColumn(name = "arrondissement_id")
+    private Arrondissement arrondissement;
+
+    public Arrondissement getArrondissement() {
+        return arrondissement;
+    }
+
+    public void setArrondissement(Arrondissement arrondissement) {
+        this.arrondissement = arrondissement;
+    }
 
 }

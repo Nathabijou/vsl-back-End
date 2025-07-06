@@ -1,6 +1,5 @@
 package com.natha.dev.Dao;
 
-import com.natha.dev.Dto.GroupeDto;
 import com.natha.dev.Model.Groupe;
 import com.natha.dev.Model.Groupe_Users;
 import com.natha.dev.Model.Users;

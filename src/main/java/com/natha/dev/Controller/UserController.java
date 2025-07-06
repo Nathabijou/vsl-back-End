@@ -3,12 +3,9 @@ package com.natha.dev.Controller;
 import com.natha.dev.Configuration.EmailConfig;
 import com.natha.dev.Dao.GroupeDao;
 import com.natha.dev.Dao.UserDao;
-import com.natha.dev.Dto.Groupe_UsersDto;
 import com.natha.dev.IService.Groupe_UsersIService;
-import com.natha.dev.Model.*;
-import com.natha.dev.ServiceImpl.JwtService;
+import com.natha.dev.Model.Users;
 import com.natha.dev.ServiceImpl.UserService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +13,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -58,6 +52,7 @@ public class UserController {
         String userLastName  = userRequest.get("userLastName");
         String userSexe      = userRequest.get("userSexe");
         String roleName      = userRequest.get("roleName");
+        String userTelephone = userRequest.get("userTelephone");
 
 
 
@@ -68,7 +63,7 @@ public class UserController {
         // Autres validations des données d'entrée
 
         // Enregistrer l'utilisateur avec son rôle en appelant le service utilisateur
-        Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, userSexe, roleName, createdBy);
+        Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, userSexe, roleName, createdBy, userTelephone);
 
         // Générer et envoyer l'OTP à l'utilisateur
         userService.sendActivationEmail( userEmail, userFirstName, userLastName, userName);
