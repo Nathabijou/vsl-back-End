@@ -33,6 +33,7 @@ public class ProjetDto {
     private Double montantMainOeuvreQualifier;
     private Double montantMainOeuvreNonQualifier;
     private Double montantAssurance;
+    private Double montantFraisCashInCashOut;
     private Double montantMateriaux;
     private Double montantTotal;
     private String createdBy;

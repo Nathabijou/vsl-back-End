@@ -126,6 +126,7 @@ public class ProjetImpl implements ProjetIService {
         p.setLatitude(dto.getLatitude());
         p.setLongitude(dto.getLongitude());
         p.setMontantAssurance(dto.getMontantAssurance());
+        p.setMontantFraisCashInCashOut(dto.getMontantFraisCashInCashOut());
         p.setMontantMateriaux(dto.getMontantMateriaux());
         p.setMontantMainOeuvreQualifier(dto.getMontantMainOeuvreQualifier());
         p.setMontantMainOeuvreNonQualifier(dto.getMontantMainOeuvreNonQualifier());
@@ -222,6 +223,7 @@ public class ProjetImpl implements ProjetIService {
         p.setModifyBy(dto.getModifyBy());
         p.setCreatedAt(dto.getCreatedAt());
         p.setUpdatedAt(dto.getUpdatedAt());
+        p.setMontantFraisCashInCashOut(dto.getMontantFraisCashInCashOut());
 
         // Nou pa mete composante ak quartier la la pou evite doublon, metòd ki rele yo mete yo
         return p;
@@ -255,6 +257,7 @@ public class ProjetImpl implements ProjetIService {
         dto.setModifyBy(p.getModifyBy());
         dto.setCreatedAt(p.getCreatedAt());
         dto.setUpdatedAt(p.getUpdatedAt());
+        dto.setMontantFraisCashInCashOut(p.getMontantFraisCashInCashOut());
         dto.setComposanteId(p.getComposante() != null ? p.getComposante().getId() : null);
         dto.setQuartierId(p.getQuartier() != null ? p.getQuartier().getId() : null);
 

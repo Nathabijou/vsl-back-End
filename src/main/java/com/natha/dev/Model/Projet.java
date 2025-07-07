@@ -46,6 +46,7 @@ public class Projet {
     private Double montantMainOeuvreNonQualifier;
     private Double montantAssurance;
     private Double montantMateriaux;
+    private Double montantFraisCashInCashOut;
     private Double montantTotal;
 
     private String createdBy;
