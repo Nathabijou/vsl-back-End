@@ -153,6 +153,7 @@ public class ComposanteServiceImpl implements ComposanteIService {
         Composante composante = new Composante();
         composante.setNom(dto.getNom());
         composante.setDescription(dto.getDescription());
+        composante.setCode(dto.getCode());
         composante.setCreatedBy(dto.getCreatedBy());
         composante.setApplicationInstance(appInstance); // ✅ mete applicationInstance
 
@@ -189,6 +190,7 @@ public class ComposanteServiceImpl implements ComposanteIService {
         ComposanteDto dto = new ComposanteDto();
         dto.setId(composante.getId());
         dto.setNom(composante.getNom());
+        dto.setCode(composante.getCode());
         dto.setDescription(composante.getDescription());
         dto.setCreatedBy(composante.getCreatedBy());
         dto.setApplicationId(composante.getApplicationInstance().getId()); // ✅
