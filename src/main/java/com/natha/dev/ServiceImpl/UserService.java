@@ -163,14 +163,13 @@ public class UserService {
         // Prepare email message
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(userEmail);
-        mailMessage.setSubject("Activation de votre compte sur Top Hospital");
+        mailMessage.setSubject("Activation de votre compte ");
         mailMessage.setText(greeting + " " + userFirstName + " " + userLastName + ",\n\n"
                 + "Nous vous informons que vous avez créé un compte avec l'adresse e-mail : " + userEmail + ".\n"
                 + " Pour finaliser la création de votre compte, veuillez cliquer sur le lien suivant :\n"
-                + activationLink + "\n\n"
-                + "Votre nom d'utilisateur est : " + userName + "\n\n"
-                + "Le lien expirera dans 72 heures.\n\n"
-                + "Cordialement,\n\nTop Hospital");
+                + "https://padf.up.railway.app/ \n\n"
+                + "Votre nom d'utilisateur est : " + userName + "\n\n");
+
 
         // Send email
         emailSender.send(mailMessage);
@@ -203,8 +202,8 @@ public class UserService {
         //String emailContent = "Bonjour " + userFirstName + " " + userLastName + ",\n\n"
         String emailContent =    ""
                 + "Votre mot de passe a été créé avec succès pour le compte associé à l'adresse e-mail : \n\n" + userEmail + ".\n\n"
-                + "Vous êtes maintenant membre de Top Hospital. Vous pouvez maintenant vous connecter à votre compte en utilisant votre nom d'utilisateur dans le message précédent.\n\n"
-                + "Cordialement,\n\nTop Hospital";
+                + "Vous pouvez maintenant vous connecter à votre compte en utilisant votre nom d'utilisateur dans le message précédent.\n\n";
+
 
         // Créer le message d'e-mail
         SimpleMailMessage message = new SimpleMailMessage();
@@ -245,10 +244,12 @@ public class UserService {
 
     private void sendOTPByEmail(String userEmail, String otpCode) {
         // Préparer le contenu de l'e-mail
-        String emailContent = "Votre code OTP pour réinitialiser votre mot de passe est :\n\n " + otpCode + "\n\n"
-                + "Veuillez utiliser ce code pour confirmer votre demande de réinitialisation de mot de passe.\n\n"
-                + "Ce code expirera dans 10 minutes.\n\n"
-                + "Cordialement,\n\nTop Hospital";
+        String emailContent = "Votre code OTP est :\n\n " + otpCode + "\n\n"
+                + "Veuillez utiliser ce code pour confirmer votre demande .\n\n"
+                + ".\n\n"
+                + ",\n\n \n" +
+                " \n" +
+                "        \n";
 
         // Créer le message d'e-mail
         SimpleMailMessage message = new SimpleMailMessage();
@@ -337,7 +338,7 @@ public class UserService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(userEmail);
         message.setSubject("Password reset Confirmation");
-        message.setText("Felicitaion \n Votre mot de passe a été modifié avec succès.");
+        message.setText("Successful .");
 
         emailSender.send(message);
     }

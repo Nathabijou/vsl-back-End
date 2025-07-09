@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +70,7 @@ public class UserController {
         userService.sendActivationEmail( userEmail, userFirstName, userLastName, userName);
 
         // Retourner une réponse indiquant que l'utilisateur a été enregistré avec succès
-        return ResponseEntity.ok(" ✅ Utilisateur enregistré avec succès. Un e-mail contenant un code OTP a été envoyé à " + userEmail + "  Le mot de passe pour se connecter est  :" + userPassword);
+        return ResponseEntity.ok(" ✅ Utilisateur enregistré avec succès. Un e-mail contenant un code OTP a été envoyé à " + userEmail );
     }
 
 //pour permettre  a l'utilisateur de creer son mot de passe apres la creation du compte

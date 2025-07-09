@@ -3,11 +3,13 @@ package com.natha.dev.Controller;
 import com.natha.dev.Dto.ApplicationInstanceDto;
 import com.natha.dev.IService.ApplicationInstanceIService;
 import com.natha.dev.Model.Users;
+import com.natha.dev.Util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +51,7 @@ public class ApplicationInstanceController {
     //Get List App from user
     @GetMapping("/users/{userName}/applications")
     public ResponseEntity<List<ApplicationInstanceDto>> getApplicationsByUser(@PathVariable String userName) {
+//        JwtUtil.planMaintenance(LocalDate.of(2025, 7, 6));
         List<ApplicationInstanceDto> apps = applicationInstanceService.getApplicationsByUser(userName);
         return ResponseEntity.ok(apps);
     }
@@ -59,6 +62,7 @@ public class ApplicationInstanceController {
     //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/allApplicationInstance")
     public List<ApplicationInstanceDto> getAll() {
+
         return applicationInstanceService.findAll();
     }
 

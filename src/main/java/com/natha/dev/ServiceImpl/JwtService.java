@@ -114,6 +114,7 @@ public class JwtService implements UserDetailsService {
         }
         return null;
     }
+    
 
     public void logout(String userName) {
         Users user = userDao.findByUserName(userName);
@@ -122,4 +123,19 @@ public class JwtService implements UserDetailsService {
             userDao.save(user);
         }
     }
+
+    public boolean validateToken(String token) {
+        String username = jwtUtil.getUsernameFromToken(token);
+        UserDetails userDetails = loadUserByUsername(username);
+        return jwtUtil.validateToken(token, userDetails);
+    }
+
+
+    public String extractUsername(String token) {
+        // Sipoze ou gen yon JwtUtil ak metòd extractUsername ki egziste
+        return jwtUtil.extractUsername(token);
+    }
+
+
+
 }

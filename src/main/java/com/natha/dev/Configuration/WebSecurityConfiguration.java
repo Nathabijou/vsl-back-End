@@ -47,7 +47,8 @@ public class WebSecurityConfiguration {
                         "/registerNewUser",
                         "/reset",
                         "/verify-otp",
-                        "/newPasswordRegister").permitAll()  // Remplacez antMatchers() par requestMatchers()
+                        "/newPasswordRegister",
+                        "/ws-chat/**").permitAll()  // Remplacez antMatchers() par requestMatchers()
                 .requestMatchers(HttpHeaders.ALLOW).permitAll()
                 .anyRequest().authenticated()
                 .and()

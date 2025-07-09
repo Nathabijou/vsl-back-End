@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.function.Function;
 public class JwtUtil {
 
     private static final String SECRET_KEY = "learn_programming_yourself";
-
+    private String secretKey = "votreSecretKey";
     private static final int TOKEN_VALIDITY = 3600 * 5;
 
     public String getUsernameFromToken(String token) {
@@ -36,6 +37,7 @@ public class JwtUtil {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
+
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
@@ -47,6 +49,8 @@ public class JwtUtil {
 
     public String generateToken(UserDetails userDetails) {
 
+
+
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
@@ -57,4 +61,29 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
     }
+
+
+    public String extractUsername(String token) {
+        return extractClaim(token).getSubject();
+    }
+
+
+    private Claims extractClaim(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+//    public static void planMaintenance(LocalDate inputDate) {
+//        LocalDate today = LocalDate.now();
+//
+//        if (inputDate.isBefore(today)) {
+////            throw new IllegalArgumentException("The date provided is before today.");
+//        }
+//
+//        System.out.println("Maintenance planned for: " + inputDate);
+//    }
+
+
 }
