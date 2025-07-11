@@ -24,6 +24,8 @@ public class Users {
     private String userFirstName;
     private String userLastName;
     private String userTelephone;
+    private String userIdentification;
+
     private String otpCode;
     private String userSexe;
 

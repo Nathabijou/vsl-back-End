@@ -14,4 +14,5 @@ public interface Groupe_UserDao extends JpaRepository<Groupe_Users, Long> {
     Optional<Groupe_Users> findByUsersAndGroupe(Users users, Groupe groupe);
     List<Groupe_Users> findByUsersUserName(String userName);
 
+    Optional<Groupe_Users> findByGroupeIdAndUsersUserName(Long groupeId, String username);
 }

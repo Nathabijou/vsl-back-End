@@ -9,5 +9,5 @@ public interface GroupeDao extends JpaRepository<Groupe, Long> {
     //    List<Groupe> findByUserGroupByGroupeId(Long groupeId);
 //    List<Groupe> findByUserGroup(Long id);
 
-//    List<Groupe> findByCommuneId(Long communeId);
+    List<Groupe> findByCommuneId(Long communeId);
 }

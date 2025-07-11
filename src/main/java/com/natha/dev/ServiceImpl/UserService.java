@@ -78,7 +78,7 @@ public class UserService {
 
     public Users registerNewUserWithRole(String userName, String userEmail, String userPassword,
                                          String userFirstName, String userLastName, String userSexe,
-                                         String roleName, String createdBy, String userTelephone) {
+                                         String roleName, String createdBy, String userTelephone, String userIdentification) {
 
         // Vérification utilisateur existant
         Users existingUser = userDao.findByUserName(userName);
@@ -86,10 +86,17 @@ public class UserService {
             throw new RuntimeException("L'utilisateur avec le nom d'utilisateur '" + userName + "' existe déjà.");
         }
 
+
         existingUser = userDao.findByUserEmail(userEmail);
         if (existingUser != null) {
             throw new RuntimeException("L'email '" + userEmail + "' est déjà enregistré.");
         }
+
+        Optional<Users> existingUserOpt = userDao.findByUserIdentification(userIdentification);
+        if (existingUserOpt.isPresent()) {
+            throw new RuntimeException("Le Numero d'identification " + userIdentification + " est déjà enregistré.");
+        }
+
 
         // Récupération rôle
         Role role = roleDao.findByRoleName(roleName);
@@ -112,6 +119,7 @@ public class UserService {
         user.setStatus(true);
         user.setCreateDate(new Date());
         user.setUserTelephone(userTelephone);
+        user.setUserIdentification(userIdentification);
 
         // Encode et set mot de passe (assure que userPassword != null)
         if (userPassword != null && !userPassword.isEmpty()) {
@@ -403,6 +411,27 @@ public class UserService {
         groupeUserDao.save(groupeUsers);
     }
 
+    // Voir liste Beneficiaire creer par un Admin
+    public List<Users> getUsersCreatedBy(String creatorUsername) {
+        return userDao.findByCreatedBy(creatorUsername);
+    }
+
+    public List<Users> getUsersCreatedByNotInGroupe(String creatorUsername, Long groupeId) {
+        // 1. Jwenn tout user ki te kreye pa creatorUsername
+        List<Users> createdUsers = userDao.findByCreatedBy(creatorUsername);
+
+        // 2. Jwenn tout user ki **deja** nan groupe sa
+        List<Groupe_Users> groupeUsers = groupeUserDao.findByGroupeId(groupeId);
+        Set<String> usernamesInGroup = groupeUsers.stream()
+                .map(gu -> gu.getUsers().getUserName())
+                .collect(Collectors.toSet());
+
+        // 3. Retire tout moun ki deja nan groupe a
+        return createdUsers.stream()
+                .filter(user -> !usernamesInGroup.contains(user.getUserName()))
+                .collect(Collectors.toList());
+    }
+
 
     public Users findByUserName(String userName) {
         return userDao.findByUserName(userName);
@@ -417,5 +446,17 @@ public class UserService {
     public Users saveUser(Users user) {
         return userDao.save(user);
     }
+
+    public void removeUsersFromGroupe(Long groupeId, List<String> usernames) {
+        for (String username : usernames) {
+            // Rechèch relasyon Groupe_Users ki konekte user ak groupe
+            Optional<Groupe_Users> groupeUserOpt = groupeUserDao.findByGroupeIdAndUsersUserName(groupeId, username);
+
+            if (groupeUserOpt.isPresent()) {
+                groupeUserDao.delete(groupeUserOpt.get());
+            }
+        }
+    }
+
 
 }

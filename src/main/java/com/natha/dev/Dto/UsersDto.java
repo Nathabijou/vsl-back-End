@@ -19,7 +19,7 @@ public class UsersDto {
     private String userPassword;
     private String userFirstName;
     private String userTelephone;
-
+    private String userIdentification;
     private String userLastName;
     private String otpCode;
     private String userSexe;
@@ -35,6 +35,7 @@ public class UsersDto {
         this.userName = username; // Initialiser l'attribut username
         this.userEmail = email;
         this.userFirstName = userFirstName;
-        this.userLastName = userLastName;// Initialiser l'attribut email
+        this.userLastName = userLastName;
+        // Initialiser l'attribut email
     }
 }

@@ -18,6 +18,6 @@ public interface GroupeIService  {
 
     List<Users> findUsersByGroupeId(Long groupeId);
 
-//    List<GroupeDto> findByCommuneId(Long communeId);
-//    GroupeDto saveById(GroupeDto groupeDto, Long communeId);
+    List<GroupeDto> findByCommuneId(Long communeId);
+    GroupeDto saveById(GroupeDto groupeDto, Long communeId);
 }

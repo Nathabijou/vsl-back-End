@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin("http://localhost:4200")
@@ -23,14 +24,14 @@ public class GroupeController {
 
 
     // rekipere tout gwoup pou yon moun specifiqie
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
     @GetMapping("/users/{userName}/groupe")
     List<GroupeDto> groupeByUsers(@PathVariable("userName") String userName) {
         return groupeIService.findByUsers(userName);
     }
 
     // rekipere tout group
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping("/allgroups")
     public ResponseEntity<List<GroupeDto>> getAllGroupes() {
         List<GroupeDto> groupes = groupeIService.findAll();
@@ -39,16 +40,27 @@ public class GroupeController {
 
 
     // rekipere tout gwoup pou yon Commune specifiqie
-//    @GetMapping("/commune/{communeId}/groupe")  // Changez groupeId en usersId
-//    List<GroupeDto> groupeByCommune(@PathVariable Long communeId) {
-//        return groupeIService.findByCommuneId(communeId);
-//    }
-//
-//    // kreye gwoup nan yon  commune specifiqie
-//    @PostMapping("/groupe/commune/{communeId}")
-//    public ResponseEntity<GroupeDto> NewGroupe(@RequestBody GroupeDto groupeDto, @PathVariable Long communeId) {
-//        GroupeDto newComposanteDto = groupeIService.saveById(groupeDto, communeId);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(newComposanteDto);
-//    }
+    @GetMapping("/commune/{communeId}/groupe")  // Changez groupeId en usersId
+    List<GroupeDto> groupeByCommune(@PathVariable Long communeId) {
+        return groupeIService.findByCommuneId(communeId);
+    }
+
+    // kreye gwoup nan yon  commune specifiqie
+    @PostMapping("/groupe/commune/{communeId}")
+    public ResponseEntity<GroupeDto> NewGroupe(@RequestBody GroupeDto groupeDto, @PathVariable Long communeId) {
+        GroupeDto newComposanteDto = groupeIService.saveById(groupeDto, communeId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newComposanteDto);
+    }
+
+    @GetMapping("/groupe/{id}")
+    public ResponseEntity<GroupeDto> getGroupeById(@PathVariable Long id) {
+        Optional<GroupeDto> groupeOpt = groupeIService.findById(id);
+        if (groupeOpt.isPresent()) {
+            return ResponseEntity.ok(groupeOpt.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
 }

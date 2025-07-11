@@ -21,7 +21,8 @@ public class Commune {
     private String nom;
 
 
-
+    @OneToMany(mappedBy = "commune", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Groupe> groupes;
 
 
     @ManyToOne

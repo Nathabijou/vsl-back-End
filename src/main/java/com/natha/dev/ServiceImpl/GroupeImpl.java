@@ -100,48 +100,44 @@ public class GroupeImpl implements GroupeIService {
     }
 
 
-//    @Override
-//    public List<GroupeDto> findByCommuneId(Long communeId) {
-//        List<Groupe> groupes = groupeDao.findByCommuneId(communeId);
-//        return groupes.stream().map(this::convertToDto).collect(Collectors.toList());
-//    }
+    @Override
+    public List<GroupeDto> findByCommuneId(Long communeId) {
+        List<Groupe> groupes = groupeDao.findByCommuneId(communeId);
+        return groupes.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
 
-//    @Override
-//    public GroupeDto saveById(GroupeDto groupeDto, Long communeId) {
-//        return null;
-//    }
 
-//    @Override
-//    public GroupeDto saveById(GroupeDto groupeDto, Long communeId) {
-//        // Recherche du programme parent
-//        Commune communeParent = communeDao.findById(communeId).orElse(null);
-//
-//        if (communeParent != null) {
-//            // Créez une nouvelle instance de Composante à partir de composanteDto
-//            Groupe newGroupe = new Groupe();
-//            newGroupe.setId(groupeDto.getId());
-//            newGroupe.setNom(groupeDto.getNom());
-//            newGroupe.setDescription(groupeDto.getDescription());
-//            newGroupe.setAdresse(groupeDto.getAdresse());
-//            newGroupe.setPrixAction(groupeDto.getPrixAction());
-//            newGroupe.setDatecreation();
-//            newGroupe.setTauxInteret(groupeDto.getTauxInteret());
-//            newGroupe.setResponsable(groupeDto.getResponsable());
-//            newGroupe.setDatecreation();
-//
-//            // Associez la nouvelle composante au programme
-////            newGroupe.setCommune(communeParent);
-//
-//            // Enregistrez la nouvelle composante dans la base de données
-//            Groupe savedGroupe = groupeDao.save(newGroupe);
-//
-//            // Convertissez la composante en DTO et retournez-la
-//            return convertToDto(savedGroupe);
-//        } else {
-//            // Gérez le cas où le programme parent n'existe pas
-//            throw new CommuneNotFoundException("commune introuvable avec l'ID : " + communeId);
-//        }
-//    }
+    @Override
+    public GroupeDto saveById(GroupeDto groupeDto, Long communeId) {
+        // Recherche du programme parent
+        Commune communeParent = communeDao.findById(communeId).orElse(null);
+
+        if (communeParent != null) {
+            // Créez une nouvelle instance de Composante à partir de composanteDto
+            Groupe newGroupe = new Groupe();
+            newGroupe.setId(groupeDto.getId());
+            newGroupe.setNom(groupeDto.getNom());
+            newGroupe.setDescription(groupeDto.getDescription());
+            newGroupe.setAdresse(groupeDto.getAdresse());
+            newGroupe.setPrixAction(groupeDto.getPrixAction());
+            newGroupe.setDatecreation();
+            newGroupe.setTauxInteret(groupeDto.getTauxInteret());
+            newGroupe.setResponsable(groupeDto.getResponsable());
+            newGroupe.setDatecreation();
+
+            // Associez la nouvelle composante au programme
+//            newGroupe.setCommune(communeParent);
+
+            // Enregistrez la nouvelle composante dans la base de données
+            Groupe savedGroupe = groupeDao.save(newGroupe);
+
+            // Convertissez la composante en DTO et retournez-la
+            return convertToDto(savedGroupe);
+        } else {
+            // Gérez le cas où le programme parent n'existe pas
+            throw new CommuneNotFoundException("commune introuvable avec l'ID : " + communeId);
+        }
+    }
 
     private Groupe convertToEntity(GroupeDto groupeDto) {
         Groupe groupe =  new Groupe();

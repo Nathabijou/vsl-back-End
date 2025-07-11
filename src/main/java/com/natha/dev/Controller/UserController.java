@@ -19,6 +19,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -54,6 +55,7 @@ public class UserController {
         String userSexe      = userRequest.get("userSexe");
         String roleName      = userRequest.get("roleName");
         String userTelephone = userRequest.get("userTelephone");
+        String userIdentification= userRequest.get("userIdentification");
 
 
 
@@ -61,10 +63,13 @@ public class UserController {
         if (userEmail == null || userEmail.isEmpty()) {
             throw new IllegalArgumentException("L'e-mail de l'utilisateur est requis.");
         }
+        if (userIdentification == null || userIdentification.isEmpty()) {
+            throw new IllegalArgumentException("L'utilisateur de l'utilisateur est requis.");
+        }
         // Autres validations des données d'entrée
 
         // Enregistrer l'utilisateur avec son rôle en appelant le service utilisateur
-        Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, userSexe, roleName, createdBy, userTelephone);
+        Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, userSexe, roleName, createdBy, userTelephone, userIdentification);
 
         // Générer et envoyer l'OTP à l'utilisateur
         userService.sendActivationEmail( userEmail, userFirstName, userLastName, userName);
@@ -257,6 +262,7 @@ public class UserController {
         existingUser.setUserEmail(updatedUserData.getUserEmail());
         existingUser.setUserSexe(updatedUserData.getUserSexe());
         existingUser.setStatus(updatedUserData.isStatus());
+        existingUser.setUserIdentification(updatedUserData.getUserIdentification());
 
         // Si w vle mete ajou role (optionnel)
         if (updatedUserData.getRole() != null) {
@@ -266,6 +272,40 @@ public class UserController {
         Users updatedUser = userService.saveUser(existingUser);
 
         return ResponseEntity.ok(updatedUser);
+    }
+// Voir Beneficiaire creer par Admin
+    @GetMapping("/users/by-creator")
+    public List<Users> getUsersByCreator(@RequestParam String creator) {
+        return userService.getUsersCreatedBy(creator);
+    }
+
+    //recuorer liste user a ajouter dans un groupe
+    @GetMapping("/users/created-by-not-in-group")
+    public List<Users> getCreatedByNotInGroup(
+            @RequestParam String creator,
+            @RequestParam Long groupeId
+    ) {
+        return userService.getUsersCreatedByNotInGroupe(creator, groupeId);
+    }
+
+
+    // UserController.java
+    @GetMapping("/users/by-identification")
+    public ResponseEntity<Users> getUserByIdentification(@RequestParam String userIdentification) {
+        Optional<Users> user = userDao.findByUserIdentification(userIdentification);
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/groupe/{groupeId}/users/remove")
+    public ResponseEntity<String> removeUsersFromGroupe(
+            @PathVariable Long groupeId,
+            @RequestBody List<String> usernames) {
+        try {
+            userService.removeUsersFromGroupe(groupeId, usernames);
+            return ResponseEntity.ok("Utilisateurs retirés du groupe avec succès.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la suppression des utilisateurs du groupe.");
+        }
     }
 
 
