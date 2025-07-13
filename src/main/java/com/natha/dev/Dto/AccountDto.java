@@ -24,6 +24,7 @@ public class AccountDto {
 
     private Long userId;
     private Long groupeuserId;
+    private BigDecimal depot = BigDecimal.ZERO;
 
 
 

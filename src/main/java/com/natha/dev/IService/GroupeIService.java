@@ -20,4 +20,6 @@ public interface GroupeIService  {
 
     List<GroupeDto> findByCommuneId(Long communeId);
     GroupeDto saveById(GroupeDto groupeDto, Long communeId);
+    GroupeDto update(GroupeDto groupeDto);
+
 }

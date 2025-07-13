@@ -28,7 +28,7 @@ public class ActionController {
     private AccountDao accountDao;
 
     //Create Action For user in account
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @PostMapping("/byAction")
     public ResponseEntity<Action> acheterAction(@RequestBody ActionDto actionDto) {
         // 1. Rechèch kont lan
@@ -63,7 +63,7 @@ public class ActionController {
 
 
     //Get all action with account
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager','ROLE_User')")
     @GetMapping("/par-compte/{accountId}")
     public ResponseEntity<List<Action>> getActionsByAccount(@PathVariable Long accountId) {
         List<Action> actions = actionDao.findByAccount_Id(accountId);
@@ -71,7 +71,7 @@ public class ActionController {
     }
 
     //Update Action
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @PutMapping("/update/{id}")
     public ResponseEntity<Action> updateNombreAction(@PathVariable Long id, @RequestBody ActionDto actionDto) {
         Optional<Action> existingAction = actionIService.findById(id);
@@ -90,7 +90,7 @@ public class ActionController {
         return ResponseEntity.ok(updated);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteAction(@PathVariable Long id) {
         try {

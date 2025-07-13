@@ -30,6 +30,11 @@ public class Groupe {
     @Column(nullable = false)
     private BigDecimal tauxInteret;
 
+    @Column(nullable = false)
+    private Boolean interetCumule = false;
+
+
+
     @ManyToOne
     @JoinColumn(name = "commune_id")
     private Commune commune;

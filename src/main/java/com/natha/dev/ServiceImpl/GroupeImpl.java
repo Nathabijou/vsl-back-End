@@ -51,6 +51,10 @@ public class GroupeImpl implements GroupeIService {
     }
 
     private GroupeDto convertToDto(Groupe groupe) {
+        if (groupe == null) {
+            return null;
+        }
+        
         GroupeDto dto = new GroupeDto();
         dto.setId(groupe.getId());
         dto.setNom(groupe.getNom());
@@ -59,13 +63,14 @@ public class GroupeImpl implements GroupeIService {
         dto.setPrixAction(groupe.getPrixAction());
         dto.setResponsable(groupe.getResponsable());
         dto.setTauxInteret(groupe.getTauxInteret());
-//        dto.setCommuneId(groupe.getCommune().getId());
-        groupe.setDatecreation(LocalDateTime.now());
         dto.setDatecreation(groupe.getDatecreation());
-
-
-
-
+        dto.setInteretCumule(groupe.getInteretCumule() != null ? groupe.getInteretCumule() : false);
+        
+        // Set commune ID if commune exists
+        if (groupe.getCommune() != null) {
+            dto.setCommuneId(groupe.getCommune().getId());
+        }
+        
         return dto;
     }
 
@@ -124,6 +129,7 @@ public class GroupeImpl implements GroupeIService {
             newGroupe.setTauxInteret(groupeDto.getTauxInteret());
             newGroupe.setResponsable(groupeDto.getResponsable());
             newGroupe.setDatecreation();
+            newGroupe.setInteretCumule(groupeDto.isInteretCumule());
 
             // Associez la nouvelle composante au programme
 //            newGroupe.setCommune(communeParent);
@@ -149,8 +155,33 @@ public class GroupeImpl implements GroupeIService {
         groupe.setTauxInteret(groupeDto.getTauxInteret());
         groupe.setPrixAction(groupeDto.getPrixAction());
         groupe.setDatecreation();
+        groupe.setInteretCumule(groupeDto.isInteretCumule());
 
         return groupe;
 
     }
+
+    @Override
+    public GroupeDto update(GroupeDto dto) {
+        Groupe groupe = groupeDao.findById(dto.getId())
+                .orElseThrow(() -> new RuntimeException("Groupe pa jwenn"));
+
+        // Update all fields from DTO
+        groupe.setNom(dto.getNom());
+        groupe.setDescription(dto.getDescription());
+        groupe.setAdresse(dto.getAdresse());
+        groupe.setResponsable(dto.getResponsable());
+        groupe.setPrixAction(dto.getPrixAction());
+        groupe.setTauxInteret(dto.getTauxInteret());
+        
+        // Handle interetCumule - if not set in DTO, keep existing value, otherwise update
+        // Note: For boolean primitives, we don't need to check for null
+        // Set interetCumule from DTO, defaulting to false if not set
+        groupe.setInteretCumule(dto.isInteretCumule());
+
+        Groupe updatedGroupe = groupeDao.save(groupe);
+        return convertToDto(updatedGroupe);
+    }
+
+
 }

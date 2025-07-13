@@ -9,6 +9,7 @@ import com.natha.dev.Model.Loan;
 import com.natha.dev.Model.Refund;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -26,6 +27,7 @@ public class LoanController {
     private AccountDao accountDao;
 
     //Creat Loan with Account
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @PostMapping("/accounts/{accountId}/loans/create")
     public ResponseEntity<?> createLoan(@PathVariable String accountId, @RequestBody LoanDto loanDto) {
         Account account = accountDao.findById(String.valueOf(Long.parseLong(accountId))) // Ou te itilize String pou findById, men id se Long
@@ -59,7 +61,7 @@ public class LoanController {
         Loan savedLoan = loanIService.save(loan);
         return ResponseEntity.ok(savedLoan);
     }
-
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @GetMapping("/accounts/{accountId}/loans")
     public List<Loan> getLoansByAccount(@PathVariable String accountId) {
         return loanIService.findByAccountId(accountId);
@@ -67,6 +69,7 @@ public class LoanController {
 
 
     //Get refund with loan
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @GetMapping("/loan/{loanId}/list")
     public ResponseEntity<List<Refund>> getRefundsForLoan(@PathVariable String loanId) {
         Loan loan = loanIService.findByIdWithRefunds(loanId)
@@ -76,24 +79,24 @@ public class LoanController {
         return ResponseEntity.ok(refunds);
     }
 
-
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @PostMapping
     public ResponseEntity<Loan> createLoan(@PathVariable String accountId, @RequestBody Loan loan) {
         Loan savedLoan = loanIService.createLoan(accountId, loan);
         return ResponseEntity.ok(savedLoan);
     }
-
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @GetMapping
     public ResponseEntity<List<Loan>> getLoans(@PathVariable String accountId) {
         return ResponseEntity.ok(loanIService.getLoansByAccount(accountId));
     }
-
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @PutMapping("/{loanId}")
     public ResponseEntity<Loan> updateLoan(@PathVariable String loanId, @RequestBody Loan loan) {
         Loan updatedLoan = loanIService.updateLoan(loanId, loan);
         return ResponseEntity.ok(updatedLoan);
     }
-
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @DeleteMapping("/{loanId}")
     public ResponseEntity<String> deleteLoan(@PathVariable String loanId) {
         loanIService.deleteLoan(loanId);

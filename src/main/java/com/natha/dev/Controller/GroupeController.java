@@ -24,14 +24,14 @@ public class GroupeController {
 
 
     // rekipere tout gwoup pou yon moun specifiqie
-    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/users/{userName}/groupe")
     List<GroupeDto> groupeByUsers(@PathVariable("userName") String userName) {
         return groupeIService.findByUsers(userName);
     }
 
     // rekipere tout group
-    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/allgroups")
     public ResponseEntity<List<GroupeDto>> getAllGroupes() {
         List<GroupeDto> groupes = groupeIService.findAll();
@@ -40,18 +40,21 @@ public class GroupeController {
 
 
     // rekipere tout gwoup pou yon Commune specifiqie
+    @PreAuthorize("permitAll()")
     @GetMapping("/commune/{communeId}/groupe")  // Changez groupeId en usersId
     List<GroupeDto> groupeByCommune(@PathVariable Long communeId) {
         return groupeIService.findByCommuneId(communeId);
     }
 
-    // kreye gwoup nan yon  commune specifiqie
+    // kreye gwoup nan yon commune specifiqie
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     @PostMapping("/groupe/commune/{communeId}")
     public ResponseEntity<GroupeDto> NewGroupe(@RequestBody GroupeDto groupeDto, @PathVariable Long communeId) {
         GroupeDto newComposanteDto = groupeIService.saveById(groupeDto, communeId);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComposanteDto);
     }
 
+    @PreAuthorize("permitAll()")
     @GetMapping("/groupe/{id}")
     public ResponseEntity<GroupeDto> getGroupeById(@PathVariable Long id) {
         Optional<GroupeDto> groupeOpt = groupeIService.findById(id);
@@ -59,6 +62,27 @@ public class GroupeController {
             return ResponseEntity.ok(groupeOpt.get());
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PutMapping("/groupe/{id}")
+    public ResponseEntity<GroupeDto> updateGroupe(@PathVariable Long id, @RequestBody GroupeDto groupeDto) {
+        groupeDto.setId(id); // Mete ID a
+        GroupeDto updated = groupeIService.update(groupeDto);
+        return ResponseEntity.ok(updated);
+    }
+
+
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/groupe/{id}")
+    public ResponseEntity<Void> deleteGroupe(@PathVariable Long id) {
+        Optional<GroupeDto> groupeOpt = groupeIService.findById(id);
+        if (groupeOpt.isPresent()) {
+            groupeIService.deleteById(id);
+            return ResponseEntity.noContent().build(); // HTTP 204
+        } else {
+            return ResponseEntity.notFound().build(); // HTTP 404
         }
     }
 

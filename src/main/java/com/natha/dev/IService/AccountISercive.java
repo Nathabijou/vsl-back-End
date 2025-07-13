@@ -3,6 +3,7 @@ package com.natha.dev.IService;
 import com.natha.dev.Dto.AccountDto;
 import org.springframework.stereotype.Service;
 
+import com.natha.dev.Dto.DepositRequest;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -22,4 +23,7 @@ public interface AccountISercive {
     AccountDto getAccountDetails(String username, Long groupId);
 
 
+    AccountDto findByUserNameAndGroupId(String username, Long groupId);
+    
+    AccountDto makeDeposit(String username, Long groupId, DepositRequest depositRequest);
 }

@@ -8,6 +8,7 @@ import com.natha.dev.Model.Refund;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -25,7 +26,7 @@ public class RefundController {
 
     @Autowired
     private AccountDao accountDao;
-
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
     @PostMapping("/loan/{loanId}")
     @Transactional
     public ResponseEntity<Refund> createRefund(@PathVariable String loanId, @RequestBody Refund refundRequest) {
@@ -52,6 +53,14 @@ public class RefundController {
         }
 
         return ResponseEntity.ok(refundRequest);
+    }
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
+    @GetMapping("/loan/{loanId}")
+    public ResponseEntity<?> getRefundsByLoan(@PathVariable String loanId) {
+        Loan loan = loanIService.findById(loanId)
+                .orElseThrow(() -> new RuntimeException("Loan not found"));
+
+        return ResponseEntity.ok(refundIService.findByLoan(loan));
     }
 
 

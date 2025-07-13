@@ -5,6 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -14,10 +16,10 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
-    private static final String SECRET_KEY = "learn_programming_yourself";
-    private String secretKey = "votreSecretKey";
-    private static final int TOKEN_VALIDITY = 3600 * 5;
+    private static final String SECRET_KEY = "votreSecretKeyTresLongEtSecurise1234567890";
+    private static final int TOKEN_VALIDITY = 3600 * 5; // 5 hours
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
@@ -28,8 +30,11 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+    public Claims getAllClaimsFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(SECRET_KEY)
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
@@ -48,10 +53,15 @@ public class JwtUtil {
     }
 
     public String generateToken(UserDetails userDetails) {
-
-
-
         Map<String, Object> claims = new HashMap<>();
+        
+        // Add user roles to claims with ROLE_ prefix
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .collect(java.util.stream.Collectors.toList()));
+                
+        // Debug log the roles being added to the token
+        logger.debug("Adding roles to JWT token: " + claims.get("roles"));
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -64,15 +74,7 @@ public class JwtUtil {
 
 
     public String extractUsername(String token) {
-        return extractClaim(token).getSubject();
-    }
-
-
-    private Claims extractClaim(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
+        return getClaimFromToken(token, Claims::getSubject);
     }
 
 //    public static void planMaintenance(LocalDate inputDate) {
