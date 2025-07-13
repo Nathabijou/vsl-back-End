@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class Account {
 
 
     private BigDecimal montant;
+    private BigDecimal depot = BigDecimal.ZERO;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createDate")
@@ -49,6 +51,15 @@ public class Account {
     @OneToMany(mappedBy = "account")
     @JsonManagedReference
     private List<Loan> loans;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Deposit> deposits = new ArrayList<>();
+
+    // Add this method to maintain bidirectional relationship
+    public void addDeposit(Deposit deposit) {
+        deposits.add(deposit);
+        deposit.setAccount(this);
+    }
 
     @OneToOne
     @JoinColumn(name = "groupe_users_id", referencedColumnName = "id")

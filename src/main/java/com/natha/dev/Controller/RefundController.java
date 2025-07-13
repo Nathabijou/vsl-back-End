@@ -54,6 +54,14 @@ public class RefundController {
         return ResponseEntity.ok(refundRequest);
     }
 
+    @GetMapping("/loan/{loanId}")
+    public ResponseEntity<?> getRefundsByLoan(@PathVariable String loanId) {
+        Loan loan = loanIService.findById(loanId)
+                .orElseThrow(() -> new RuntimeException("Loan not found"));
+
+        return ResponseEntity.ok(refundIService.findByLoan(loan));
+    }
+
 
 
 

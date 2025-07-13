@@ -48,10 +48,12 @@ public class JwtUtil {
     }
 
     public String generateToken(UserDetails userDetails) {
-
-
-
         Map<String, Object> claims = new HashMap<>();
+        
+        // Add user roles to claims with ROLE_ prefix
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .collect(java.util.stream.Collectors.toList()));
 
         return Jwts.builder()
                 .setClaims(claims)

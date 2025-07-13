@@ -17,4 +17,5 @@ public interface AccountDao extends JpaRepository<Account, String> {
 
     Optional<Account> findByUserNameAndGroupeUsers_Groupe_Id(String username, Long groupId);
 
+    Optional<Account> findByGroupeUsers_Users_UserNameAndGroupeUsers_Groupe_Id(String username, Long groupId);
 }

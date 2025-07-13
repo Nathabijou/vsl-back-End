@@ -31,38 +31,55 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtService jwtService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
+            throws ServletException, IOException {
+        
         final String requestTokenHeader = request.getHeader("Authorization");
-
         String username = null;
         String jwtToken = null;
 
+        // Extract token from header
         if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
             jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtUtil.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
-                System.out.println("Unable to get JWT Token");
+                logger.error("Unable to get JWT Token");
             } catch (ExpiredJwtException e) {
-                System.out.println("JWT Token has expired");
+                logger.warn("JWT Token has expired");
             }
         } else {
-            System.out.println("JWT token does not start with Bearer");
+            logger.warn("JWT Token does not begin with Bearer String");
         }
 
+        // Validate the token and set up Spring Security context
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            UserDetails userDetails = jwtService.loadUserByUsername(username);
-
-            if (jwtUtil.validateToken(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-
-                System.out.println("User authenticated: " + username);
-                System.out.println("Authorities: " + userDetails.getAuthorities());
+            try {
+                UserDetails userDetails = jwtService.loadUserByUsername(username);
+                
+                // Debug log the user's authorities
+                logger.info("User " + username + " has authorities: " + userDetails.getAuthorities());
+                
+                if (jwtUtil.validateToken(jwtToken, userDetails)) {
+                    // Create authentication with the same authorities as loaded from userDetails
+                    UsernamePasswordAuthenticationToken authentication = 
+                        new UsernamePasswordAuthenticationToken(
+                            userDetails, 
+                            null, 
+                            userDetails.getAuthorities()
+                        );
+                    
+                    authentication.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    
+                    // Set the authentication in the SecurityContext
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    
+                    logger.info("Successfully authenticated user: " + username + " with roles: " + userDetails.getAuthorities());
+                }
+            } catch (Exception e) {
+                logger.error("Cannot set user authentication: ", e);
             }
         }
 

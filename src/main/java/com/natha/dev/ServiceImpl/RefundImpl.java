@@ -3,6 +3,7 @@ package com.natha.dev.ServiceImpl;
 import com.natha.dev.Dao.RefundDao;
 import com.natha.dev.IService.RefundIService;
 
+import com.natha.dev.Model.Loan;
 import com.natha.dev.Model.Refund;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,11 @@ public class RefundImpl implements RefundIService {
     @Override
     public void flush() {
         refundDao.flush(); // <<< sa a p forse DB mete done yo
+    }
+
+    @Override
+    public List<Refund> findByLoan(Loan loan) {
+        return refundDao.findByLoan(loan);
     }
 }
 

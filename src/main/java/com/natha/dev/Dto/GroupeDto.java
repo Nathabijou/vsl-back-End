@@ -15,6 +15,7 @@ public class GroupeDto {
     private String responsable;
     private String description;
     private LocalDateTime datecreation;
+    private boolean interetCumule;
 
 
 
@@ -24,7 +25,7 @@ public class GroupeDto {
 
     private Long userName;
 //    private Long compteId;
-//    private Long communeId;
+    private Long communeId;
 
     // Getter & Setter
     public LocalDateTime getDatecreation() {
@@ -33,5 +34,8 @@ public class GroupeDto {
 
     public void setDatecreation(LocalDateTime datecreation) {
         this.datecreation = datecreation;
+    }
+
+    public void setIdGroupe(Long id) {
     }
 }

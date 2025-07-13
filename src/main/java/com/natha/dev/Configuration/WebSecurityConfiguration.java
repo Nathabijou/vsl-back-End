@@ -39,22 +39,27 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.cors().and()
-                .csrf().disable()
-                .authorizeHttpRequests()  // Remplacez authorizeRequests() par authorizeHttpRequests()
+        httpSecurity
+            .cors().and()
+            .csrf().disable()
+            .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/authenticate",
-                        "/registerNewUser",
-                        "/reset",
-                        "/verify-otp",
-                        "/newPasswordRegister",
-                        "/ws-chat/**").permitAll()  // Remplacez antMatchers() par requestMatchers()
+                    "/authenticate",
+                    "/registerNewUser",
+                    "/reset",
+                    "/verify-otp",
+                    "/newPasswordRegister",
+                    "/ws-chat/**"
+                ).permitAll()
                 .requestMatchers(HttpHeaders.ALLOW).permitAll()
                 .anyRequest().authenticated()
-                .and()
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            )
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            );
 
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();

@@ -5,6 +5,7 @@ import com.natha.dev.Dao.GroupeDao;
 import com.natha.dev.Dao.Groupe_UserDao;
 import com.natha.dev.Dao.UserDao;
 import com.natha.dev.Dto.AccountDto;
+import com.natha.dev.Dto.DepositRequest;
 import com.natha.dev.IService.AccountISercive;
 import com.natha.dev.IService.GroupeIService;
 
@@ -38,10 +39,45 @@ public class AccountImpl implements AccountISercive {
     private GroupeDao groupeDao;
 
     @Override
+    public AccountDto findByUserNameAndGroupId(String username, Long groupId) {
+        Optional<Account> optional = accountDao.findByGroupeUsers_Users_UserNameAndGroupeUsers_Groupe_Id(username, groupId);
+
+        if (optional.isPresent()) {
+            return convertToDto(optional.get());
+        } else {
+            throw new RuntimeException("Aucun compte trouvé pour l'utilisateur " + username + " dans le groupe ID " + groupId);
+        }
+    }
+    
+    @Override
+    public AccountDto makeDeposit(String username, Long groupId, DepositRequest depositRequest) {
+        if (depositRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Le montant du dépôt doit être supérieur à zéro");
+        }
+        
+        Account account = accountDao.findByGroupeUsers_Users_UserNameAndGroupeUsers_Groupe_Id(username, groupId)
+                .orElseThrow(() -> new RuntimeException("Aucun compte trouvé pour l'utilisateur " + username + " dans le groupe ID " + groupId));
+        
+        // Mettre à jour le solde et le dépôt
+        account.setBalance(account.getBalance().add(depositRequest.getAmount()));
+        account.setDepot(account.getDepot().add(depositRequest.getAmount()));
+        
+        // Enregistrer les modifications
+        Account updatedAccount = accountDao.save(account);
+        
+        // Ici, vous pourriez aussi enregistrer les détails du dépôt (ID, date, etc.)
+        // dans une table de transactions si nécessaire
+        
+        return convertToDto(updatedAccount);
+    }
+
+
+    @Override
     public Optional<AccountDto> findById(String accountId) {
         Optional<Account> compte = accountDao.findById(accountId);
         return compte.map(this::convertToDto);
     }
+
 
     @Override
     public List<AccountDto> findAll() {

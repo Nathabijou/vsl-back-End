@@ -63,7 +63,7 @@ public class ActionController {
 
 
     //Get all action with account
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER','USER')")
     @GetMapping("/par-compte/{accountId}")
     public ResponseEntity<List<Action>> getActionsByAccount(@PathVariable Long accountId) {
         List<Action> actions = actionDao.findByAccount_Id(accountId);
@@ -71,7 +71,7 @@ public class ActionController {
     }
 
     //Update Action
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
     @PutMapping("/update/{id}")
     public ResponseEntity<Action> updateNombreAction(@PathVariable Long id, @RequestBody ActionDto actionDto) {
         Optional<Action> existingAction = actionIService.findById(id);
