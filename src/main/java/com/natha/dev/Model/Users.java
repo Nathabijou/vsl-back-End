@@ -73,26 +73,4 @@ public class Users {
         this.otpCode = otpCode;
     }
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "user_application_instance",
-            joinColumns = @JoinColumn(name = "user_name"), // byen matche
-            inverseJoinColumns = @JoinColumn(name = "id_app")
-    )
-
-    private Set<ApplicationInstance> applicationInstances;
-
-
-    @ManyToMany
-    @JsonIgnore
-    @JoinTable(
-            name = "user_composante_access",
-            joinColumns = @JoinColumn(name = "user_name"),
-            inverseJoinColumns = @JoinColumn(name = "composante_id")
-    )
-    private Set<Composante> composantes = new HashSet<>();
-
-
-
 }

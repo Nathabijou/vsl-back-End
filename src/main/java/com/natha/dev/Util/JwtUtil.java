@@ -1,10 +1,10 @@
 package com.natha.dev.Util;
 
-import com.natha.dev.Configuration.JwtConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
@@ -26,10 +26,10 @@ public class JwtUtil {
     private final String secretString;
     private static final int TOKEN_VALIDITY = 3600 * 5; // 5 hours
 
-    public JwtUtil(JwtConfig jwtConfig) {
-        this.secretString = jwtConfig.jwtSecret();
-        this.secretKey = jwtConfig.jwtSecretKey();
-        logger.info("JWT Util initialized with secret key length: {}", secretString.length());
+    public JwtUtil(@Value("${jwt.secret}") String secretString) {
+        this.secretString = secretString;
+        this.secretKey = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
+        logger.info("JWT Util initialized.");
     }
 
     public String getUsernameFromToken(String token) {
@@ -103,6 +103,4 @@ public class JwtUtil {
 //
 //        System.out.println("Maintenance planned for: " + inputDate);
 //    }
-
-
 }

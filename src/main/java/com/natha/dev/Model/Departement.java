@@ -18,26 +18,7 @@ public class Departement {
     private String name;
 
 
-    // Departement.java
-    @ManyToMany(mappedBy = "departements")
-    private List<Zone> zones;
-
-    @ManyToOne
-    @JoinColumn(name = "zone_id") // mete non kolòn ki konekte departement ak zone nan baz done a
-    private Zone zone;
-
-
     @OneToMany(mappedBy = "departement", cascade = CascadeType.ALL)
     private List<Arrondissement> arrondissements;
-
-    // getter and setter pou zone
-    public Zone getZone() {
-        return zone;
-    }
-
-    public void setZone(Zone zone) {
-        this.zone = zone;
-    }
-
 
 }
