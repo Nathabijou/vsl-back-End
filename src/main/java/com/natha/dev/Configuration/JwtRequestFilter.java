@@ -9,52 +9,79 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
-
 import java.io.IOException;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
 
-
+    private final JwtUtil jwtUtil;
+    private final JwtService jwtService;
 
     @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private JwtService jwtService;
+    public JwtRequestFilter(JwtUtil jwtUtil, @Lazy JwtService jwtService) {
+        this.jwtUtil = jwtUtil;
+        this.jwtService = jwtService;
+        logger.info("JwtRequestFilter initialized");
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
             throws ServletException, IOException {
-        
         final String requestTokenHeader = request.getHeader("Authorization");
         String username = null;
         String jwtToken = null;
 
+        logger.info("Processing request to: {}", request.getRequestURI());
+        
+        // Skip filter for public endpoints
+        if (shouldNotFilter(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
         // Extract token from header
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
-            try {
-                username = jwtUtil.getUsernameFromToken(jwtToken);
-            } catch (IllegalArgumentException e) {
-                logger.error("Unable to get JWT Token");
-            } catch (ExpiredJwtException e) {
-                logger.warn("JWT Token has expired");
-            }
-        } else {
-            logger.warn("JWT Token does not begin with Bearer String");
+        if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer ")) {
+            logger.warn("JWT Token is missing or does not begin with Bearer String");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No JWT token found in request headers");
+            return;
+        }
+        
+        jwtToken = requestTokenHeader.substring(7);
+        logger.debug("JWT Token received: {}", 
+            jwtToken.length() > 10 ? 
+                jwtToken.substring(0, 5) + "..." + jwtToken.substring(jwtToken.length() - 5) : 
+                "[token too short]");
+                
+        try {
+            username = jwtUtil.getUsernameFromToken(jwtToken);
+            logger.info("Successfully extracted username from token: {}", username);
+        } catch (IllegalArgumentException e) {
+            logger.error("Unable to get JWT Token: " + e.getMessage(), e);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid JWT Token");
+            return;
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT Token has expired: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT Token has expired");
+            return;
+        } catch (Exception e) {
+            logger.error("Error processing JWT Token: " + e.getMessage(), e);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error processing authentication");
+            return;
         }
 
         // Validate the token and set up Spring Security context

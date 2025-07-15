@@ -24,8 +24,7 @@ public class AccountDto {
 
     private Long userId;
     private Long groupeuserId;
-    private BigDecimal depot = BigDecimal.ZERO;
-
-
+    private BigDecimal depot;
+    private int totalActionCount;  // Kantite total aksyon ki soti nan depo yo
 
 }

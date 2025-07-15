@@ -8,12 +8,20 @@ import com.natha.dev.Model.Groupe;
 import com.natha.dev.Model.Groupe_Users;
 import com.natha.dev.Model.Role;
 import com.natha.dev.Model.Users;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.natha.dev.Util.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +32,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@EnableAsync
 public class UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     private UserDao userDao;
@@ -34,10 +45,11 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JavaMailSender emailSender;
-    @Autowired
-    private UserService userService;
+    // Removed self-injection to prevent circular dependency
     @Autowired
     private Groupe_UserDao groupeUserDao;
+    @Autowired
+    private JwtUtil jwtUtil;
     @Autowired
     private GroupeDao groupeDao;
 
@@ -132,55 +144,88 @@ public class UserService {
         Users savedUser = userDao.save(user);
 
         if (savedUser != null) {
-            sendActivationEmail(userEmail, userFirstName, userLastName, userName);
+            this.sendActivationEmail(userEmail, userFirstName, userLastName, userName);
         }
 
         return savedUser;
     }
 
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-
+    @Async
     public void sendActivationEmail(String userEmail, String userFirstName, String userLastName, String userName) {
-        // Generate JWT token
-        String jwtToken = Jwts.builder()
-                .setSubject(userEmail) // You can customize the token payload
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 72 * 60 * 60 * 1000)) // 72 hours expiration
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
+        try {
+            // Generate JWT token using JwtUtil
+            UserDetails userDetails = User.builder()
+                .username(userEmail)
+                .password("") // Password is not needed for token generation
+                .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
+                .build();
+            
+            String jwtToken = jwtUtil.generateToken(userDetails);
+            String activationLink = "https://padf.up.railway.app/activation?token=" + jwtToken;
+            String greeting = getCurrentTimeGreeting();
 
-        // Create activation link with JWT token
-
-        String activationLink =  jwtToken;
-        //String activationLink = "http://www.algoleaders.com/activate?token=" + jwtToken;
-
-
-        // Get current time
-        LocalTime currentTime = LocalTime.now();
-
-        // Determine greeting based on the current time
-        String greeting = "";
-        if (currentTime.isAfter(LocalTime.MIDNIGHT) && currentTime.isBefore(LocalTime.NOON)) {
-            greeting = "Bonjour";
-        } else {
-            greeting = "Bonsoir";
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            
+            helper.setFrom("haitipadf@gmail.com", "PADF Team");
+            helper.setTo(userEmail);
+            helper.setSubject("Activation de votre compte");
+            
+            String emailContent = String.format("""
+                <html>
+                <body>
+                    <p>%s %s %s,</p>
+                    <p>Nous vous informons que vous avez créé un compte avec l'adresse e-mail : %s</p>
+                    <p>Pour finaliser la création de votre compte, veuillez cliquer sur le lien suivant :</p>
+                    <p><a href="%s">Activer mon compte</a></p>
+                    <p>Votre nom d'utilisateur est : <strong>%s</strong></p>
+                    <br>
+                    <p>Cordialement,<br>L'équipe PADF</p>
+                </body>
+                </html>
+                """, greeting, userFirstName, userLastName, userEmail, activationLink, userName);
+            
+            helper.setText(emailContent, true); // true = isHtml
+            
+            // Send email with retry logic
+            int maxRetries = 3;
+            int attempt = 0;
+            boolean sent = false;
+            
+            while (attempt < maxRetries && !sent) {
+                attempt++;
+                try {
+                    emailSender.send(message);
+                    sent = true;
+                    logger.info("Activation email sent to: {}", userEmail);
+                } catch (Exception e) {
+                    if (attempt == maxRetries) {
+                        logger.error("Failed to send activation email after {} attempts to: {}", maxRetries, userEmail, e);
+                        // Consider adding the email to a queue for later retry
+                    } else {
+                        logger.warn("Attempt {}/{} failed to send email to: {}", attempt, maxRetries, userEmail, e);
+                        Thread.sleep(2000); // Wait 2 seconds before retry
+                    }
+                }
+            }
+            
+        } catch (Exception e) {
+            logger.error("Failed to prepare or send activation email to: " + userEmail, e);
+            // Don't fail the entire registration if email sending fails
+            // The account is still created, but the user might need to request a new activation email
         }
-
-        // Prepare email message
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(userEmail);
-        mailMessage.setSubject("Activation de votre compte ");
-        mailMessage.setText(greeting + " " + userFirstName + " " + userLastName + ",\n\n"
-                + "Nous vous informons que vous avez créé un compte avec l'adresse e-mail : " + userEmail + ".\n"
-                + " Pour finaliser la création de votre compte, veuillez cliquer sur le lien suivant :\n"
-                + "https://padf.up.railway.app/ \n\n"
-                + "Votre nom d'utilisateur est : " + userName + "\n\n");
-
-
-        // Send email
-        emailSender.send(mailMessage);
+    }
+    
+    private String getCurrentTimeGreeting() {
+        LocalTime currentTime = LocalTime.now();
+        if (currentTime.isBefore(LocalTime.NOON)) {
+            return "Bonjour";
+        } else if (currentTime.isBefore(LocalTime.of(18, 0))) {
+            return "Bon après-midi";
+        } else {
+            return "Bonsoir";
+        }
     }
 
 

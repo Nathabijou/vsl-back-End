@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("actions")
+
 public class ActionController {
 
     @Autowired
@@ -29,7 +29,7 @@ public class ActionController {
 
     //Create Action For user in account
     @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
-    @PostMapping("/byAction")
+    @PostMapping("/actions/byAction")
     public ResponseEntity<Action> acheterAction(@RequestBody ActionDto actionDto) {
         // 1. Rechèch kont lan
         Account account = accountDao.findById(actionDto.getAccountId())
@@ -62,9 +62,9 @@ public class ActionController {
     }
 
 
-    //Get all action with account
+    //Get all action with account (ok)
     @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager','ROLE_User')")
-    @GetMapping("/par-compte/{accountId}")
+    @GetMapping("/actions/par-compte/{accountId}")
     public ResponseEntity<List<Action>> getActionsByAccount(@PathVariable Long accountId) {
         List<Action> actions = actionDao.findByAccount_Id(accountId);
         return ResponseEntity.ok(actions);
@@ -72,7 +72,7 @@ public class ActionController {
 
     //Update Action
     @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
-    @PutMapping("/update/{id}")
+    @PutMapping("/actions/update/{id}")
     public ResponseEntity<Action> updateNombreAction(@PathVariable Long id, @RequestBody ActionDto actionDto) {
         Optional<Action> existingAction = actionIService.findById(id);
         if (existingAction.isEmpty()) {
@@ -91,7 +91,7 @@ public class ActionController {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/actions/delete/{id}")
     public ResponseEntity<Void> deleteAction(@PathVariable Long id) {
         try {
             actionIService.deleteById(id);

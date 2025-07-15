@@ -1,5 +1,6 @@
 package com.natha.dev.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 @AllArgsConstructor
@@ -39,6 +41,9 @@ public class Account {
     private BigDecimal montant;
     private BigDecimal depot = BigDecimal.ZERO;
 
+    @Column(name = "total_deposit", precision = 19, scale = 2)
+    private BigDecimal totalDeposit = BigDecimal.ZERO;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "createDate")
     private Date createDate;
@@ -52,8 +57,23 @@ public class Account {
     @JsonManagedReference
     private List<Loan> loans;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "account", orphanRemoval = true)
     private List<Deposit> deposits = new ArrayList<>();
+
+    public BigDecimal getTotalDeposit() {
+        if (deposits == null || deposits.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        return deposits.stream()
+                .map(Deposit::getAmount)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    // Keep the setter for JPA
+    public void setTotalDeposit(BigDecimal totalDeposit) {
+        // This is kept for JPA but not used in our logic
+    }
 
     // Add this method to maintain bidirectional relationship
     public void addDeposit(Deposit deposit) {

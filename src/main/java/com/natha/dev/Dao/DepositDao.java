@@ -10,6 +10,7 @@ public interface DepositDao {
     Optional<Deposit> findById(String id);
     Deposit save(Deposit deposit);
     void deleteById(String id);
-    List<Deposit> findByAccountId(String accountId);
+    void delete(Deposit deposit);
+    List<Deposit> findByAccountId(Long accountId);
     // Add other necessary methods here
 }

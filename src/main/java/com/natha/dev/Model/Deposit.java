@@ -17,10 +17,24 @@ public class Deposit {
     private String id;
     
     @Column(nullable = false)
+    private Integer numberOfShares;
+
+    private String description;
+
+    @Column(nullable = false)
     private BigDecimal amount;
     
     @Column(nullable = false)
     private LocalDateTime depositDate;
+    
+    @Column(name = "create_by")
+    private String createBy;
+
+    @Column(name = "last_modified_by")
+    private String lastModifiedBy;
+
+    @Column(name = "last_modified_date")
+    private LocalDateTime lastModifiedDate;
     
     @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)

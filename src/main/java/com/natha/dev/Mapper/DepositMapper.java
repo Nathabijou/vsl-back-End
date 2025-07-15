@@ -16,8 +16,13 @@ public class DepositMapper {
         dto.setId(deposit.getId());
         dto.setAmount(deposit.getAmount());
         dto.setDepositDate(deposit.getDepositDate());
+        dto.setNumberOfShares(deposit.getNumberOfShares());
+        dto.setDescription(deposit.getDescription());
+        dto.setCreateBy(deposit.getCreateBy()); 
+        dto.setLastModifiedBy(deposit.getLastModifiedBy());
+        dto.setLastModifiedDate(deposit.getLastModifiedDate());
         if (deposit.getAccount() != null) {
-            dto.setAccountId(String.valueOf(deposit.getAccount().getId()));
+            dto.setAccountId(deposit.getAccount().getId());
         }
         return dto;
     }
@@ -31,6 +36,11 @@ public class DepositMapper {
         deposit.setId(dto.getId());
         deposit.setAmount(dto.getAmount());
         deposit.setDepositDate(dto.getDepositDate());
+        deposit.setNumberOfShares(dto.getNumberOfShares());
+        deposit.setDescription(dto.getDescription());
+        deposit.setCreateBy(dto.getCreateBy()); 
+        deposit.setLastModifiedBy(dto.getLastModifiedBy());
+        deposit.setLastModifiedDate(dto.getLastModifiedDate());
         // Note: Account will be set in the service layer
         return deposit;
     }

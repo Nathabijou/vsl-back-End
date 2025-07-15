@@ -1,18 +1,18 @@
 package com.natha.dev.ServiceImpl;
 
-import com.natha.dev.Dao.AccountDao;
-import com.natha.dev.Dao.GroupeDao;
-import com.natha.dev.Dao.Groupe_UserDao;
-import com.natha.dev.Dao.UserDao;
+import com.natha.dev.Dao.*;
 import com.natha.dev.Dto.AccountDto;
 import com.natha.dev.Dto.DepositRequest;
 import com.natha.dev.IService.AccountISercive;
 import com.natha.dev.IService.GroupeIService;
 
 import com.natha.dev.Model.*;
+import com.natha.dev.Dao.DepositDao;
+import com.natha.dev.Model.Deposit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Objects;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -37,37 +37,55 @@ public class AccountImpl implements AccountISercive {
 
     @Autowired
     private GroupeDao groupeDao;
+    
+    @Autowired
+    private DepositDao depositDao;
 
     @Override
     public AccountDto findByUserNameAndGroupId(String username, Long groupId) {
+        System.out.println("=== DEBUT findByUserNameAndGroupId ===");
+        System.out.println("Username: " + username + ", GroupId: " + groupId);
+
         Optional<Account> optional = accountDao.findByGroupeUsers_Users_UserNameAndGroupeUsers_Groupe_Id(username, groupId);
 
         if (optional.isPresent()) {
-            return convertToDto(optional.get());
+            Account account = optional.get();
+            System.out.println("Trouvé compte ID: " + account.getId());
+            // Konvèti an DTO kote tout kalkil kòrèk yo fèt
+            return convertToDto(account);
         } else {
             throw new RuntimeException("Aucun compte trouvé pour l'utilisateur " + username + " dans le groupe ID " + groupId);
         }
     }
-    
+
     @Override
+    @Transactional
     public AccountDto makeDeposit(String username, Long groupId, DepositRequest depositRequest) {
+        System.out.println("=== DEBUT makeDeposit ===");
+        System.out.println("Username: " + username + ", GroupId: " + groupId);
+        System.out.println("Montant du dépôt: " + depositRequest.getAmount());
+        
         if (depositRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Le montant du dépôt doit être supérieur à zéro");
+            throw new IllegalArgumentException("Montan an dwe pi gran pase zewo");
         }
         
+        // Jwenn kont lan
         Account account = accountDao.findByGroupeUsers_Users_UserNameAndGroupeUsers_Groupe_Id(username, groupId)
-                .orElseThrow(() -> new RuntimeException("Aucun compte trouvé pour l'utilisateur " + username + " dans le groupe ID " + groupId));
-        
-        // Mettre à jour le solde et le dépôt
-        account.setBalance(account.getBalance().add(depositRequest.getAmount()));
-        account.setDepot(account.getDepot().add(depositRequest.getAmount()));
-        
-        // Enregistrer les modifications
+                .orElseThrow(() -> new RuntimeException("Pa gen kont pou itilizatè " + username + " nan gwoup ID " + groupId));
+
+
+        // Kalkile nouvo valè yo
+        BigDecimal nouvoDepo = account.getDepot() != null ?
+                             account.getDepot().add(depositRequest.getAmount()) :
+                             depositRequest.getAmount();
+
+        // Mete ajou kont lan
+        // Balans lan PA dwe mete ajou isit la. Se sèlman depo a ki dwe anrejistre.
+        account.setDepot(nouvoDepo);
+
+        // Sove modifikasyon yo
         Account updatedAccount = accountDao.save(account);
-        
-        // Ici, vous pourriez aussi enregistrer les détails du dépôt (ID, date, etc.)
-        // dans une table de transactions si nécessaire
-        
+
         return convertToDto(updatedAccount);
     }
 
@@ -191,6 +209,7 @@ public class AccountImpl implements AccountISercive {
         account.setBalance(accountDto.getBalance());
         account.setInteret(accountDto.getInteret());
         account.setBalanceDue(accountDto.getBalanceDue());
+        account.setDepot(accountDto.getDepot() != null ? accountDto.getDepot() : BigDecimal.ZERO);
         return account;
     }
 
@@ -214,26 +233,80 @@ public class AccountImpl implements AccountISercive {
     }
 
     public int getTotalNombreAksyonParAccount(Account account) {
-        return account.getActions().stream()
-                .mapToInt(Action::getNombre)
-                .sum();
+        // Si gen aksyon nan kont lan, nou kalkile yo
+        if (account.getActions() != null && !account.getActions().isEmpty()) {
+            return account.getActions().stream()
+                    .mapToInt(Action::getNombre)
+                    .sum();
+        }
+        
+        // Si pa gen aksyon, nou retounen 0
+        return 0;
+    }
+    
+    // Metòd pou kalkile total lajan nan tout depo yo
+    private BigDecimal getTotalDepositsAmount(Account account) {
+        if (account.getDeposits() != null && !account.getDeposits().isEmpty()) {
+            return account.getDeposits().stream()
+                    .map(Deposit::getAmount)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        return BigDecimal.ZERO;
+    }
+    
+    // Metòd pou konte kantite depo total yo
+    private int countTotalDeposits(Account account) {
+        if (account.getDeposits() != null) {
+            return account.getDeposits().size();
+        }
+        return 0;
     }
 
     private AccountDto convertToDto(Account account) {
+        System.out.println("=== DEBUT convertToDto ===");
         AccountDto accountDto = new AccountDto();
         accountDto.setIdAccount(account.getId());
-        accountDto.setBalance(getMontantTotalParAccount(account));
-        accountDto.setNombreDaction(getTotalNombreAksyonParAccount(account));
+
+        // 1. Kalkile kantite aksyon reyèl yon sèl fwa
+        int nombreActions = getTotalNombreAksyonParAccount(account);
+        accountDto.setNombreDaction(nombreActions);
+
+        // 2. Fòse kalkil balans lan baze SÈLMAN sou kantite aksyon reyèl la
+        BigDecimal calculatedBalance = BigDecimal.ZERO;
+        if (account.getGroupeUsers() != null && account.getGroupeUsers().getGroupe() != null) {
+            BigDecimal prixAction = account.getGroupeUsers().getGroupe().getPrixAction();
+            if (prixAction != null) {
+                calculatedBalance = prixAction.multiply(BigDecimal.valueOf(nombreActions));
+            }
+        }
+        accountDto.setBalance(calculatedBalance);
+
+        // 3. Kalkile total lajan ki te depoze (pou enfòmasyon sèlman)
+        BigDecimal totalDepositsAmount = getTotalDepositsAmount(account);
+        accountDto.setDepot(totalDepositsAmount);
+
+        // 4. Kalkile kantite total aksyon ki soti nan depo yo
+        int totalActionCountFromDeposits = account.getDeposits().stream()
+                .mapToInt(deposit -> deposit.getNumberOfShares() != null ? deposit.getNumberOfShares() : 0)
+                .sum();
+        accountDto.setTotalActionCount(totalActionCountFromDeposits);
+
+        // Lòt enfòmasyon
         accountDto.setInteret(account.getInteret());
         accountDto.setBalanceDue(account.getBalanceDue());
         accountDto.setNumeroCompte(account.getNumeroCompte());
         accountDto.setActive(account.isActive());
+
+        System.out.println("=== FIN convertToDto ===");
         return accountDto;
     }
 
     @Override
     public AccountDto getAccountDetails(String username, Long groupId) {
-        Optional<Account> optionalAccount = accountDao.findByUserNameAndGroupeUsers_Groupe_Id(username, groupId);
+        Optional<Account> optionalAccount = accountDao.findByGroupeUsers_Users_UserNameAndGroupeUsers_Groupe_Id(username, groupId);
+        
+        // Fòse itilizasyon convertToDto pou asire ke tout kalkil yo kòrèk
         return optionalAccount.map(this::convertToDto)
                 .orElseThrow(() -> new RuntimeException("Account not found for user in group"));
     }
