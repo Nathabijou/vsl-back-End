@@ -1,5 +1,7 @@
 package com.natha.dev.IService;
 
+import com.natha.dev.Model.Account;
+import com.natha.dev.Dto.LoanDto;
 import com.natha.dev.Model.Loan;
 import com.natha.dev.Model.Refund;
 
@@ -8,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LoanIService {
-    Loan createLoan(String accountId, Loan loan);
+    Loan createLoan(String accountId, LoanDto loanDto);
 
     BigDecimal calculateBalanceDue(Loan loan);
 
@@ -22,4 +24,8 @@ public interface LoanIService {
     Optional<Loan> findByIdWithRefunds(String idLoan);
 
     void processRefund(Refund refundRequest);
+
+    Account updateAndSaveBalanceDue(String idLoan);
+
+    List<Loan> findAllByStatus(String status);
 }

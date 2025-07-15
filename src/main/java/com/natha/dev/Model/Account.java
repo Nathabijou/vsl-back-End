@@ -14,7 +14,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-
+/**
+ * @author natha
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -28,6 +30,10 @@ public class Account {
     private String numeroCompte;
     private BigDecimal balance;
     private BigDecimal interet;
+
+    @Column(nullable = false)
+    private boolean interetCumule = false; // false = SIMPLE, true = CUMULATIVE
+
     private BigDecimal balanceDue = BigDecimal.ZERO;
 
     @Column(nullable = false)

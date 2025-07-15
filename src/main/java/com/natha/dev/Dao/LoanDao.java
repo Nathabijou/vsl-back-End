@@ -14,6 +14,8 @@ public interface LoanDao extends JpaRepository<Loan, String > {
 
     boolean existsByAccount_IdAndStatus(String accountId, String status);
 
+    List<Loan> findAllByStatus(String status);
+
     @Query("SELECT l FROM Loan l LEFT JOIN FETCH l.refunds WHERE l.idLoan = :idLoan")
     Optional<Loan> findByIdWithRefunds(@Param("idLoan") String idLoan);
 

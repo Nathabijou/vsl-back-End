@@ -43,14 +43,10 @@ public class AccountImpl implements AccountISercive {
 
     @Override
     public AccountDto findByUserNameAndGroupId(String username, Long groupId) {
-        System.out.println("=== DEBUT findByUserNameAndGroupId ===");
-        System.out.println("Username: " + username + ", GroupId: " + groupId);
-
         Optional<Account> optional = accountDao.findByGroupeUsers_Users_UserNameAndGroupeUsers_Groupe_Id(username, groupId);
 
         if (optional.isPresent()) {
             Account account = optional.get();
-            System.out.println("Trouvé compte ID: " + account.getId());
             // Konvèti an DTO kote tout kalkil kòrèk yo fèt
             return convertToDto(account);
         } else {
@@ -61,10 +57,7 @@ public class AccountImpl implements AccountISercive {
     @Override
     @Transactional
     public AccountDto makeDeposit(String username, Long groupId, DepositRequest depositRequest) {
-        System.out.println("=== DEBUT makeDeposit ===");
-        System.out.println("Username: " + username + ", GroupId: " + groupId);
-        System.out.println("Montant du dépôt: " + depositRequest.getAmount());
-        
+
         if (depositRequest.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Montan an dwe pi gran pase zewo");
         }
@@ -264,7 +257,6 @@ public class AccountImpl implements AccountISercive {
     }
 
     private AccountDto convertToDto(Account account) {
-        System.out.println("=== DEBUT convertToDto ===");
         AccountDto accountDto = new AccountDto();
         accountDto.setIdAccount(account.getId());
 
@@ -298,7 +290,6 @@ public class AccountImpl implements AccountISercive {
         accountDto.setNumeroCompte(account.getNumeroCompte());
         accountDto.setActive(account.isActive());
 
-        System.out.println("=== FIN convertToDto ===");
         return accountDto;
     }
 

@@ -11,6 +11,7 @@ import java.time.LocalDate;
 public class LoanDto {
     private String accountId;
     private BigDecimal principalAmount;
+    private BigDecimal interestRate;
     private LocalDate startDate;
     private LocalDate dueDate;
 }

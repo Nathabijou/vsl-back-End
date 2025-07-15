@@ -47,7 +47,7 @@ public class GroupeController {
     }
 
     // kreye gwoup nan yon commune specifiqie
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_Admin', 'ROLE_Manager')")
     @PostMapping("/groupe/commune/{communeId}")
     public ResponseEntity<GroupeDto> NewGroupe(@RequestBody GroupeDto groupeDto, @PathVariable Long communeId) {
         GroupeDto newComposanteDto = groupeIService.saveById(groupeDto, communeId);
@@ -74,7 +74,7 @@ public class GroupeController {
 
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ROLE_Admin')")
     @DeleteMapping("/groupe/{id}")
     public ResponseEntity<Void> deleteGroupe(@PathVariable Long id) {
         Optional<GroupeDto> groupeOpt = groupeIService.findById(id);

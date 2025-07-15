@@ -21,7 +21,7 @@ public class AccountController {
     @Autowired
     private AccountISercive accountISercive;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/user/{username}")
     public ResponseEntity<List<AccountDto>> getAccountsByUsername(@PathVariable String username) {
         logger.info("Fetching accounts for user: " + username);
@@ -53,7 +53,7 @@ public class AccountController {
         return ResponseEntity.ok(createdAccount);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
+    @PreAuthorize("permitAll()")
     @GetMapping("/user/{username}/group/{groupId}")
     public ResponseEntity<AccountDto> getAccountForUserInGroup(
             @PathVariable String username,

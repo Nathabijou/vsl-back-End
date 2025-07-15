@@ -6,6 +6,7 @@ import com.natha.dev.Dao.UserDao;
 import com.natha.dev.IService.Groupe_UsersIService;
 import com.natha.dev.Model.Users;
 import com.natha.dev.ServiceImpl.UserService;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,8 @@ public class UserController {
 
 
 //pour creer un compte
-    @PostMapping("/registerNewUser")
+@PermitAll
+@PostMapping("/registerNewUser")
     public ResponseEntity<String> registerNewUserWithRole(@RequestBody Map<String, String> userRequest, Principal principal) {
 
 
@@ -70,9 +72,6 @@ public class UserController {
 
         // Enregistrer l'utilisateur avec son rôle en appelant le service utilisateur
         Users newUser = userService.registerNewUserWithRole(userName, userEmail, userPassword, userFirstName, userLastName, userSexe, roleName, createdBy, userTelephone, userIdentification);
-
-        // Générer et envoyer l'OTP à l'utilisateur
-        userService.sendActivationEmail( userEmail, userFirstName, userLastName, userName);
 
         // Retourner une réponse indiquant que l'utilisateur a été enregistré avec succès
         return ResponseEntity.ok(" ✅ Utilisateur enregistré avec succès. Un e-mail contenant un code OTP a été envoyé à " + userEmail );
@@ -200,19 +199,19 @@ public class UserController {
 
 
     @GetMapping({"/forAdmin"})
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin')")
     public String forAdmin(){
         return "This URL is only accessible to the admin";
     }
 
     @GetMapping({"/forManager"})
-    @PreAuthorize("hasRole('Manager')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Manager')")
     public String forManager(){
         return "This URL is only accessible to the Manager";
     }
 
     @GetMapping({"/forUser"})
-    @PreAuthorize("hasRole('User')")
+    @PreAuthorize("hasAnyAuthority('ROLE_User')")
     public String forUser(){
         return "This URL is only accessible to the user";
     }

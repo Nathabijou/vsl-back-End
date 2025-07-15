@@ -49,8 +49,8 @@ public class DepositController {
         
         return ResponseEntity.ok(depositService.getDepositsByAccount(accountId));
     }
-    
-    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
+
+    @PreAuthorize("permitAll()")
     @GetMapping("/deposits/{username}/group/{groupId}")
     public ResponseEntity<Map<String, Object>> getDepositsByUserAndGroup(
             @PathVariable String username,
