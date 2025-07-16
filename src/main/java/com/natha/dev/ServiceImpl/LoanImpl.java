@@ -70,13 +70,19 @@ public class LoanImpl implements LoanIService {
         loan.setStatus("EN_COURS");
         loan.setIdLoan(UUID.randomUUID().toString());
 
+        // KOREKSYON KRITIK: Pran valè interetCumule dirèkteman nan GWOUP la.
+        Groupe groupe = account.getGroupeUsers().getGroupe();
+        if (groupe == null) {
+            throw new IllegalStateException("Gwoup ki asosye ak kont sa a pa jwenn.");
+        }
+        loan.setInteretCumule(groupe.isInteretCumule());
+
         // Sèvi ak done ki soti nan DTO a
         loan.setPrincipalAmount(loanDto.getPrincipalAmount());
         loan.setInterestRate(loanDto.getInterestRate());
-        loan.setInteretCumule(account.isInteretCumule()); // Kopye kalite enterè a depi nan kont lan
 
-        // Kalkile enterè pou premye mwa a imedyatman
-        BigDecimal interestRate = loan.getInterestRate().divide(BigDecimal.valueOf(100));
+        // Kalkile enterè pou premye mwa a touswit
+        BigDecimal interestRate = loan.getInterestRate().divide(BigDecimal.valueOf(100)); // 5% -> 0.05
         BigDecimal firstMonthInterest = loan.getPrincipalAmount().multiply(interestRate);
 
         // Mete ajou chan prè a ak enterè premye mwa a

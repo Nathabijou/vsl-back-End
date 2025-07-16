@@ -30,21 +30,20 @@ public class Groupe {
     @Column(nullable = false)
     private BigDecimal tauxInteret;
 
-    @Column(nullable = false)
-    private Boolean interetCumule = false;
+    @Column(name = "is_interet_cumule", nullable = false, columnDefinition = "bit default 0")
+    private boolean interetCumule;
 
 
+
+    @Column(name = "frequence_remboursement")
+    private String frequenceRemboursement;
 
     @ManyToOne
     @JoinColumn(name = "commune_id")
     private Commune commune;
 
-
     @PrePersist
     public void setDatecreation() {
         this.datecreation = LocalDateTime.now();
     }
-
-
-
 }

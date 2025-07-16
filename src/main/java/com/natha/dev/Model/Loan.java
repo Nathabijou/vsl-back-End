@@ -40,8 +40,8 @@ public class Loan {
     @Column(precision = 19, scale = 2)
     private BigDecimal accumulatedInterest = BigDecimal.ZERO; // Enterè total ki akimile
 
-    @Column(nullable = false)
-    private boolean interetCumule; // Kalite enterè (kopye depi nan kont lan)
+    @Column(name = "is_interet_cumule", nullable = false, columnDefinition = "bit default 0")
+    private boolean interetCumule; // Kalite enterè (kopye depi nan gwoup la)
 
     @Column(nullable = false)
     private BigDecimal interestRate;

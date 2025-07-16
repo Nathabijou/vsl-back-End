@@ -22,5 +22,6 @@ public interface CommuneIService {
 
     CommuneDto save(CommuneDto communeDto);
 
+    CommuneDto update(Long id, CommuneDto communeDto);
 
 }

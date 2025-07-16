@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 @Service
 public class CommuneImpl implements CommuneIService {
 
@@ -77,6 +78,23 @@ public class CommuneImpl implements CommuneIService {
         return convertToDto(savedCommune);
     }
 
+    @Override
+    public CommuneDto update(Long id, CommuneDto communeDto) {
+        Commune commune = communeDao.findById(id)
+                .orElseThrow(() -> new RuntimeException("Commune not found with id: " + id));
+
+        commune.setNom(communeDto.getNom());
+
+        if (communeDto.getDepartementId() != null) {
+            Arrondissement arrondissement = arrondissmentDao.findById(communeDto.getDepartementId())
+                    .orElseThrow(() -> new RuntimeException("Arrondissement not found with id: " + communeDto.getDepartementId()));
+            commune.setArrondissement(arrondissement);
+        }
+
+        Commune updatedCommune = communeDao.save(commune);
+        return convertToDto(updatedCommune);
+    }
+
 
     // Méthodes de conversion
     private CommuneDto convertToDto(Commune commune) {
@@ -110,8 +128,3 @@ public class CommuneImpl implements CommuneIService {
                 .collect(Collectors.toList());
     }
 }
-
-
-
-
-

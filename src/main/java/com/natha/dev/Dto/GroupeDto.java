@@ -1,5 +1,6 @@
 package com.natha.dev.Dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,10 +16,9 @@ public class GroupeDto {
     private String responsable;
     private String description;
     private LocalDateTime datecreation;
+
+    @JsonProperty("interetCumule")
     private boolean interetCumule;
-
-
-
 
     private BigDecimal prixAction;
     private BigDecimal tauxInteret;

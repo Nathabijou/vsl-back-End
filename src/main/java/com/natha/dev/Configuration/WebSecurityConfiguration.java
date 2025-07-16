@@ -61,7 +61,8 @@ public class WebSecurityConfiguration {
                     "/reset",
                     "/verify-otp",
                     "/newPasswordRegister",
-                    "/ws-chat/**"
+                    "/ws-chat/**",
+                    "/communess/**"
                 ).permitAll()
                 // Allow pre-flight OPTIONS requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

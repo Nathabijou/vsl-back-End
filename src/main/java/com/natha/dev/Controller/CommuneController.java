@@ -24,6 +24,7 @@ public class CommuneController {
         return communeIService.save(dto);
     }
     //@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN','MANAGER')")
+
     @GetMapping("/communes/arrondissment/{id}")
     public List<CommuneDto> getByDepartement(@PathVariable Long id) {
         return communeIService.getByArrondissmentId(id);
@@ -37,6 +38,12 @@ public class CommuneController {
     @DeleteMapping("/communes/{id}")
     public void delete(@PathVariable Long id) {
         communeIService.delete(id);
+    }
+
+//    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    @PutMapping("/communess/{id}")
+    public CommuneDto update(@PathVariable Long id, @RequestBody CommuneDto communeDto) {
+        return communeIService.update(id, communeDto);
     }
 
 //    @DeleteMapping("/commune/{id}")

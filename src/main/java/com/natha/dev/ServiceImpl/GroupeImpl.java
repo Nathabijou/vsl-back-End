@@ -64,7 +64,7 @@ public class GroupeImpl implements GroupeIService {
         dto.setResponsable(groupe.getResponsable());
         dto.setTauxInteret(groupe.getTauxInteret());
         dto.setDatecreation(groupe.getDatecreation());
-        dto.setInteretCumule(groupe.getInteretCumule() != null ? groupe.getInteretCumule() : false);
+        dto.setInteretCumule(groupe.isInteretCumule());
         
         // Set commune ID if commune exists
         if (groupe.getCommune() != null) {
@@ -128,11 +128,10 @@ public class GroupeImpl implements GroupeIService {
             newGroupe.setDatecreation();
             newGroupe.setTauxInteret(groupeDto.getTauxInteret());
             newGroupe.setResponsable(groupeDto.getResponsable());
-            newGroupe.setDatecreation();
             newGroupe.setInteretCumule(groupeDto.isInteretCumule());
 
             // Associez la nouvelle composante au programme
-//            newGroupe.setCommune(communeParent);
+            newGroupe.setCommune(communeParent);
 
             // Enregistrez la nouvelle composante dans la base de données
             Groupe savedGroupe = groupeDao.save(newGroupe);
@@ -164,24 +163,25 @@ public class GroupeImpl implements GroupeIService {
     @Override
     public GroupeDto update(GroupeDto dto) {
         Groupe groupe = groupeDao.findById(dto.getId())
-                .orElseThrow(() -> new RuntimeException("Groupe pa jwenn"));
+                .orElseThrow(() -> new RuntimeException("Groupe not found"));
 
-        // Update all fields from DTO
+        // Update fields from DTO
         groupe.setNom(dto.getNom());
-        groupe.setDescription(dto.getDescription());
         groupe.setAdresse(dto.getAdresse());
+        groupe.setDescription(dto.getDescription());
         groupe.setResponsable(dto.getResponsable());
-        groupe.setPrixAction(dto.getPrixAction());
         groupe.setTauxInteret(dto.getTauxInteret());
-        
-        // Handle interetCumule - if not set in DTO, keep existing value, otherwise update
-        // Note: For boolean primitives, we don't need to check for null
-        // Set interetCumule from DTO, defaulting to false if not set
+        groupe.setPrixAction(dto.getPrixAction());
         groupe.setInteretCumule(dto.isInteretCumule());
+
+        // Handle updating the Commune relationship
+        if (dto.getCommuneId() != null) {
+            Commune commune = communeDao.findById(dto.getCommuneId())
+                    .orElseThrow(() -> new CommuneNotFoundException("Commune not found with id: " + dto.getCommuneId()));
+            groupe.setCommune(commune);
+        }
 
         Groupe updatedGroupe = groupeDao.save(groupe);
         return convertToDto(updatedGroupe);
     }
-
-
 }

@@ -47,8 +47,8 @@ public class GroupeController {
     }
 
     // kreye gwoup nan yon commune specifiqie
-    @PreAuthorize("hasAnyRole('ROLE_Admin', 'ROLE_Manager')")
-    @PostMapping("/groupe/commune/{communeId}")
+//    @PreAuthorize("hasAnyRole('ROLE_Admin', 'ROLE_Manager')")
+    @PostMapping("/communes/{communeId}/groupes")
     public ResponseEntity<GroupeDto> NewGroupe(@RequestBody GroupeDto groupeDto, @PathVariable Long communeId) {
         GroupeDto newComposanteDto = groupeIService.saveById(groupeDto, communeId);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComposanteDto);
@@ -64,7 +64,7 @@ public class GroupeController {
             return ResponseEntity.notFound().build();
         }
     }
-    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_Admin', 'ROLE_Manager')")
     @PutMapping("/groupe/{id}")
     public ResponseEntity<GroupeDto> updateGroupe(@PathVariable Long id, @RequestBody GroupeDto groupeDto) {
         groupeDto.setId(id); // Mete ID a
