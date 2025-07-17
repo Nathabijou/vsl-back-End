@@ -38,6 +38,9 @@ public class Groupe {
     @Column(name = "frequence_remboursement")
     private String frequenceRemboursement;
 
+    @Transient
+    private BigDecimal solde;
+
     @ManyToOne
     @JoinColumn(name = "commune_id")
     private Commune commune;

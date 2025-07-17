@@ -14,8 +14,10 @@ import com.natha.dev.Model.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -65,6 +67,16 @@ public class GroupeImpl implements GroupeIService {
         dto.setTauxInteret(groupe.getTauxInteret());
         dto.setDatecreation(groupe.getDatecreation());
         dto.setInteretCumule(groupe.isInteretCumule());
+
+        // Calculate the total balance of all accounts in the group
+        List<Groupe_Users> groupeUsers = groupeUserDao.findByGroupeId(groupe.getId());
+        BigDecimal totalSolde = groupeUsers.stream()
+                .map(Groupe_Users::getAccount)
+                .filter(Objects::nonNull)
+                .map(com.natha.dev.Model.Account::getBalance)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        dto.setSolde(totalSolde);
         
         // Set commune ID if commune exists
         if (groupe.getCommune() != null) {

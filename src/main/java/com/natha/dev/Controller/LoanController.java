@@ -47,7 +47,7 @@ public class LoanController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager', 'ROLE_User','ROLE_Moderant')")
     @GetMapping("/{idLoan}")
     public ResponseEntity<Loan> getLoanById(@PathVariable String idLoan) {
         Loan loan = loanIService.findById(idLoan)
@@ -55,14 +55,14 @@ public class LoanController {
         return ResponseEntity.ok(loan);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager', 'ROLE_User','ROLE_Moderant')")
     @GetMapping("/accounts/{accountId}/loans")
     public List<Loan> getLoansByAccount(@PathVariable String accountId) {
         return loanIService.findByAccountId(accountId);
     }
 
     //Get refund with loan
-    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Admin', 'ROLE_Manager', 'ROLE_User','ROLE_Moderant')")
     @GetMapping("/loan/{loanId}/list")
     public ResponseEntity<List<Refund>> getRefundsForLoan(@PathVariable String loanId) {
         Loan loan = loanIService.findByIdWithRefunds(loanId)
