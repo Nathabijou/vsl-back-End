@@ -66,6 +66,24 @@ public class Account {
     @OneToMany(mappedBy = "account", orphanRemoval = true)
     private List<Deposit> deposits = new ArrayList<>();
 
+    @Transient
+    private Integer totalAction;
+
+    public Integer getTotalAction() {
+        int totalSharesFromDeposits = 0;
+        if (this.deposits != null && !this.deposits.isEmpty()) {
+            totalSharesFromDeposits = this.deposits.stream()
+                    .map(Deposit::getNumberOfShares)
+                    .filter(Objects::nonNull)
+                    .mapToInt(Integer::intValue)
+                    .sum();
+        }
+
+        int baseActions = (this.nombreDaction != null) ? this.nombreDaction : 0;
+
+        return baseActions + totalSharesFromDeposits;
+    }
+
     public BigDecimal getTotalDeposit() {
         if (deposits == null || deposits.isEmpty()) {
             return BigDecimal.ZERO;

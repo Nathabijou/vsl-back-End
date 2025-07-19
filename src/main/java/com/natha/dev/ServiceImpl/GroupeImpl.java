@@ -68,6 +68,21 @@ public class GroupeImpl implements GroupeIService {
         dto.setDatecreation(groupe.getDatecreation());
         dto.setInteretCumule(groupe.isInteretCumule());
 
+        // Set the calculated montant from the entity
+        dto.setMontant(groupe.getMontant());
+
+        // Set the calculated totalAction from the entity
+        dto.setTotalAction(groupe.getTotalAction());
+
+        // Set the calculated totalInteret from the entity
+        dto.setTotalInteret(groupe.getTotalInteret());
+
+        // Set the calculated capital from the entity
+        dto.setCapital(groupe.getCapital());
+
+        // Set the calculated interet (division) from the entity
+        dto.setInteret(groupe.getInteret());
+
         // Calculate the total balance of all accounts in the group
         List<Groupe_Users> groupeUsers = groupeUserDao.findByGroupeId(groupe.getId());
         BigDecimal totalSolde = groupeUsers.stream()

@@ -23,6 +23,11 @@ public class GroupeDto {
     private BigDecimal prixAction;
     private BigDecimal tauxInteret;
     private BigDecimal solde;
+    private BigDecimal montant;
+    private int totalAction;
+    private BigDecimal totalInteret;
+    private BigDecimal capital;
+    private int interet;
 
     private Long userName;
 //    private Long compteId;

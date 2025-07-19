@@ -2,13 +2,15 @@ package com.natha.dev.ServiceImpl;
 
 import com.natha.dev.Dao.*;
 import com.natha.dev.Dto.AccountDto;
+import com.natha.dev.Dto.DepositDto;
 import com.natha.dev.Dto.DepositRequest;
 import com.natha.dev.IService.AccountISercive;
 import com.natha.dev.IService.GroupeIService;
 
 import com.natha.dev.Model.*;
-import com.natha.dev.Dao.DepositDao;
+import com.natha.dev.Dao.DepositRepository;
 import com.natha.dev.Model.Deposit;
+import com.natha.dev.Model.Groupe_Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +32,7 @@ public class AccountImpl implements AccountISercive {
     private GroupeIService groupeIService;
 
     @Autowired
-    private Groupe_UserDao groupeUserDao;
+    private Groupe_UserDao groupe_UserDao;
 
     @Autowired
     private UserDao userDao;
@@ -39,7 +41,7 @@ public class AccountImpl implements AccountISercive {
     private GroupeDao groupeDao;
     
     @Autowired
-    private DepositDao depositDao;
+    private DepositRepository depositRepository;
 
     @Override
     public AccountDto findByUserNameAndGroupId(String username, Long groupId) {
@@ -130,25 +132,21 @@ public class AccountImpl implements AccountISercive {
     }
 
     public AccountDto createAccount(Long groupeUserId, AccountDto dto) {
-        Groupe_Users groupeUsers = groupeUserDao.findById(groupeUserId)
+        Groupe_Users groupeUser = groupe_UserDao.findById(groupeUserId)
                 .orElseThrow(() -> new RuntimeException("GroupeUser not found"));
 
         Account account = new Account();
-        account.setNom(dto.getNom());
-        account.setBalance(BigDecimal.ZERO); // pa mete balans la lè w ap kreye
-        account.setNombreDaction(0); // menm jan
-        account.setBalanceDue(BigDecimal.ZERO);
-        account.setInteret(BigDecimal.ZERO);
         account.setNumeroCompte(generateUniqueAccountNumber());
-        account.setGroupe_users(groupeUsers);
-        account.setUserName(groupeUsers.getUsers().getUserName());
-        account.setGroupeId(groupeUsers.getGroupe().getId());
-        account.setCreateDate(new Date());
+        account.setGroupeUsers(groupeUser);
+        account.setNombreDaction(dto.getNombreDaction());
+        account.setInteret(BigDecimal.valueOf(dto.getInteret()));
+        account.setBalance(dto.getBalance());
+        account.setBalanceDue(dto.getBalanceDue());
+        account.setActive(true);
 
-        Account saved = accountDao.save(account);
-
-        dto.setIdAccount(saved.getId());
-        dto.setNumeroCompte(saved.getNumeroCompte());
+        accountDao.save(account);
+        dto.setIdAccount(account.getId());
+        dto.setNumeroCompte(account.getNumeroCompte());
         return dto;
     }
 
@@ -168,7 +166,7 @@ public class AccountImpl implements AccountISercive {
         Groupe group = groupeDao.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Groupe not found"));
 
-        Groupe_Users gu = groupeUserDao.findByUsersAndGroupe(user, group)
+        Groupe_Users gu = groupe_UserDao.findByUsersAndGroupe(user, group)
                 .orElseThrow(() -> new RuntimeException("User is not on the group"));
 
         if (gu.getAccount() != null) {
@@ -180,19 +178,20 @@ public class AccountImpl implements AccountISercive {
         Account account = new Account();
         account.setNom(dto.getNom());
         account.setBalance(BigDecimal.ZERO);
-        account.setInteret(BigDecimal.ZERO);
         account.setBalanceDue(BigDecimal.ZERO);
+        account.setInteret(BigDecimal.valueOf(dto.getInteret())); 
         account.setNombreDaction(0);
         account.setCreateDate(new Date());
         account.setNumeroCompte(generatedAccountNumber);
-        account.setGroupe_users(gu);
+        account.setGroupeUsers(gu);
         account.setUserName(user.getUserName());
         account.setGroupeId(group.getId());
 
-        accountDao.save(account);
+        Account savedAccount = accountDao.save(account);
+        gu.setAccount(savedAccount);
+        groupe_UserDao.save(gu);
 
-        dto.setNumeroCompte(generatedAccountNumber);
-        return dto;
+        return convertToDto(savedAccount);
     }
 
     private Account convertToEntity(AccountDto accountDto) {
@@ -200,7 +199,7 @@ public class AccountImpl implements AccountISercive {
         account.setId(accountDto.getIdAccount());
         account.setNumeroCompte(accountDto.getNumeroCompte());
         account.setBalance(accountDto.getBalance());
-        account.setInteret(accountDto.getInteret());
+        account.setInteret(BigDecimal.valueOf(accountDto.getInteret()));
         account.setBalanceDue(accountDto.getBalanceDue());
         account.setDepot(accountDto.getDepot() != null ? accountDto.getDepot() : BigDecimal.ZERO);
         return account;
@@ -264,7 +263,7 @@ public class AccountImpl implements AccountISercive {
         int nombreActions = getTotalNombreAksyonParAccount(account);
         accountDto.setNombreDaction(nombreActions);
 
-        // 2. Fòse kalkil balans lan baze SÈLMAN sou kantite aksyon reyèl la
+        // 2. Kalkile valè aksyon yo (sa se "balance" reyèl la)
         BigDecimal calculatedBalance = BigDecimal.ZERO;
         if (account.getGroupeUsers() != null && account.getGroupeUsers().getGroupe() != null) {
             BigDecimal prixAction = account.getGroupeUsers().getGroupe().getPrixAction();
@@ -272,23 +271,45 @@ public class AccountImpl implements AccountISercive {
                 calculatedBalance = prixAction.multiply(BigDecimal.valueOf(nombreActions));
             }
         }
-        accountDto.setBalance(calculatedBalance);
+        accountDto.setBalance(calculatedBalance); // BALANCE = Valè aksyon sèlman
 
-        // 3. Kalkile total lajan ki te depoze (pou enfòmasyon sèlman)
+        // 3. Kalkile total lajan ki te depoze
         BigDecimal totalDepositsAmount = getTotalDepositsAmount(account);
-        accountDto.setDepot(totalDepositsAmount);
+        accountDto.setDepot(totalDepositsAmount); // DEPOT = Total depo sèlman
 
-        // 4. Kalkile kantite total aksyon ki soti nan depo yo
-        int totalActionCountFromDeposits = account.getDeposits().stream()
-                .mapToInt(deposit -> deposit.getNumberOfShares() != null ? deposit.getNumberOfShares() : 0)
-                .sum();
-        accountDto.setTotalActionCount(totalActionCountFromDeposits);
+        // 4. Nouvo fòmil pou SOLDE TOTAL: Balans + Depo
+        BigDecimal finalSolde = calculatedBalance.add(totalDepositsAmount);
+        accountDto.setSolde(finalSolde); // SOLDE = Sòm de lòt yo
+
+        // 5. Sèvi ak metòd ki kòrèk la pou kalkile kantite total aksyon yo
+        accountDto.setTotalAction(account.getTotalAction());
+
+        // 6. Kalkile enterè pèsonèl manm nan (MonInteret)
+        int monInteret = 0;
+        if (account.getGroupeUsers() != null && account.getGroupeUsers().getGroupe() != null) {
+            int interetDuGroupe = account.getGroupeUsers().getGroupe().getInteret();
+            monInteret = account.getTotalAction() * interetDuGroupe;
+        }
+        accountDto.setMonInteret(monInteret);
 
         // Lòt enfòmasyon
-        accountDto.setInteret(account.getInteret());
+        if (account.getInteret() != null) {
+            accountDto.setInteret(account.getInteret().intValue());
+        }
         accountDto.setBalanceDue(account.getBalanceDue());
         accountDto.setNumeroCompte(account.getNumeroCompte());
         accountDto.setActive(account.isActive());
+
+        // 5. Kalkile sòm total aksyon ki soti nan depo yo
+        int totalSharesFromDeposits = 0;
+        if (account.getDeposits() != null) {
+            totalSharesFromDeposits = account.getDeposits().stream()
+                    .map(com.natha.dev.Model.Deposit::getNumberOfShares)
+                    .filter(java.util.Objects::nonNull)
+                    .mapToInt(Integer::intValue)
+                    .sum();
+        }
+        accountDto.setTotalNumberOfSharesFromDeposits(totalSharesFromDeposits);
 
         return accountDto;
     }

@@ -1,7 +1,7 @@
 package com.natha.dev.ServiceImpl;
 
 import com.natha.dev.Dao.AccountDao;
-import com.natha.dev.Dao.DepositDao;
+import com.natha.dev.Dao.DepositRepository;
 import com.natha.dev.Dto.DepositDto;
 import com.natha.dev.IService.IDepositService;
 import com.natha.dev.Mapper.DepositMapper;
@@ -24,7 +24,7 @@ import java.util.Objects;
 public class DepositServiceImpl implements IDepositService {
 
     @Autowired
-    private DepositDao depositDao;
+    private DepositRepository depositRepository;
     
     @Autowired
     private AccountDao accountDao;
@@ -37,7 +37,7 @@ public class DepositServiceImpl implements IDepositService {
     public Map<String, Object> getDepositsByAccount(String accountId) {
         // Convert String accountId to Long
         Long accountIdLong = Long.parseLong(accountId);
-        List<Deposit> deposits = depositDao.findByAccountId(accountIdLong);
+        List<Deposit> deposits = depositRepository.findByAccountId(accountIdLong);
         
         // Calculate total deposit amount
         BigDecimal totalAmount = deposits.stream()
@@ -100,7 +100,7 @@ public class DepositServiceImpl implements IDepositService {
         depo.setCreateBy(username); // Anrejistre itilizatè ki fè depo a
         
         // Save the deposit
-        Deposit depoSove = depositDao.save(depo);
+        Deposit depoSove = depositRepository.save(depo);
 
         // Convert to DTO and return
         return depositMapper.toDto(depoSove);
@@ -114,7 +114,7 @@ public class DepositServiceImpl implements IDepositService {
                 .orElseThrow(() -> new RuntimeException("Aucun compte trouvé pour l'utilisateur " + username + " dans le groupe ID " + groupId));
         
         // Get all deposits for this account
-        List<Deposit> deposits = depositDao.findByAccountId(account.getId());
+        List<Deposit> deposits = depositRepository.findByAccountId(account.getId());
         
         // Calculate total deposit amount
         BigDecimal totalAmount = deposits.stream()
@@ -142,7 +142,7 @@ public class DepositServiceImpl implements IDepositService {
     @Transactional
     public DepositDto updateDeposit(String depositId, DepositDto depositDto, String modifiedBy) {
         // Jwenn depo ki egziste a
-        Deposit existingDeposit = depositDao.findById(depositId)
+        Deposit existingDeposit = depositRepository.findById(depositId)
                 .orElseThrow(() -> new RuntimeException("Deposit not found with id: " + depositId));
 
         // Jwenn kont lan ak gwoup la pou pri aksyon an
@@ -163,7 +163,7 @@ public class DepositServiceImpl implements IDepositService {
         existingDeposit.setLastModifiedDate(LocalDateTime.now());
 
         // Sove chanjman yo san yo pa manyen balans kont lan
-        Deposit updatedDeposit = depositDao.save(existingDeposit);
+        Deposit updatedDeposit = depositRepository.save(existingDeposit);
 
         return depositMapper.toDto(updatedDeposit);
     }
@@ -172,9 +172,9 @@ public class DepositServiceImpl implements IDepositService {
     @Transactional
     public void deleteDeposit(String id) {
         // Find the deposit first to ensure it exists before deleting
-        if (!depositDao.findById(id).isPresent()) {
+        if (!depositRepository.findById(id).isPresent()) {
             throw new RuntimeException("Dépôt non trouvé avec l'ID: " + id);
         }
-        depositDao.deleteById(id);
+        depositRepository.deleteById(id);
     }
 }

@@ -59,6 +59,7 @@ public class WebSecurityConfiguration {
                     "/authenticate",
                     "/registerNewUser",
                     "/reset",
+                    "/forgetpassword-admin",
                     "/verify-otp",
                     "/newPasswordRegister",
                     "/ws-chat/**",
