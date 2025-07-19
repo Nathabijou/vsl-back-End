@@ -2,8 +2,10 @@ package com.natha.dev.ServiceImpl;
 
 import com.natha.dev.Dao.GroupeUsersDao;
 import com.natha.dev.Dto.AccountDto;
+import com.natha.dev.Dto.GroupeDto;
 import com.natha.dev.Dto.RepartitionDto;
 import com.natha.dev.IService.AccountISercive;
+import com.natha.dev.IService.GroupeIService;
 import com.natha.dev.IService.IRepartitionService;
 import com.natha.dev.Model.Groupe_Users;
 import com.natha.dev.Model.Users;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -26,58 +29,63 @@ public class RepartitionServiceImpl implements IRepartitionService {
     private GroupeUsersDao groupeUsersDao;
 
     @Autowired
-    private AccountISercive accountService; // Sèvi ak sèvis kont lan dirèkteman
+    private AccountISercive accountService;
+
+    @Autowired
+    private GroupeIService groupeService; 
 
     @Override
     public List<RepartitionDto> getRepartitionByGroupe(Long groupeId) {
-        logger.info("Kòmanse kalkil repartition pou gwoup ID: {}", groupeId);
-        List<Groupe_Users> groupMembers = groupeUsersDao.findByGroupeId(groupeId);
+        GroupeDto groupeDto = groupeService.findById(groupeId)
+                .orElse(null);
 
+        if (groupeDto == null) {
+            logger.warn("Pa jwenn gwoup la pou ID: {}", groupeId);
+            return Collections.emptyList();
+        }
+
+        final BigDecimal interetGroupe = groupeDto.getInteret() != null ? groupeDto.getInteret() : BigDecimal.ZERO;
+
+        List<Groupe_Users> groupMembers = groupeUsersDao.findByGroupeId(groupeId);
         if (groupMembers.isEmpty()) {
             logger.warn("Pa jwenn okenn manm pou gwoup ID: {}", groupeId);
+            return Collections.emptyList();
         }
 
         return groupMembers.stream()
                 .map(member -> {
                     Users user = member.getUsers();
                     if (user == null) {
-//                        logger.error("Itilizatè se null pou yon manm nan gwoup ID: {}", groupeId);
                         return null;
                     }
 
                     try {
-                        // Jwenn AccountDto ki gen tout kalkil yo ki deja fèt
                         AccountDto accountDto = accountService.findByUserNameAndGroupId(user.getUserName(), groupeId);
 
                         if (accountDto == null) {
-//                            logger.warn("Pa jwenn AccountDto pou itilizatè {} nan gwoup {}", user.getUserName(), groupeId);
                             return null;
                         }
 
                         RepartitionDto repartitionDto = new RepartitionDto();
                         repartitionDto.setPrenom(user.getUserFirstName());
-                        repartitionDto.setNom(user.getUserLastName()); // Sèvi ak non fanmi itilizatè a
+                        repartitionDto.setNom(user.getUserLastName());
                         repartitionDto.setSexe(user.getUserSexe());
                         repartitionDto.setTelephone(user.getUserTelephone());
 
-                        // Pran valè ki deja kalkile yo
                         BigDecimal solde = accountDto.getSolde() != null ? accountDto.getSolde() : BigDecimal.ZERO;
-                        BigDecimal monInteret = BigDecimal.valueOf(accountDto.getMonInteret());
+                        int totalActionManm = accountDto.getTotalAction();
 
-                        // Ranpli nouvo chan yo
-                        repartitionDto.setTotalAction(accountDto.getTotalAction());
+                        repartitionDto.setTotalAction(totalActionManm);
                         repartitionDto.setSolde(solde);
 
-                        BigDecimal montantAToucher = solde.add(monInteret);
-
-                        logger.info("",
-                                user.getUserFirstName(), user.getUserLastName(), solde, monInteret, montantAToucher);
+                        // Kalkil: (Total Aksyon * Enterè Gwoup) + Sòl
+                        BigDecimal montantAToucher = (new BigDecimal(totalActionManm).multiply(interetGroupe)).add(solde);
 
                         repartitionDto.setMontantAToucher(montantAToucher);
                         return repartitionDto;
 
                     } catch (Exception e) {
-                        logger.error(" nan gwoup {}: {}",
+                        logger.error("Erè pandan y ap kalkile repartition pou itilizatè {} nan gwoup {}: {}",
                                 user.getUserName(), groupeId, e.getMessage());
                         return null;
                     }

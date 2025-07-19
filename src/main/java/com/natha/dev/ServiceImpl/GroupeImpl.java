@@ -4,8 +4,10 @@ import com.natha.dev.Dao.CommuneDao;
 import com.natha.dev.Dao.GroupeDao;
 import com.natha.dev.Dao.Groupe_UserDao;
 import com.natha.dev.Dao.UserDao;
+import com.natha.dev.Dto.AccountDto;
 import com.natha.dev.Dto.GroupeDto;
 import com.natha.dev.Exeption.CommuneNotFoundException;
+import com.natha.dev.IService.AccountISercive;
 import com.natha.dev.IService.GroupeIService;
 import com.natha.dev.Model.Commune;
 import com.natha.dev.Model.Groupe;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +35,9 @@ public class GroupeImpl implements GroupeIService {
     private UserDao userDao;
     @Autowired
     private Groupe_UserDao groupeUserDao;
+
+    @Autowired
+    private AccountISercive accountService; // Enjekte sèvis kont lan
 
     @Override
     public Optional<GroupeDto> findById(Long id) {
@@ -68,23 +74,57 @@ public class GroupeImpl implements GroupeIService {
         dto.setDatecreation(groupe.getDatecreation());
         dto.setInteretCumule(groupe.isInteretCumule());
 
-        // Set the calculated montant from the entity
-        dto.setMontant(groupe.getMontant());
+        // Jwenn tout manm gwoup la
+        List<Groupe_Users> groupeUsers = groupeUserDao.findByGroupeId(groupe.getId());
 
-        // Set the calculated totalAction from the entity
-        dto.setTotalAction(groupe.getTotalAction());
+        // Kòrèk Kalkil pou totalAction (sòm total aksyon ki nan chak kont)
+        int totalActionCorrect = groupeUsers.stream()
+                .map(Groupe_Users::getAccount)
+                .filter(Objects::nonNull)
+                .mapToInt(com.natha.dev.Model.Account::getTotalAction)
+                .sum();
+        dto.setTotalAction(totalActionCorrect);
 
-        // Set the calculated totalInteret from the entity
-        dto.setTotalInteret(groupe.getTotalInteret());
+        // Kolekte tout AccountDto yo yon sèl fwa pou nou ka reyitilize yo
+        List<AccountDto> accountDtos = groupeUsers.stream()
+                .map(gu -> {
+                    try {
+                        return accountService.findByUserNameAndGroupId(gu.getUsers().getUserName(), groupe.getId());
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
-        // Set the calculated capital from the entity
-        dto.setCapital(groupe.getCapital());
+        // Kòrèk Kalkil pou Montant (sòm tout sòld yo)
+        BigDecimal montantCorrect = accountDtos.stream()
+                .map(AccountDto::getSolde)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        dto.setMontant(montantCorrect);
 
-        // Set the calculated interet (division) from the entity
-        dto.setInteret(groupe.getInteret());
+        // Kòrèk Kalkil pou TotalInteret (sòm tout enterè ki nan chak kont)
+        BigDecimal totalInteretCorrect = groupeUsers.stream()
+                .map(Groupe_Users::getAccount)
+                .filter(Objects::nonNull)
+                .map(com.natha.dev.Model.Account::getInteret)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        dto.setTotalInteret(totalInteretCorrect);
+
+        // Kòrèk Kalkil pou Capital (Montant + TotalInteret)
+        BigDecimal capitalCorrect = montantCorrect.add(totalInteretCorrect);
+        dto.setCapital(capitalCorrect);
+
+        // Kòrèk Kalkil pou Interet (TotalInteret / TotalAction)
+        BigDecimal interetCorrect = BigDecimal.ZERO;
+        if (totalActionCorrect > 0) {
+            interetCorrect = totalInteretCorrect.divide(new BigDecimal(totalActionCorrect), 2, RoundingMode.HALF_UP);
+        }
+        dto.setInteret(interetCorrect);
 
         // Calculate the total balance of all accounts in the group
-        List<Groupe_Users> groupeUsers = groupeUserDao.findByGroupeId(groupe.getId());
         BigDecimal totalSolde = groupeUsers.stream()
                 .map(Groupe_Users::getAccount)
                 .filter(Objects::nonNull)

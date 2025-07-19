@@ -27,7 +27,7 @@ public class GroupeDto {
     private int totalAction;
     private BigDecimal totalInteret;
     private BigDecimal capital;
-    private int interet;
+    private BigDecimal interet;
 
     private Long userName;
 //    private Long compteId;
