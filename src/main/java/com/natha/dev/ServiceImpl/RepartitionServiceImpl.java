@@ -41,7 +41,7 @@ public class RepartitionServiceImpl implements IRepartitionService {
                 .map(member -> {
                     Users user = member.getUsers();
                     if (user == null) {
-                        logger.error("Itilizatè se null pou yon manm nan gwoup ID: {}", groupeId);
+//                        logger.error("Itilizatè se null pou yon manm nan gwoup ID: {}", groupeId);
                         return null;
                     }
 
@@ -50,7 +50,7 @@ public class RepartitionServiceImpl implements IRepartitionService {
                         AccountDto accountDto = accountService.findByUserNameAndGroupId(user.getUserName(), groupeId);
 
                         if (accountDto == null) {
-                            logger.warn("Pa jwenn AccountDto pou itilizatè {} nan gwoup {}", user.getUserName(), groupeId);
+//                            logger.warn("Pa jwenn AccountDto pou itilizatè {} nan gwoup {}", user.getUserName(), groupeId);
                             return null;
                         }
 
@@ -70,14 +70,14 @@ public class RepartitionServiceImpl implements IRepartitionService {
 
                         BigDecimal montantAToucher = solde.add(monInteret);
 
-                        logger.info("Kalkil pou {} {}: Solde = {}, MonInteret = {}, Total = {}",
+                        logger.info("",
                                 user.getUserFirstName(), user.getUserLastName(), solde, monInteret, montantAToucher);
 
                         repartitionDto.setMontantAToucher(montantAToucher);
                         return repartitionDto;
 
                     } catch (Exception e) {
-                        logger.error("Erè pandan y ap kalkile repartition pou itilizatè {} nan gwoup {}: {}", 
+                        logger.error(" nan gwoup {}: {}",
                                 user.getUserName(), groupeId, e.getMessage());
                         return null;
                     }
