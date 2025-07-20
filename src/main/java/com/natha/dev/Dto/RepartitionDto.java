@@ -20,5 +20,6 @@ public class RepartitionDto {
     private int totalAction;
     private BigDecimal solde;
     private BigDecimal montantAToucher;
+    private String statutPaiement; // NOUVO CHAN POU ESTATI PEMAN
 
 }

@@ -74,14 +74,22 @@ public class RepartitionServiceImpl implements IRepartitionService {
 
                         BigDecimal solde = accountDto.getSolde() != null ? accountDto.getSolde() : BigDecimal.ZERO;
                         int totalActionManm = accountDto.getTotalAction();
+                        BigDecimal balanceDue = accountDto.getBalanceDue() != null ? accountDto.getBalanceDue() : BigDecimal.ZERO;
 
                         repartitionDto.setTotalAction(totalActionManm);
                         repartitionDto.setSolde(solde);
 
-                        // Kalkil: (Total Aksyon * Enterè Gwoup) + Sòl
+                        // Kalkil la ap toujou fèt
                         BigDecimal montantAToucher = (new BigDecimal(totalActionManm).multiply(interetGroupe)).add(solde);
-
                         repartitionDto.setMontantAToucher(montantAToucher);
+
+                        // Tcheke si gen dèt pou mete estati a
+                        if (balanceDue.compareTo(BigDecimal.ZERO) > 0) {
+                            repartitionDto.setStatutPaiement("Non-Complet");
+                        } else {
+                            repartitionDto.setStatutPaiement("Complet");
+                        }
+
                         return repartitionDto;
 
                     } catch (Exception e) {
