@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -95,7 +96,10 @@ public class Groupe {
             return BigDecimal.ZERO;
         }
         return accounts.stream()
-                .flatMap(account -> account.getLoans().stream())
+                .flatMap(account -> {
+                    List<Loan> loans = account.getLoans();
+                    return loans != null ? loans.stream() : Stream.empty();
+                })
                 .map(Loan::getAccumulatedInterest)
                 .filter(java.util.Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

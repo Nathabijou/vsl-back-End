@@ -61,7 +61,7 @@ public class Account {
 
     @OneToMany(mappedBy = "account")
     @JsonManagedReference
-    private List<Loan> loans;
+    private List<Loan> loans = new ArrayList<>();
 
     @OneToMany(mappedBy = "account", orphanRemoval = true)
     private List<Deposit> deposits = new ArrayList<>();
